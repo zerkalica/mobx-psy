@@ -6,7 +6,8 @@ export function draft<O extends {}>(orig: O): O {
 
 class Draft<O extends {}, K extends keyof O = keyof O> {
   constructor(protected original: O) {
-    Object.keys(original)
+    // subscribe to original changes
+    for (let key in original) original[key]
   }
 
   @observable protected draft = new Map<keyof O, O[K]>()
