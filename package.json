@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "parcel serve src/index.html --open",
-    "build": "parcel build src/index.html",
+    "build": "parcel build src/index.html --public-url=/react-mobx-flats",
     "check": "tsc --noEmit",
     "check:watch": "tsc --noEmit --watch"
   },
