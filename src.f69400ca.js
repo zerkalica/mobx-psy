@@ -38149,8 +38149,11 @@ function () {
     this.values = new Proxy(this.original, {
       get: this.getValue.bind(this),
       set: this.setValue.bind(this)
-    });
-    Object.keys(original);
+    }); // subscribe to original changes
+
+    for (var key in original) {
+      original[key];
+    }
   }
 
   Draft.prototype.getValue = function (target, name) {
@@ -39603,7 +39606,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "36335" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43401" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
