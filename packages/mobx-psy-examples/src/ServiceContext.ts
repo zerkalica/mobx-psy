@@ -1,6 +1,6 @@
 import React from 'react'
 import { LocationStore } from './router'
-import { Loader } from './loader'
+import { Loader } from 'mobx-psy'
 
 const location = new LocationStore()
 export const loader = new Loader()

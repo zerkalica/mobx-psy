@@ -1,6 +1,6 @@
 import { action, computed, reaction } from 'mobx'
 import { LocationStore } from '../router'
-import { draft, disposer } from '../loader'
+import { draft, disposer } from 'mobx-psy'
 
 export const flatDomainFilterParamsDefaults = {
   rooms: 0,

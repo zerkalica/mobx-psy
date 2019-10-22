@@ -2,7 +2,7 @@ import React from 'react'
 import { FlatDomain } from './FlatDomain'
 import { FlatDetails } from './FlatDetails'
 import { NumberInput, CheckBox } from '../ui'
-import { observer, mock } from '../loader'
+import { observer, mock } from 'mobx-psy'
 
 export const FlatList = observer(function FlatList() {
   const flats = FlatDomain.use()

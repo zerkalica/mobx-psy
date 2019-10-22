@@ -14,11 +14,12 @@ export const fallbackConfig: FallbackOptions = {
 export interface FallbackLoadingProps {
   request?: RequestInfo
   children?: React.ReactNode
+  className?: string
 }
 
-export function FallbackLoading({ children }: FallbackLoadingProps) {
+export function FallbackLoading({ children, className = 'Fallback'}: FallbackLoadingProps) {
   return (
-    <div className="Fallback Fallback__loading">
+    <div className={`Fallback Fallback__loading ${className}`}>
       {children ? <div className="Fallback__content">{children}</div> : null}
     </div>
   )

@@ -1,7 +1,7 @@
 import React from 'react'
 import { action, computed, observable, reaction } from 'mobx'
 import { LocationStore } from '../router'
-import { Loader, disposer } from '../loader'
+import { Loader, disposer } from 'mobx-psy'
 import { useServiceContext } from '../ServiceContext'
 import { IFlat } from '../mocks'
 import { FlatDomainFilter } from './FlatDomainFilter'

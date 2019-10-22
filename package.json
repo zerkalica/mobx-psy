@@ -1,32 +1,16 @@
 {
-  "name": "react-mobx-flats",
+  "name": "mobx-psy-packages",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
   "private": true,
-  "main": "src/index.html",
-  "dependencies": {
-    "mobx": "^5.14.0",
-    "mobx-react-lite": "^1.5.0",
-    "react": "^16.10.2",
-    "react-dom": "^16.10.2"
-  },
-  "devDependencies": {
-    "@types/react": "16.9.9",
-    "@types/react-dom": "16.9.2",
-    "parcel": "^1.12.4",
-    "typescript": "^3.6.4"
-  },
+  "description": "Mobx pseudo syncronous loader",
+  "main": "dist/index.js",
+  "repository": "https://github.com/zerkalica/mobx-psy",
+  "author": "Stefan Zerkalica <zerkalica@gmail.com>",
+  "license": "MIT",
   "scripts": {
-    "start": "parcel serve src/index.html --open",
-    "build": "parcel build src/index.html --public-url=/react-mobx-flats",
-    "check": "tsc --noEmit",
-    "check:watch": "tsc --noEmit --watch"
+    "start": "cd packages/mobx-psy-examples && yarn start"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
+  "workspaces": [
+    "packages/*"
   ]
 }

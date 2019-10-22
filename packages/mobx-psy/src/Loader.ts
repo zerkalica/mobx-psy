@@ -32,10 +32,10 @@ export function throwHidden(error: Error): never {
 
 const throwOnAccess = {
   get(target: any, key: string | Symbol | number) {
-    throw target.valueOf()
+    return throwHidden(target)
   },
-  ownKeys<V extends {}>(target: V): string[] {
-    throw target.valueOf()
+  ownKeys(target: any): string[] {
+    return throwHidden(target)
   },
 }
 
@@ -43,7 +43,7 @@ export function parallel<V extends {}>(v: () => V): V {
   try {
     return v()
   } catch (e) {
-    return new Proxy({} as V, throwOnAccess)
+    return new Proxy(e, throwOnAccess)
   }
 }
 

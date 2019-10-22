@@ -1,0 +1,22 @@
+{
+  "name": "mobx-psy",
+  "version": "1.0.0",
+  "description": "Mobx pseudo syncronous loader",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/zerkalica/mobx-psy",
+  "author": "Stefan Zerkalica <zerkalica@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.9",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "mobx": "^5.14.2",
+    "mobx-react-lite": "^1.5.0",
+    "react": "^16.10.2"
+  }
+}

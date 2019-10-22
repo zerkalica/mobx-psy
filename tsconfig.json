@@ -2,6 +2,8 @@
     "exclude": [
         ".cache",
         "dist",
+        "packages/*/dist",
+        "packages/*/node_modules",
         "node_modules"
     ],
     "compilerOptions": {
@@ -13,11 +15,16 @@
         "strict": true,
         "module": "esnext",
         "target": "es5",
+        "composite": true,
         "moduleResolution": "node",
         "lib": [
             "dom",
             "esnext"
         ],
-        "jsx": "react"
+        "jsx": "react",
+        "baseUrl": "packages",
+        "paths": {
+            "*": ["./*/src"]
+        },
     }
 }

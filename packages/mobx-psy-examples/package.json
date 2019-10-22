@@ -1,0 +1,26 @@
+{
+  "name": "mobx-psy-examples",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mobx pseudo syncronous examples",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel serve src/index.html --open",
+    "build": "parcel build src/index.html --public-url=/mobx-psy",
+    "check": "tsc --noEmit",
+    "check:watch": "tsc --noEmit --watch"
+  },
+  "dependencies": {
+    "mobx": "^5.14.2",
+    "mobx-psy": "^1.0.0",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.9",
+    "@types/react-dom": "^16.9.2",
+    "parcel": "^1.12.4",
+    "typescript": "^3.6.4"
+  }
+}

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { ServiceContextProvider } from './ServiceContext'
 import { FlatList } from './flat'
 import { LocationStore } from './router'
-import { Loader } from './loader'
+import { Loader } from 'mobx-psy'
 
 import { configure } from 'mobx'
 import { createFetch } from './mocks'
