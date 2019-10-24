@@ -1,5 +1,7 @@
 import { action, computed, observable } from 'mobx'
+
 import { disposer } from './disposer'
+import { throwHidden } from './utils'
 
 export interface RequestInfo<Params extends {} = {}> {
   readonly name: string
@@ -24,10 +26,6 @@ export function getResponse(target: ResponseTarget): undefined | Response {
 
 function setResponse(target: ResponseTarget, loader: Response) {
   ;(target as any)[responseKey] = loader
-}
-
-export function throwHidden(error: Error): never {
-  throw error // Set Never pause here in chrome devtools
 }
 
 const throwOnAccess = {

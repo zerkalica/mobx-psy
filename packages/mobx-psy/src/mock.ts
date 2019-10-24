@@ -1,4 +1,5 @@
-import { getResponse, throwHidden } from './Loader'
+import { getResponse } from './Loader'
+import { throwHidden } from './utils'
 
 export const mockState: {
   called: Promise<any> | null
