@@ -1,9 +1,10 @@
-import React from 'react'
 import { observer as mobxObserver } from 'mobx-react-lite'
-import { getResponse } from './Loader'
+import React from 'react'
+
 import { fallbackConfig, FallbackOptions } from './Fallback'
 import { mockState } from './mock'
-import { throwHidden } from './utils'
+import { getRefreshable } from '../fibers'
+import { throwHidden } from '../utils'
 
 export type SafeObserverOptions = Parameters<typeof mobxObserver>[1] &
   Partial<FallbackOptions>
@@ -22,26 +23,28 @@ export function observer<Props extends {}, Ref = {}>(
     props,
     ref
   ): React.ReactElement | null => {
-    const node = React.useRef<React.ReactElement | null>(null) // eslint-disable-line
+    const node = React.useRef<React.ReactElement | null>(null)
 
     try {
       node.current = baseComponent(props, ref)
       if (mockState.called) throwHidden(mockState.called)
       return node.current
     } catch (error) {
-      const request = getResponse(error)
+      const refreshable = getRefreshable(error)
       if (error instanceof Error) {
         console.error(error)
         if (!FallbackError) return throwHidden(error)
         return (
           <FallbackError
-            request={request}
+            refreshable={refreshable}
             error={error}
             children={node.current}
           />
         )
       }
-      return <FallbackLoading request={request} children={node.current} />
+      return (
+        <FallbackLoading refreshable={refreshable} children={node.current} />
+      )
     } finally {
       mockState.called = null
     }

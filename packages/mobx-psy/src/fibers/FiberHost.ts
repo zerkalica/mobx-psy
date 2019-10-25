@@ -1,47 +1,75 @@
-import { Refreshable } from '../Refreshable'
-import { Fiber, FiberKey, IFiberHost } from './Fiber'
+import { Fiber, IFiberHost } from './Fiber'
 
-export class FiberHost implements IFiberHost {
+export abstract class FiberHost implements IFiberHost {
+  static current: IFiberHost | undefined = undefined
+
+  static sync<V>(id: string, handler: (signal: AbortSignal) => PromiseLike<V>): V {
+    const host = FiberHost.current
+    if (!host) throw new Error(`Run fiber ${id} inside fiber host`)
+  
+    return host.sync<V>(id, handler)
+  }
+
   /**
    * Used for aborting all pended async operations in fibers on cell destruction.
    */
-  protected abortController = new AbortController()
+  protected abortController: AbortController | undefined = undefined
 
   /**
    * Fibers cache, live only when cell is pending or error.
    */
-  protected fibers = new Map<any, Fiber>()
+  protected fibers: Map<string, Fiber> | undefined = undefined
 
-  constructor(protected controller: Refreshable) {}
+  ;[Symbol.toStringTag]: string
+
+  constructor(id: string) {
+    this[Symbol.toStringTag] = id
+  }
 
   toString() {
-    return `${String(this.controller)}.fibers`
+    return this[Symbol.toStringTag]
   }
 
   get size() {
-    return this.fibers.size
+    return this.fibers ? this.fibers.size : 0
+  }
+
+  get signal() {
+    if (!this.abortController) this.abortController = new AbortController()
+    return this.abortController.signal
   }
 
   /**
    * Creates or returns cached fiber.
    * Key is unique in cell scope.
    *
-   * @param key Unique cache lookup key
+   * @param id Unique cache lookup key
    */
-  fiber<V>(key: FiberKey): Fiber<V> {
+  sync<V>(id: string, cb: (signal: AbortSignal) => PromiseLike<V>): V {
+    if (!this.fibers) this.fibers = new Map()
     const fibers = this.fibers
 
-    let fiber: Fiber<V> | undefined = fibers.get(key)
+    let fiber: Fiber<V> | undefined = fibers.get(id)
     if (!fiber) {
-      fiber = new Fiber(key, this.controller, this.abortController.signal)
-      fibers.set(key, fiber)
+      fiber = new Fiber(id, cb, this)
+      fibers.set(id, fiber)
     }
 
-    return fiber
+    return fiber.get()
   }
 
-  destructor() {
-    this.abortController.abort()
-    this.fibers.clear()
+  abstract get initial(): boolean
+  abstract next(): void
+
+  refresh() {
+    this.clear()
+    this.next()
+  }
+
+  protected clear() {
+    if (this.abortController) this.abortController.abort()
+    this.abortController = undefined
+    if (this.fibers) this.fibers.clear()
+    this.fibers = undefined
   }
 }

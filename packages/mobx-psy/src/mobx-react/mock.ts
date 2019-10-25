@@ -1,5 +1,5 @@
-import { getResponse } from './Loader'
-import { throwHidden } from './utils'
+import { throwHidden } from '../utils'
+import { getRefreshable } from '../fibers'
 
 export const mockState: {
   called: Promise<any> | null
@@ -14,8 +14,8 @@ export function mock<State, Fallback>(
   try {
     return unsafe()
   } catch (error) {
-    const response = getResponse(error)
-    if (error instanceof Error || !response || !response.initial)
+    const refreshable = getRefreshable(error)
+    if (error instanceof Error || !refreshable || !refreshable.initial)
       return throwHidden(error)
     const result = fallback()
     mockState.called = error

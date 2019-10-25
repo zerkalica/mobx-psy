@@ -1,12 +1,12 @@
-import { FiberHost } from '../fibers'
-import { Fiber } from '../fibers'
-import { defer, throwHidden } from '../utils'
 import { action, observable } from 'mobx'
-import { isPromise } from 'q'
+
+import { FiberHost } from '../fibers'
+import { defer, isPromise, throwHidden } from '../utils'
+import { getDerivableName } from './getDerivableName'
 
 type Task = () => void
 
-export class Queue {
+export class Actions extends FiberHost {
   protected tasks: Task[] = []
 
   /**
@@ -14,11 +14,13 @@ export class Queue {
      */
   @observable protected locked: Error | PromiseLike<any> | undefined = undefined
 
-  protected host: FiberHost | undefined = undefined
+  constructor() {
+    super('Actions#' + getDerivableName())
+  }
 
   run(task: Task): void {
     this.tasks.push(task)
-    this.refresh()
+    this.next()
   }
 
   get pending(): boolean {
@@ -37,40 +39,41 @@ export class Queue {
 
   protected scheduled = false
 
-  @action.bound refresh() {
+  next() {
     if (this.tasks.length === 0) return
     if (this.scheduled) return
     this.scheduled = true
 
     defer.add(this.processing)
   }
+  
+  get initial() {
+    return false
+  }
 
   @action.bound protected processing() {
     if (this.tasks.length === 0) return
     const task = this.tasks[0]
-    const prev = Fiber.host
-    if (!this.host) this.host = new FiberHost(this)
-    Fiber.host = this.host
+    const prev = FiberHost.current
+    FiberHost.current = this
     try {
       task()
       this.tasks = this.tasks.slice(1)
       if (this.tasks.length === 0) this.locked = undefined
       this.scheduled = false
-      this.host.destructor()
-      this.host = undefined
-      this.refresh()
+      this.clear()
+      this.next()
     } catch (error) {
       this.locked = error
       if (!isPromise(error)) return throwHidden(error)
       error.then(this.processing, this.processing)
     } finally {
-      Fiber.host = prev
+      FiberHost.current = prev
     }
   }
 
   destructor() {
-    if (this.host) this.host.destructor()
-    this.host = undefined
+    this.clear()
     this.tasks = []
     this.scheduled = false
   }

@@ -1,19 +1,21 @@
-const origId = Symbol('unprofixy')
+import { throwHidden } from './common'
 
-const throwOnAccess: ProxyHandler<any> = {
-    get<V extends Object>(target: Error, key: string | symbol): V {
-        if (key === origId) return target.valueOf() as V
-        throw target.valueOf()
-    },
-    ownKeys(target: Error): string[] {
-        throw target.valueOf()
-    }
+const origId = Symbol('original')
+
+type ProxyTarget<V = any> = (Error | PromiseLike<any>) & {
+  [origId]?: V
 }
 
-export function proxifyError<V extends Object>(v: V & {[origId]?: V}): V {
-    return v[origId] ? v : new Proxy(v, throwOnAccess) as any
+const throwOnAccess: ProxyHandler<ProxyTarget> = {
+  get<V extends Object>(target: ProxyTarget, key: string | symbol): V {
+    if (key === origId) return target.valueOf() as V
+    return throwHidden(target.valueOf() as ProxyTarget)
+  },
+  ownKeys(target: ProxyTarget): string[] {
+    return throwHidden(target.valueOf() as ProxyTarget)
+  },
 }
 
-export function unproxifyError<V extends Object>(v: V & {[origId]?: V}): V {
-    return v[origId] || v
+export function proxify<V>(v: ProxyTarget<V>): V {
+  return ((v[origId] ? v : new Proxy(v, throwOnAccess)) as unknown) as V
 }
