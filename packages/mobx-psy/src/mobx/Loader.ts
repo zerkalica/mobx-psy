@@ -8,20 +8,21 @@ export class Loader<V> extends FiberHost {
   @observable protected counter = 0
   protected init = true
 
-  constructor(protected get: () => V) {
+  constructor(protected handler: () => V, protected dispose: () => void) {
     super('Loader#' + getDerivableName())
-    disposer(this, 'state', () => this.destructor.bind(this))
+    disposer(this, 'value', () => this.destructor.bind(this))
   }
 
   get initial() {
     return this.init
   }
 
-  @computed get state(): V {
+  @computed get value(): V {
+    this.counter
     const prev = FiberHost.current
     FiberHost.current = this
     try {
-      const next = this.get()
+      const next = this.handler()
       this.clear()
       this.init = false
       return next
@@ -37,5 +38,6 @@ export class Loader<V> extends FiberHost {
   destructor() {
     this.clear()
     this.init = true
+    this.dispose()
   }
 }

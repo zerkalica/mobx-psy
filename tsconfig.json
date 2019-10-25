@@ -12,6 +12,7 @@
         "esModuleInterop": true,
         "sourceMap": true,
         "declaration": true,
+        "declarationMap": true,
         "strict": true,
         "module": "esnext",
         "target": "es5",
@@ -24,7 +25,9 @@
         "jsx": "react",
         "baseUrl": "packages",
         "paths": {
-            "*": ["./*/src"]
+            "mobx-psy": ["mobx-psy/src"],
+            "mobx-psy/*": ["mobx-psy/src/*"],
+            "mobx-psy-*": ["mobx-psy-*/src"]
         },
     }
 }

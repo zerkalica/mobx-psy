@@ -1,21 +1,20 @@
 import React from 'react'
 import { LocationStore } from './router'
-import { Loader } from 'mobx-psy'
+import { fiberizeFetch } from 'mobx-psy'
 
-const location = new LocationStore()
-export const loader = new Loader()
+export type Fetch = ReturnType<typeof fiberizeFetch>
 
-// For typechecking
-const serviceContextDefault = { loader, location }
+export interface IServiceContext {
+    location: LocationStore
+    fetch: Fetch
+}
 
-export type IServiceContext = typeof serviceContextDefault
-
-const ServiceContext = React.createContext(serviceContextDefault)
+const ServiceContext = React.createContext<IServiceContext | undefined>(undefined)
 
 export const ServiceContextProvider = ServiceContext.Provider
 
 export function useServiceContext() {
     const context = React.useContext(ServiceContext)
-
+    if (!context) throw new Error('Wrap your app into <ServiceContextProvider>')
     return context
 }

@@ -8,7 +8,8 @@
   "author": "Stefan Zerkalica <zerkalica@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "cd packages/mobx-psy-examples && yarn start"
+    "start": "yarn workspace mobx-psy-examples run start",
+    "upgrade": "yarn workspaces run upgrade --all"
   },
   "workspaces": [
     "packages/*"

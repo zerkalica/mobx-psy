@@ -1,16 +1,6 @@
 import React from 'react'
 import { Refreshable } from '../fibers'
 
-export interface FallbackOptions {
-  loading: React.FC<FallbackLoadingProps>
-  error?: React.FC<FallbackErrorProps>
-}
-
-export const fallbackConfig: FallbackOptions = {
-  loading: FallbackLoading,
-  error: FallbackError,
-}
-
 export interface FallbackLoadingProps {
   refreshable?: Refreshable
   children?: React.ReactNode

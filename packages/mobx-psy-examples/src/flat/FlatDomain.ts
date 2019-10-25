@@ -1,8 +1,8 @@
 import React from 'react'
 import { action, computed, observable, reaction } from 'mobx'
 import { LocationStore } from '../router'
-import { Loader, disposer } from 'mobx-psy'
-import { useServiceContext } from '../ServiceContext'
+import { sync, disposer } from 'mobx-psy'
+import { useServiceContext, Fetch } from '../ServiceContext'
 import { IFlat } from '../mocks'
 import { FlatDomainFilter } from './FlatDomainFilter'
 
@@ -24,7 +24,7 @@ interface FlatsState {
 }
 
 export class FlatDomain {
-  constructor(protected location: LocationStore, protected fetcher: Loader) {
+  constructor(protected location: LocationStore, protected fetch: Fetch) {
     disposer(this, 'filtered', () =>
       reaction(() => JSON.stringify(this.filter.values), this.pageReset)
     )
@@ -33,7 +33,7 @@ export class FlatDomain {
   static use() {
     const context = useServiceContext()
     return React.useMemo(
-      () => new FlatDomain(context.location, context.loader),
+      () => new this(context.location, context.fetch),
       [context]
     )
   }
@@ -93,25 +93,19 @@ export class FlatDomain {
     return this.nextDisabled
   }
 
-  @computed protected get request() {
-    return this.fetcher.create<FlatsState>('/flats')
-  }
-
   protected lastTotalPages = 1
 
   get totalPages() {
     return this.lastTotalPages
   }
 
-  @observable protected retry = 0
-
-  @computed protected get response() {
-    const response = this.request.get(
+  @sync get response() {
+    const response = this.fetch<FlatsState>(
+      'flats',
       {
         ...this.params,
         ...this.filter.values,
-      },
-      this.retry
+      }
     )
 
     this.lastTotalPages = response.total_pages
@@ -126,8 +120,8 @@ export class FlatDomain {
     return new Flat(raw)
   }
 
-  @action.bound refresh() {
-    this.retry++
+  refresh() {
+    sync.refresh(() => this.response)
   }
 
   @computed get filtered() {

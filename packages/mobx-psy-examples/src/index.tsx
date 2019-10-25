@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { ServiceContextProvider } from './ServiceContext'
 import { FlatList } from './flat'
 import { LocationStore } from './router'
-import { Loader } from 'mobx-psy'
+import { fiberizeFetch } from 'mobx-psy'
 
 import { configure } from 'mobx'
 import { createFetch } from './mocks'
@@ -12,15 +12,19 @@ configure({
   enforceActions: 'observed',
 })
 
-const App = ({ timeout = 500, errorRate = 0.8 }) => {
+export interface AppProps {
+  timeout?: number
+  errorRate?: number
+  baseUrl?: string
+}
+
+function App({ timeout = 500, errorRate = 0.8, baseUrl = '/' }: AppProps) {
   const fetcher = createFetch({
     timeout,
     errorRate,
   })
   const appContext = {
-    loader: new Loader((name, params, signal) =>
-      fetcher(name, { body: params, signal })
-    ),
+    fetch: fiberizeFetch((url, params) => fetcher(baseUrl + url, params)),
     location: new LocationStore(window.location, window.history, window),
   }
 

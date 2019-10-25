@@ -6,16 +6,21 @@ import { getDerivableName } from './getDerivableName'
 
 type Task = () => void
 
-export class Actions extends FiberHost {
+export interface ActionsStatus {
+  readonly processing: boolean
+  readonly error: Error | undefined
+}
+
+export class Actions extends FiberHost implements ActionsStatus {
   protected tasks: Task[] = []
 
   /**
-        PromiseLike if pending, undefined if complete, if Error error
-     */
+    PromiseLike if pending, undefined if complete, if Error error
+  */
   @observable protected locked: Error | PromiseLike<any> | undefined = undefined
 
-  constructor() {
-    super('Actions#' + getDerivableName())
+  constructor(id: string) {
+    super(`${id}#${getDerivableName()}`)
   }
 
   run(task: Task): void {
@@ -23,7 +28,7 @@ export class Actions extends FiberHost {
     this.next()
   }
 
-  get pending(): boolean {
+  get processing(): boolean {
     const { locked } = this
     return !!locked && !(locked instanceof Error)
   }
@@ -33,10 +38,6 @@ export class Actions extends FiberHost {
     return locked instanceof Error ? locked : undefined
   }
 
-  get complete(): boolean {
-    return !this.locked
-  }
-
   protected scheduled = false
 
   next() {
@@ -44,14 +45,14 @@ export class Actions extends FiberHost {
     if (this.scheduled) return
     this.scheduled = true
 
-    defer.add(this.processing)
+    defer.add(this.invoke)
   }
-  
+
   get initial() {
     return false
   }
 
-  @action.bound protected processing() {
+  @action.bound protected invoke() {
     if (this.tasks.length === 0) return
     const task = this.tasks[0]
     const prev = FiberHost.current
@@ -66,7 +67,7 @@ export class Actions extends FiberHost {
     } catch (error) {
       this.locked = error
       if (!isPromise(error)) return throwHidden(error)
-      error.then(this.processing, this.processing)
+      error.then(this.invoke, this.invoke)
     } finally {
       FiberHost.current = prev
     }

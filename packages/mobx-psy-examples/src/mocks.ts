@@ -68,8 +68,8 @@ export type Fetch<V = any> = (
   url: string,
   params?: {
     body?: object
-    signal?: AbortSignal
-    method?: 'GET' | 'DELETE' | 'POST' | 'PATCH'
+    signal?: AbortSignal | null
+    method?: string
   }
 ) => Promise<V>
 

@@ -1,25 +1,38 @@
 import { observer as mobxObserver } from 'mobx-react-lite'
 import React from 'react'
 
-import { fallbackConfig, FallbackOptions } from './Fallback'
+import {
+  FallbackError,
+  FallbackLoading,
+  FallbackLoadingProps,
+  FallbackErrorProps,
+} from './Fallback'
 import { mockState } from './mock'
 import { getRefreshable } from '../fibers'
 import { throwHidden } from '../utils'
 
-export type SafeObserverOptions = Parameters<typeof mobxObserver>[1] &
-  Partial<FallbackOptions>
+export type SafeObserverOptions = Parameters<typeof mobxObserver>[1] & {
+  loading?: React.FC<FallbackLoadingProps>
+  error?: React.FC<FallbackErrorProps>
+}
 
 type RefComponent<Ref, Props> = React.RefForwardingComponent<Ref, Props>
 
+export const observerDefaultOptions: SafeObserverOptions = {
+  loading: FallbackLoading,
+  error: FallbackError,
+}
+
 export function observer<Props extends {}, Ref = {}>(
   baseComponent: RefComponent<Ref, Props>,
-  options?: SafeObserverOptions
+  options: SafeObserverOptions = observerDefaultOptions
 ) {
-  const FallbackError = (options ? options.error : null) || fallbackConfig.error
-  const FallbackLoading =
-    (options ? options.loading : null) || fallbackConfig.loading
+  if (options !== observerDefaultOptions)
+    options = { ...observerDefaultOptions, ...options }
+  const FallbackError = options.error
+  const FallbackLoading = options.loading
 
-  const safeComponent: RefComponent<Ref, Props> = (
+  const SafeComponentRaw: RefComponent<Ref, Props> = (
     props,
     ref
   ): React.ReactElement | null => {
@@ -42,6 +55,7 @@ export function observer<Props extends {}, Ref = {}>(
           />
         )
       }
+      if (!FallbackLoading) return throwHidden(error)
       return (
         <FallbackLoading refreshable={refreshable} children={node.current} />
       )
@@ -49,16 +63,24 @@ export function observer<Props extends {}, Ref = {}>(
       mockState.called = null
     }
   }
+  let SafeComponent = SafeComponentRaw
+  if (!FallbackLoading) {
+    SafeComponent = (props, ref) => (
+      <React.Suspense fallback={null}>
+        <SafeComponentRaw {...props} ref={ref} />
+      </React.Suspense>
+    )
+  }
 
   const value = baseComponent.displayName || baseComponent.name
-  Object.defineProperty(safeComponent, 'name', { value })
-  safeComponent.displayName = value
+  Object.defineProperty(SafeComponent, 'name', { value })
+  SafeComponent.displayName = value
   if (baseComponent.hasOwnProperty('propTypes'))
-    safeComponent.propTypes = baseComponent.propTypes
+    SafeComponent.propTypes = baseComponent.propTypes
   if (baseComponent.hasOwnProperty('contextTypes'))
-    safeComponent.contextTypes = baseComponent.contextTypes
+    SafeComponent.contextTypes = baseComponent.contextTypes
   if (baseComponent.hasOwnProperty('defaultProps'))
-    safeComponent.defaultProps = baseComponent.defaultProps
+    SafeComponent.defaultProps = baseComponent.defaultProps
 
-  return mobxObserver(safeComponent, options)
+  return mobxObserver(SafeComponent, options)
 }

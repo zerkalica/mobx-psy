@@ -1,15 +1,6 @@
-import { Fiber, IFiberHost } from './Fiber'
+import { Fiber } from './Fiber'
 
-export abstract class FiberHost implements IFiberHost {
-  static current: IFiberHost | undefined = undefined
-
-  static sync<V>(id: string, handler: (signal: AbortSignal) => PromiseLike<V>): V {
-    const host = FiberHost.current
-    if (!host) throw new Error(`Run fiber ${id} inside fiber host`)
-  
-    return host.sync<V>(id, handler)
-  }
-
+export abstract class FiberHost {
   /**
    * Used for aborting all pended async operations in fibers on cell destruction.
    */
@@ -21,6 +12,8 @@ export abstract class FiberHost implements IFiberHost {
   protected fibers: Map<string, Fiber> | undefined = undefined
 
   ;[Symbol.toStringTag]: string
+
+  static current: FiberHost | undefined = undefined
 
   constructor(id: string) {
     this[Symbol.toStringTag] = id
@@ -39,23 +32,13 @@ export abstract class FiberHost implements IFiberHost {
     return this.abortController.signal
   }
 
-  /**
-   * Creates or returns cached fiber.
-   * Key is unique in cell scope.
-   *
-   * @param id Unique cache lookup key
-   */
-  sync<V>(id: string, cb: (signal: AbortSignal) => PromiseLike<V>): V {
+  get(id: string): Fiber | undefined {
+    return this.fibers ? this.fibers.get(id) : undefined
+  }
+
+  set(id: string, fiber: Fiber) {
     if (!this.fibers) this.fibers = new Map()
-    const fibers = this.fibers
-
-    let fiber: Fiber<V> | undefined = fibers.get(id)
-    if (!fiber) {
-      fiber = new Fiber(id, cb, this)
-      fibers.set(id, fiber)
-    }
-
-    return fiber.get()
+    this.fibers.set(id, fiber)
   }
 
   abstract get initial(): boolean
