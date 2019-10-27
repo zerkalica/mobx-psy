@@ -5,11 +5,16 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rm -rf dist/* *.tsbuildinfo"
+  },
   "devDependencies": {
     "@types/node": "^12.11.7",
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.3",
-    "typescript": "^3.6.4"
+    "typescript": "3.7.1-rc"
   },
   "dependencies": {
     "react": "^16.11.0",

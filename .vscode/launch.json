@@ -1,0 +1,21 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"env": {"NODE_ENV": "development"},
+			"name": "Dev Server",
+			"runtimeArgs": ["--inspect-brk=9229"],
+			"port": 9229,
+			"program": "${workspaceRoot}/packages/mobx-psy-examples/dist/server/index.js"
+		},
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Launch Chrome",
+			"url": "http://localhost:8080",
+			"webRoot": "${workspaceRoot}"
+		}
+	]
+}

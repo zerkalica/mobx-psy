@@ -11,7 +11,7 @@ export interface FallbackLoadingProps {
 export function FallbackLoading({
   children,
   className = 'Fallback Fallback__loading',
-  contentClassName = 'Fallback__content'
+  contentClassName = 'Fallback__content',
 }: FallbackLoadingProps) {
   return (
     <div className={className}>
@@ -35,18 +35,20 @@ export function FallbackError({
   error,
   className = 'Fallback Fallback__error',
   errorClassName = 'Fallback__error__block',
-  contentClassName = 'Fallback__content'
+  contentClassName = 'Fallback__content',
 }: FallbackErrorProps) {
   return (
     <div className={className}>
       <div className={errorClassName}>
         <h3>
           {error.message}
-          {refreshable ? `fetch ${refreshable}` : null}
+          {refreshable ? ` (${refreshable})` : ''}
         </h3>
 
         {refreshable ? (
-          <button onClick={refreshable.refresh}>Refresh</button>
+          <button onClick={refreshable.refresh.bind(refreshable)}>
+            Refresh
+          </button>
         ) : null}
         <pre>{String(error.stack)}</pre>
       </div>

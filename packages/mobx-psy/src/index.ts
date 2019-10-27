@@ -1,5 +1,5 @@
-export * from './fibers'
-export * from './mobx-react'
+export {configure, MobxPsyConfig} from './config'
 export * from './fibers'
 export * from './mobx'
+export * from './mobx-react'
 export * from './utils'

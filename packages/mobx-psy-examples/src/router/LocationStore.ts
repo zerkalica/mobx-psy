@@ -1,14 +1,7 @@
 import { action, observable, computed } from 'mobx'
 import { DefaultParams, Route } from './Route'
 import { ParamMapper } from './Serializer'
-
-export interface LocationLike {
-  search: string
-  origin: string
-  pathname: string
-  port: string
-  hostname: string
-}
+import { defer, LocationLike } from 'mobx-psy'
 
 export interface HistoryLike {
   pushState(data: any, title: string, url?: string | null): void
@@ -91,7 +84,7 @@ export class LocationStore {
     this.replaceLast = replace
     if (!this.scheduled && this.history) {
       this.scheduled = true
-      requestAnimationFrame(this.updateHistory.bind(this))
+      defer.add(this.updateHistory.bind(this))
     }
   }
 

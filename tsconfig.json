@@ -12,9 +12,8 @@
         "esModuleInterop": true,
         "sourceMap": true,
         "declaration": true,
-        "declarationMap": true,
         "strict": true,
-        "module": "esnext",
+        "module": "commonjs",
         "target": "es5",
         "composite": true,
         "moduleResolution": "node",
@@ -26,7 +25,6 @@
         "baseUrl": "packages",
         "paths": {
             "mobx-psy": ["mobx-psy/src"],
-            "mobx-psy/*": ["mobx-psy/src/*"],
             "mobx-psy-*": ["mobx-psy-*/src"]
         },
     }

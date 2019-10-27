@@ -9,7 +9,9 @@
   "license": "MIT",
   "scripts": {
     "start": "yarn workspace mobx-psy-examples run start",
-    "upgrade": "yarn workspaces run upgrade --all"
+    "build": "yarn workspaces run build",
+    "upgrade": "yarn workspaces run upgrade --all",
+    "clean": "yarn workspaces run clean"
   },
   "workspaces": [
     "packages/*"

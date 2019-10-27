@@ -1,12 +1,10 @@
 import React from 'react'
 import { LocationStore } from './router'
-import { fiberizeFetch } from 'mobx-psy'
-
-export type Fetch = ReturnType<typeof fiberizeFetch>
+import { SyncFetch } from 'mobx-psy'
 
 export interface IServiceContext {
     location: LocationStore
-    fetch: Fetch
+    fetch: SyncFetch
 }
 
 const ServiceContext = React.createContext<IServiceContext | undefined>(undefined)

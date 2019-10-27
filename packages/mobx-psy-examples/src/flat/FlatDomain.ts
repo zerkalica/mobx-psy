@@ -1,8 +1,8 @@
 import React from 'react'
 import { action, computed, observable, reaction } from 'mobx'
 import { LocationStore } from '../router'
-import { sync, disposer } from 'mobx-psy'
-import { useServiceContext, Fetch } from '../ServiceContext'
+import { sync, disposer, SyncFetch } from 'mobx-psy'
+import { useServiceContext } from '../ServiceContext'
 import { IFlat } from '../mocks'
 import { FlatDomainFilter } from './FlatDomainFilter'
 
@@ -24,7 +24,7 @@ interface FlatsState {
 }
 
 export class FlatDomain {
-  constructor(protected location: LocationStore, protected fetch: Fetch) {
+  constructor(protected location: LocationStore, protected fetch: SyncFetch) {
     disposer(this, 'filtered', () =>
       reaction(() => JSON.stringify(this.filter.values), this.pageReset)
     )
@@ -103,8 +103,10 @@ export class FlatDomain {
     const response = this.fetch<FlatsState>(
       'flats',
       {
-        ...this.params,
-        ...this.filter.values,
+        body: {
+          ...this.params,
+          ...this.filter.values,  
+        }
       }
     )
 
@@ -120,7 +122,7 @@ export class FlatDomain {
     return new Flat(raw)
   }
 
-  refresh() {
+  @action.bound refresh() {
     sync.refresh(() => this.response)
   }
 

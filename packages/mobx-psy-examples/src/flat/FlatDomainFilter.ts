@@ -12,9 +12,15 @@ export const flatDomainFilterParamsDefaults = {
 export class FlatDomainFilter {
   constructor(protected location: LocationStore) {
     disposer(this, 'values', () =>
-      reaction(() => JSON.stringify(this.draft), this.submit, {
-        delay: 300,
-      })
+      reaction(
+        () => {
+          return JSON.stringify(this.draft)
+        },
+        this.submit,
+        {
+          delay: 300,
+        }
+      )
     )
   }
 

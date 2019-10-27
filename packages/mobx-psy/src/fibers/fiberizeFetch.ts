@@ -1,40 +1,40 @@
 import { throwHidden } from '../utils'
 import { Fiber } from './Fiber'
 
-export type FetchBaseParams = Pick<RequestInit, 'method' | 'signal'>
+export type FetchInitBase = { signal?: AbortSignal | null }
 
-export type FetchLike<Result = any, Params extends FetchBaseParams = any> = (
+export type FetchLike<Init extends FetchInitBase = any> = <Result>(
   url: string,
-  init: Params
+  init: Init
 ) => Promise<Result>
 
-type SerializableItem = string | number | null | object
-export type Serializable = SerializableItem | SerializableItem[]
-export type StateItem = [string, Serializable]
+export type SyncFetch<Init extends FetchInitBase = any> = <Result>(
+  url: string,
+  init: Init
+) => Result
+
+export type HydratedState = Record<string, any>
 
 /**
  * Add fiber cache to fetch-like function.
  */
-export function fiberizeFetch(
-  fetchFn: FetchLike,
-  cache?: Map<string, Serializable> | undefined,
-) {
-  return <Result, Params extends Pick<RequestInit, 'method'> = {}>(
-    url: string,
-    init: Params
-  ) => {
-    const id = `${(init && init.method) || 'GET'} ${url}`
-    let fiber = Fiber.get<Result>(id)
+export function fiberizeFetch<Init extends FetchInitBase>(
+  fetchFn: FetchLike<Init>,
+  cache?: HydratedState | undefined,
+  keepCache = false
+): SyncFetch<Init> {
+  return <Result, Params extends Init>(url: string, init: Params) => {
+    let fiber = Fiber.get<Result>(url)
     if (!fiber) {
       const fn = (signal: AbortSignal) => {
-        const data = cache ? cache.get(url) : undefined
+        const data = cache ? (cache[url] as Result) : undefined
         if (data === undefined)
           return throwHidden(fetchFn(url, { ...init, signal }))
-        if (cache) cache.delete(url)
+        if (cache && !keepCache) cache[url] = undefined
         return data
       }
 
-      fiber = new Fiber(id, fn)
+      fiber = new Fiber(url, fn)
     }
 
     return fiber.get()

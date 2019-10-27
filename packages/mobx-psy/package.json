@@ -8,11 +8,13 @@
   "author": "Stefan Zerkalica <zerkalica@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rm -rf dist/* *.tsbuildinfo"
   },
   "devDependencies": {
     "@types/react": "^16.9.9",
-    "typescript": "^3.6.4"
+    "typescript": "3.7.1-rc"
   },
   "dependencies": {
     "mobx": "^5.14.2",

@@ -22,6 +22,7 @@ export type DefaultParams = {
 
 export class Route<O extends DefaultParams, K extends keyof O = keyof O> {
   protected serializer: Serializer<O>
+  readonly values: O
 
   constructor(
     protected defaults: O,
@@ -30,13 +31,22 @@ export class Route<O extends DefaultParams, K extends keyof O = keyof O> {
     protected query: ParamsQuery = new ParamsQueryMock()
   ) {
     this.serializer = new Serializer(defaults, mapper)
+    const values = (this.values = {} as O)
+    const keys = Object.keys(defaults)
+    for (let key of keys) {
+      Object.defineProperty(values, key, {
+        enumerable: true,
+        get: this.getValue.bind(this, key as K),
+        set: this.setValue.bind(this, key as K),
+      })
+    }
   }
 
   location(query: ParamsQuery): Route<O> {
     return new Route(this.defaults, this.mapper, this.deleteDefault, query)
   }
 
-  protected getValue(target: O, key: K): O[K] {
+  protected getValue(key: K): O[K] {
     const value = this.serializer.deserialize(
       key,
       this.query.get(key as string)
@@ -44,7 +54,7 @@ export class Route<O extends DefaultParams, K extends keyof O = keyof O> {
     return value
   }
 
-  protected setValue(target: O, key: K, value: O[K]) {
+  protected setValue(key: K, value: O[K]) {
     const next =
       this.deleteDefault && value === this.defaults[key]
         ? undefined
@@ -55,19 +65,11 @@ export class Route<O extends DefaultParams, K extends keyof O = keyof O> {
     return true
   }
 
-  readonly values: O = new Proxy(this.defaults, {
-    get: this.getValue.bind(this),
-    set: this.setValue.bind(this),
-  })
-
   @computed get changed() {
     const { defaults } = this
     let changed = false
     for (let key in defaults) {
-      if (
-        defaults[key as keyof O] !==
-        this.getValue(defaults, (key as unknown) as K)
-      )
+      if (defaults[key as keyof O] !== this.getValue((key as unknown) as K))
         changed = true
     }
 
@@ -81,7 +83,7 @@ export class Route<O extends DefaultParams, K extends keyof O = keyof O> {
     }
 
     for (let name in next) {
-      this.setValue(this.defaults, (name as unknown) as K, next[name] as O[K])
+      this.setValue((name as unknown) as K, next[name] as O[K])
     }
   }
 }

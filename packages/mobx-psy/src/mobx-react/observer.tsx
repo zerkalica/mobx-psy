@@ -1,38 +1,21 @@
 import { observer as mobxObserver } from 'mobx-react-lite'
 import React from 'react'
 
-import {
-  FallbackError,
-  FallbackLoading,
-  FallbackLoadingProps,
-  FallbackErrorProps,
-} from './Fallback'
 import { mockState } from './mock'
 import { getRefreshable } from '../fibers'
 import { throwHidden } from '../utils'
 
-export type SafeObserverOptions = Parameters<typeof mobxObserver>[1] & {
-  loading?: React.FC<FallbackLoadingProps>
-  error?: React.FC<FallbackErrorProps>
-}
+import { config, MobxPsyConfig } from '../config'
 
 type RefComponent<Ref, Props> = React.RefForwardingComponent<Ref, Props>
 
-export const observerDefaultOptions: SafeObserverOptions = {
-  loading: FallbackLoading,
-  error: FallbackError,
-}
-
 export function observer<Props extends {}, Ref = {}>(
   baseComponent: RefComponent<Ref, Props>,
-  options: SafeObserverOptions = observerDefaultOptions
+  options: MobxPsyConfig = config
 ) {
-  if (options !== observerDefaultOptions)
-    options = { ...observerDefaultOptions, ...options }
-  const FallbackError = options.error
-  const FallbackLoading = options.loading
+  if (options !== config) options = { ...config, ...options }
 
-  const SafeComponentRaw: RefComponent<Ref, Props> = (
+  const SafeComponent: RefComponent<Ref, Props> = (
     props,
     ref
   ): React.ReactElement | null => {
@@ -40,45 +23,34 @@ export function observer<Props extends {}, Ref = {}>(
 
     try {
       node.current = baseComponent(props, ref)
-      if (mockState.called) throwHidden(mockState.called)
+      if (mockState.called) return throwHidden(mockState.called)
       return node.current
     } catch (error) {
       const refreshable = getRefreshable(error)
       if (error instanceof Error) {
         console.error(error)
-        if (!FallbackError) return throwHidden(error)
+        if (!options.error) return throwHidden(error)
         return (
-          <FallbackError
+          <options.error
             refreshable={refreshable}
             error={error}
             children={node.current}
           />
         )
       }
-      if (!FallbackLoading) return throwHidden(error)
+      if (!options.loading) return throwHidden(error)
       return (
-        <FallbackLoading refreshable={refreshable} children={node.current} />
+        <options.loading refreshable={refreshable} children={node.current} />
       )
     } finally {
       mockState.called = null
     }
   }
-  let SafeComponent = SafeComponentRaw
-  if (!FallbackLoading) {
-    SafeComponent = (props, ref) => (
-      <React.Suspense fallback={null}>
-        <SafeComponentRaw {...props} ref={ref} />
-      </React.Suspense>
-    )
-  }
-
   const value = baseComponent.displayName || baseComponent.name
   Object.defineProperty(SafeComponent, 'name', { value })
   SafeComponent.displayName = value
   if (baseComponent.hasOwnProperty('propTypes'))
     SafeComponent.propTypes = baseComponent.propTypes
-  if (baseComponent.hasOwnProperty('contextTypes'))
-    SafeComponent.contextTypes = baseComponent.contextTypes
   if (baseComponent.hasOwnProperty('defaultProps'))
     SafeComponent.defaultProps = baseComponent.defaultProps
 
