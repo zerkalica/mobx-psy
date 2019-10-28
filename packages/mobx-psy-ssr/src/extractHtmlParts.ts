@@ -4,7 +4,7 @@ export function stateToScriptTag(
   pkgName: string,
   state: HydratedState
 ): string {
-  return `\n<script>window['${pkgName}'] = ${JSON.stringify(state)};</script>\n`
+  return `\n<script>window["${pkgName}"] = ${JSON.stringify(state)};</script>\n`
 }
 
 /**
@@ -20,19 +20,17 @@ export function extractHtmlParts({
   pkgName,
   stateKey,
   html,
-  template,
 }: {
   pkgName: string
   stateKey: string
   html: string
-  template: string
 }): { header: string; footerPre: string; footerPost: string } {
   const divTag = `<div id="${pkgName}">`
   const divPos = html.indexOf(divTag)
   const stateTag = `window["${stateKey}"]`
   const statePos = html.indexOf(stateTag, divPos)
   if (divPos === -1 || statePos === -1)
-    throw new Error(`${divTag} or ${stateTag} not found in ${template}`)
+    throw new Error(`${divTag} or ${stateTag} not found in ${html}`)
   const header = html.substring(0, divPos + divTag.length)
   const footerPre = html.substring(divPos + divTag.length, statePos + stateTag.length)
   const footerPost = html.substring(statePos + stateTag.length)

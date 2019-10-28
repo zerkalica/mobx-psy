@@ -3,7 +3,7 @@ import { action, computed, observable, reaction } from 'mobx'
 import { LocationStore } from '../router'
 import { sync, disposer, SyncFetch } from 'mobx-psy'
 import { useServiceContext } from '../ServiceContext'
-import { IFlat } from '../mocks'
+import { IFlat } from '../app/common/mocks'
 import { FlatDomainFilter } from './FlatDomainFilter'
 
 export class Flat {

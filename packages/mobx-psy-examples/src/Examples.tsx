@@ -11,12 +11,13 @@ import { FlatList } from './flat'
 import { LocationStore } from './router'
 import { ServiceContextProvider } from './ServiceContext'
 import { pkgName } from './pkg'
+// import * as styles from './Examples.css'
 
 configure({
   enforceActions: 'observed',
-})
+})                                                                                                                                                                                                          
 
-export function App<Init extends FetchInitBase>({
+export function MobxPsyExamples<Init extends FetchInitBase>({
   fetch,
   location,
   cache,
