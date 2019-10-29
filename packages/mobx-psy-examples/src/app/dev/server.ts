@@ -1,3 +1,5 @@
+import '../common/polyfills'
+
 import express from 'express'
 import Bundler from 'parcel-bundler'
 import path from 'path'

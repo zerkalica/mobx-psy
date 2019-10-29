@@ -23,14 +23,16 @@ interface ReactMiddlewareProps {
   apiUrl?: string
   fetch: FetchLike<any>
   publicUrl: string
+  entry?: string
 }
 
 export function reactMiddleware({
   apiUrl = '/',
   fetch,
   publicUrl,
+  entry = 'browser'
 }: ReactMiddlewareProps) {
-  const html = indexHtml({publicUrl, entry: 'browser.js'})
+  const html = indexHtml({publicUrl, entry, pkgName})
 
   const { header, footerPre, footerPost } = extractHtmlParts({
     pkgName,

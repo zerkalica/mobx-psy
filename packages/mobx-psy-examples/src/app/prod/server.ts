@@ -1,3 +1,5 @@
+import '../common/polyfills'
+
 import express from 'express'
 import { FetchLike } from 'mobx-psy'
 import fetch from 'node-fetch'

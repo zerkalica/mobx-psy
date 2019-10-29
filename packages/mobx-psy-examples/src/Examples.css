@@ -1,4 +1,4 @@
-/* @keyframes mol_view_wait_move {
+@keyframes mol_view_wait_move {
   from {
     background-position: 0 0;
   }
@@ -6,7 +6,7 @@
   to {
     background-position: 200vmax 0;
   }
-} */
+}
 
 .Fallback__loading {
   min-width: 2rem;
@@ -23,7 +23,7 @@
     hsla(0, 0%, 50%, 0.1) 100%
   );
   background-size: 200vmax 200vmax;
-  /* animation: mol_view_wait_move 1s linear infinite; */
+  animation: mol_view_wait_move 1s linear infinite;
   /* background-color: lightyellow; */
 }
 
