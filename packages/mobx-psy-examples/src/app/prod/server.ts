@@ -1,3 +1,4 @@
+import 'source-map-support/register'
 import '../common/polyfills'
 
 import express from 'express'

@@ -16,6 +16,6 @@ export const config: MobxPsyConfig = {
   error: FallbackError,
 }
 
-export function configure(next: Partial<MobxPsyConfig>) {
+export function configurePsy(next: Partial<MobxPsyConfig>) {
   Object.assign(config, next)
 }

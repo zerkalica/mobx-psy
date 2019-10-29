@@ -1,4 +1,4 @@
-export {configure, MobxPsyConfig} from './config'
+export {configurePsy, MobxPsyConfig} from './config'
 export * from './fibers'
 export * from './mobx'
 export * from './mobx-react'

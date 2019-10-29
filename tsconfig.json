@@ -26,6 +26,6 @@
         "paths": {
             "mobx-psy": ["mobx-psy/src"],
             "mobx-psy-*": ["mobx-psy-*/src"]
-        },
+        }
     }
 }

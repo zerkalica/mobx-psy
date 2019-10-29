@@ -8,9 +8,9 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf dist/* *.tsbuildinfo",
-    "build": "tsc -b && NODE_ENV=production PUBLIC_URL=/mobx-psy ts-node-dev src/app/prod/build.ts",
-    "start": "./bin/mobx-psy-examples",
-    "watch": "NODE_ENV=development ts-node-dev src/app/dev/server.ts"
+    "build": "tsc -b && NODE_ENV=production PUBLIC_URL=/mobx-psy ts-node src/app/prod/build.ts",
+    "start": "NODE_ENV=production node dist/app/prod/server",
+    "watch": "tsc -b && NODE_ENV=development concurrently 'tsc --build --watch' 'ts-node src/app/dev/server.ts'"
   },
   "bin": {
     "mobx-psmy-examples": "./bin/mobx-psy-examples"
@@ -35,9 +35,10 @@
     "@types/parcel-bundler": "^1.12.1",
     "@types/react": "^16.9.9",
     "@types/react-dom": "^16.9.2",
+    "concurrently": "^5.0.0",
     "parcel": "^1.12.4",
     "source-map-support": "^0.5.13",
-    "ts-node-dev": "^1.0.0-pre.43",
+    "ts-node": "^8.4.1",
     "typescript": "3.7.1-rc"
   }
 }

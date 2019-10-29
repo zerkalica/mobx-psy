@@ -1,2 +1,2 @@
-#Mobx pseudosyncronous
+#Mobx pseudo-synchronous
 

@@ -4,6 +4,9 @@ import express from 'express'
 import Bundler from 'parcel-bundler'
 import path from 'path'
 
+// @ts-ignore
+//import ttsPlugin from 'parcel-plugin-ttypescript'
+
 import { createFetch } from '../common/mocks'
 import {
   bundleRoot,
@@ -24,6 +27,8 @@ const bundler = new Bundler(entryPoint, {
   publicUrl,
   contentHash: false,
 })
+
+//ttsPlugin(bundler)
 
 express()
   .use(bundler.middleware())

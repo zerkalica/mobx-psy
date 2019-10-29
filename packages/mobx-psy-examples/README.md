@@ -1,5 +1,8 @@
-# Mobx pseudosyncronous examples
+# Mobx pseudo-synchronous example application
 
-Demo app for mobx-psy. Flats search: filter form, list, pagination, loading indicator, parametrized url.
+Flats search: filter form, list, pagination, loading indicator, parametrized url. Parcel, server side rendering, dev and prod server, state hydrate.
 
-Parcel, server side rendering, dev and prod server, state hydrate.
+Install and run:
+
+* yarn watch - run dev server
+* yarn build - build bundle and server in dist

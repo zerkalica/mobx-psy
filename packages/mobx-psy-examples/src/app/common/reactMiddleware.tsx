@@ -1,5 +1,3 @@
-import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only'
-
 import express from 'express'
 import { FetchLike } from 'mobx-psy'
 import {

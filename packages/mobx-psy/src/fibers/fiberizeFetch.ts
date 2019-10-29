@@ -23,7 +23,7 @@ export function fiberizeFetch<Init extends FetchInitBase>(
   cache?: HydratedState | undefined,
   keepCache = false
 ): SyncFetch<Init> {
-  return <Result, Params extends Init>(url: string, init: Params) => {
+  return <Result, Params extends Init = Init>(url: string, init: Params) => {
     let fiber = Fiber.get<Result>(url)
     if (!fiber) {
       const fn = (signal: AbortSignal) => {
