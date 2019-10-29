@@ -3,17 +3,25 @@ import '../common/polyfills'
 import Bundler from 'parcel-bundler'
 import path from 'path'
 
-import { bundleRoot, publicUrl } from '../common/reactMiddleware'
+import { bundleRoot, publicUrl } from '../common/variables'
 
-const entryPoint = path.join(__dirname, 'browser.ts')
-const bundler = new Bundler(entryPoint, {
+const bundlerBrowser = new Bundler(path.join(__dirname, 'browser.ts'), {
   outDir: bundleRoot,
   publicUrl,
   contentHash: false,
 })
 
-bundler
+const bundlerServer = new Bundler(path.join(__dirname, 'server.ts'), {
+  outDir: bundleRoot,
+  publicUrl,
+  contentHash: false,
+  target: 'node',
+  bundleNodeModules: true,
+})
+
+bundlerBrowser
   .bundle()
+  .then(() => bundlerServer.bundle())
   .then(() => {
     console.log(`Copy ${bundleRoot}/* to ${publicUrl} url`)
     process.exit(0)

@@ -5,17 +5,12 @@ import {
   locationFromNodeRequest,
   ServerRender,
 } from 'mobx-psy-ssr'
-import path from 'path'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 
 import {indexHtml} from './index.html'
 
 import { MobxPsyExamples, LocationStore, pkgName, stateKey } from '../..'
-
-export const bundleRoot = path.join(__dirname, '..', '..', '..', 'dist', 'bundle')
-export const port = process.env.PORT || 8080
-export const publicUrl = process.env.PUBLIC_URL || '/'
 
 interface ReactMiddlewareProps {
   apiUrl?: string

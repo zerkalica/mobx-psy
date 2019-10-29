@@ -3,17 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "description": "Mobx pseudo syncronous examples",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf dist/* *.tsbuildinfo",
-    "build": "tsc -b && NODE_ENV=production PUBLIC_URL=/mobx-psy ts-node src/app/prod/build.ts",
-    "start": "NODE_ENV=production node dist/app/prod/server",
-    "watch": "tsc -b && NODE_ENV=development concurrently 'tsc --build --watch' 'ts-node src/app/dev/server.ts'"
+    "build": "tsc --build && parcel build src/app/prod/server.ts --public-url=/mobx-psy --target=node && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
+    "start": "PUBLIC_URL=/mobx-psy node dist/server.js",
+    "watch": "tsc --build && parcel build src/app/dev/server.ts --target=node && concurrently --raw --kill-others 'tsc --build --watch' 'node dist/server.js'",
+    "build:alt": "tsc --build && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
+    "start:alt": "PUBLIC_URL=/mobx-psy ts-node --transpile-only src/app/prod/server.ts",
+    "watch:alt": "tsc --build && concurrently --raw --kill-others 'tsc --build --watch' 'ts-node --transpile-only src/app/dev/server.ts'"
   },
   "bin": {
-    "mobx-psmy-examples": "./bin/mobx-psy-examples"
+    "mobx-psy-examples": "./bin/mobx-psy-examples"
   },
   "engines": {
     "node": ">=12.0.0"

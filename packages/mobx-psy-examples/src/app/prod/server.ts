@@ -1,3 +1,4 @@
+import '../common/envProd'
 import 'source-map-support/register'
 import '../common/polyfills'
 
@@ -5,12 +6,8 @@ import express from 'express'
 import { FetchLike } from 'mobx-psy'
 import fetch from 'node-fetch'
 
-import {
-  bundleRoot,
-  port,
-  publicUrl,
-  reactMiddleware,
-} from '../common/reactMiddleware'
+import { reactMiddleware } from '../common/reactMiddleware'
+import { bundleRoot, port, publicUrl } from '../common/variables'
 
 express()
   .use(express.static(bundleRoot, { index: false }))

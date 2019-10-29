@@ -1,37 +1,30 @@
+import '../common/envDev'
 import '../common/polyfills'
 
 import express from 'express'
 import Bundler from 'parcel-bundler'
 import path from 'path'
 
-// @ts-ignore
-//import ttsPlugin from 'parcel-plugin-ttypescript'
-
 import { createFetch } from '../common/mocks'
-import {
-  bundleRoot,
-  port,
-  publicUrl,
-  reactMiddleware,
-} from '../common/reactMiddleware'
+import { reactMiddleware } from '../common/reactMiddleware'
+import { bundleRoot, port, publicUrl } from '../common/variables'
 
 const fetch = createFetch({
   errorRate: 1,
   timeout: 100,
 })
 
-const entryPoint = path.join(__dirname, 'browser.ts')
-
-const bundler = new Bundler(entryPoint, {
-  outDir: bundleRoot,
-  publicUrl,
-  contentHash: false,
-})
-
-//ttsPlugin(bundler)
+const bundlerBrowser = new Bundler(
+  path.join(process.cwd(), 'src', 'app', 'dev', 'browser.ts'),
+  {
+    outDir: bundleRoot,
+    publicUrl,
+    contentHash: false,
+  }
+)
 
 express()
-  .use(bundler.middleware())
+  .use(bundlerBrowser.middleware())
   .use(reactMiddleware({ fetch, publicUrl }))
   .listen(port, () => {
     console.log(
