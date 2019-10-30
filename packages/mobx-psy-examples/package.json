@@ -3,17 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "description": "Mobx pseudo syncronous examples",
-  "main": "dist/lib/index.js",
-  "types": "dist/lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf dist/* *.tsbuildinfo",
-    "build": "tsc --build && parcel build src/app/prod/server.ts --public-url=/mobx-psy --target=node && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
-    "start": "PUBLIC_URL=/mobx-psy node dist/server.js",
-    "watch": "tsc --build && parcel build src/app/dev/server.ts --target=node && concurrently --raw --kill-others 'tsc --build --watch' 'node dist/server.js'",
-    "build:alt": "tsc --build && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
-    "start:alt": "PUBLIC_URL=/mobx-psy ts-node --transpile-only src/app/prod/server.ts",
-    "watch:alt": "tsc --build && concurrently --raw --kill-others 'tsc --build --watch' 'ts-node --transpile-only src/app/dev/server.ts'"
+    "build": "tsc --build && mobx-psy-examples-assets && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
+    "start": "node dist/app/prod/server",
+    "watch": "tsc-watch --build --onFirstSuccess 'node dist/app/dev/server' --onSuccess 'mobx-psy-examples-assets'"
   },
   "bin": {
     "mobx-psy-examples": "./bin/mobx-psy-examples"
@@ -26,6 +23,7 @@
     "express": "^4.17.1",
     "mobx": "^5.14.2",
     "mobx-psy": "^1.0.0",
+    "mobx-psy-scripts": "^1.0.0",
     "mobx-psy-ssr": "^1.0.0",
     "node-fetch": "^2.6.0",
     "parcel-bundler": "^1.12.4",
@@ -38,10 +36,9 @@
     "@types/parcel-bundler": "^1.12.1",
     "@types/react": "^16.9.9",
     "@types/react-dom": "^16.9.2",
-    "concurrently": "^5.0.0",
     "parcel": "^1.12.4",
     "source-map-support": "^0.5.13",
-    "ts-node": "^8.4.1",
+    "tsc-watch": "^4.0.0",
     "typescript": "3.7.1-rc"
   }
 }

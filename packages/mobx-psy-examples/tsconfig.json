@@ -1,11 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist/lib",
+    "outDir": "dist",
     "rootDir": "src",
     "jsx": "react"
   },
   "references": [
+    {"path": "../mobx-psy-scripts"},
     {"path": "../mobx-psy"},
     {"path": "../mobx-psy-ssr"}
   ]
