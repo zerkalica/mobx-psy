@@ -1,7 +1,13 @@
 import yargs from 'yargs'
 import { clean, build, watch } from './commands'
+import findUp from 'find-up'
+import fs from 'fs'
 
-export function yargsRun() {
+export async function yargsRun() {
+  const configPath = await findUp(['.buildrc', '.buildrc.json'])
+  const configData = await (configPath ? fs.promises.readFile(configPath).toString() : '')
+  const config = configPath ? JSON.parse(configData) : {}
+
   yargs
     .command({
       command: 'clean',
@@ -24,6 +30,11 @@ export function yargsRun() {
           type: 'string',
           default: 'src/app/dev/browser.ts',
           description: 'Dev browser bundle entry point'
+        })
+        .option('bundle', {
+          type: 'string',
+          default: 'dist/app/public',
+          description: 'Browser bundle build directory'
         }),
     })
     .command({
@@ -32,7 +43,8 @@ export function yargsRun() {
       handler: watch,
       builder: addBuildOptions,
     })
-    .config().argv
+    .help()
+    .config(config).argv
 }
 
 function addBuildOptions<Y extends typeof yargs>(yargsApi: Y) {

@@ -11,18 +11,22 @@ const exec = util.promisify(child_process.exec)
 //"build": "tsc --build && mobx-psy-scripts-assets && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
 
 export async function build(
-  props: {entry: string, public: string} & Parameters<typeof makeAssets>[0]
+  props: {entry: string, bundle: string, public: string} & Parameters<typeof makeAssets>[0]
 ) {
+  console.log('Compiling...')
   const {stdout, stderr} = await exec('tsc --build')
   console.log(stdout)
   if (stderr) console.error(stderr)
+  console.log(`Make assets in ${props.build}`)
   await makeAssets(props)
 
   const bundlerBrowser = new Bundler(props.entry, {
-    outDir: props.build,
+    outDir: props.bundle,
     publicUrl: props.public,
     contentHash: false,
+    watch: false
   })
 
   await bundlerBrowser.bundle()
+  console.log('Done')
 }

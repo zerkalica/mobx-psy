@@ -8,9 +8,9 @@
   "license": "MIT",
   "scripts": {
     "clean": "mobx-psy-scripts clean",
-    "build": "tsc --build && mobx-psy-scripts-assets && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
-    "start": "node dist/app/prod/server",
-    "watch": "tsc-watch --build --onFirstSuccess 'node dist/app/dev/server' --onSuccess 'mobx-psy-scripts-assets'"
+    "build": "mobx-psy-scripts build --public=/mobx-psy",
+    "start": "bin/mobx-psy-examples",
+    "watch": "mobx-psy-scripts watch"
   },
   "bin": {
     "mobx-psy-examples": "./bin/mobx-psy-examples"

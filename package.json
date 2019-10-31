@@ -8,6 +8,7 @@
   "author": "Stefan Zerkalica <zerkalica@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "postinstall": "yarn workspace mobx-psy-scripts run build",
     "start": "yarn workspace mobx-psy-examples run start",
     "watch": "yarn workspace mobx-psy-examples run watch",
     "build": "yarn workspaces run build",
