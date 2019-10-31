@@ -19,18 +19,18 @@ export function yargsRun() {
       command: 'build',
       describe: 'Create production build',
       handler: build,
-      builder: addBuildOptions,
-    })
-    .command({
-      command: 'watch',
-      describe: 'Development watch server',
-      handler: watch,
       builder: yargs => addBuildOptions(yargs)
         .option('entry', {
           type: 'string',
           default: 'src/app/dev/browser.ts',
           description: 'Dev browser bundle entry point'
         }),
+    })
+    .command({
+      command: 'watch',
+      describe: 'Development watch server',
+      handler: watch,
+      builder: addBuildOptions,
     })
     .config().argv
 }
@@ -57,10 +57,15 @@ function addBuildOptions<Y extends typeof yargs>(yargsApi: Y) {
       default: process.cwd(),
       description: 'Project directory with tsconfig.json',
     })
-    .option('dev-server', {
+    .option('dev', {
       type: 'string',
       default: 'dist/app/dev/server.js',
       description: 'Dev server command',
+    })
+    .option('public', {
+      type: 'string',
+      default: '/',
+      description: 'Public url for bundler',
     })
     .option('src', {
       type: 'string',
