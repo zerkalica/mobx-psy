@@ -7,10 +7,10 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "clean": "rm -rf dist/* *.tsbuildinfo",
-    "build": "tsc --build && mobx-psy-examples-assets && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
+    "clean": "mobx-psy-scripts clean",
+    "build": "tsc --build && mobx-psy-scripts-assets && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
     "start": "node dist/app/prod/server",
-    "watch": "tsc-watch --build --onFirstSuccess 'node dist/app/dev/server' --onSuccess 'mobx-psy-examples-assets'"
+    "watch": "tsc-watch --build --onFirstSuccess 'node dist/app/dev/server' --onSuccess 'mobx-psy-scripts-assets'"
   },
   "bin": {
     "mobx-psy-examples": "./bin/mobx-psy-examples"

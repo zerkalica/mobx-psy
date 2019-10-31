@@ -8,22 +8,17 @@ const open = util.promisify(fs.open)
 const close = util.promisify(fs.close)
 const mkdir = util.promisify(fs.mkdir)
 
-export const defaultSrcDir = 'src'
-export const defaultPattern =
-  '**/*.{css,sass,less,html,png,gif,jpg,svg,md,txt,woff2,woff}'
-export const defaultOutDir = 'dist'
-
-export async function copyAssets({
-  cwd = defaultSrcDir,
-  pattern = defaultPattern,
-  outDir = defaultOutDir,
+export async function makeAssets({
+  src,
+  assets,
+  build,
 }: {
-  cwd?: string
-  outDir?: string
-  pattern?: string
-} = {}) {
-  const files = await glob(pattern, { cwd })
-  const outFiles = files.map(file => path.join(outDir, file))
+  src: string
+  assets: string
+  build: string
+}) {
+  const files = await glob(assets, { cwd: src })
+  const outFiles = files.map(file => path.join(build, file))
   await Promise.all(
     outFiles.map(file => mkdir(path.dirname(file), { recursive: true }))
   )

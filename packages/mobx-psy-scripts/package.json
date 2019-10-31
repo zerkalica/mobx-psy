@@ -12,20 +12,24 @@
     "watch": "tsc --watch"
   },
   "bin": {
+    "mobx-psy-scripts": "./bin/mobx-psy-scripts",
     "mobx-psy-scripts-assets": "./bin/mobx-psy-scripts-assets"
   },
   "dependencies": {
     "abortcontroller-polyfill": "^1.4.0",
     "glob": "^7.1.5",
-    "node-fetch": "^2.6.0",
     "parcel-bundler": "^1.12.4",
+    "rimraf": "^3.0.0",
+    "shelljs": "^0.8.3",
     "source-map-support": "^0.5.16",
     "tsc-watch": "^4.0.0",
     "yargs": "^14.2.0"
   },
   "devDependencies": {
-    "@types/cross-spawn": "^6.0.1",
-    "@types/glob": "^7.1.1"
+    "@types/glob": "^7.1.1",
+    "@types/rimraf": "^2.0.3",
+    "@types/shelljs": "^0.8.5",
+    "@types/yargs": "^13.0.3"
   },
   "peerDependencies": {
     "typescript": "*"

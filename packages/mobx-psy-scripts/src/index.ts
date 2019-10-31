@@ -1,2 +1,2 @@
-import 'source-map-support/register'
-export * from './copyAssets'
+export * from './commands'
+export * from './yargsRun'
