@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 
-require('../dist').yargsRun()
+require('source-map-support/register')
+
+require('../dist').runCommand()

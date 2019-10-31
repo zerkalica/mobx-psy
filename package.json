@@ -3,19 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "description": "Mobx pseudo syncronous loader",
-  "main": "dist/index.js",
   "repository": "https://github.com/zerkalica/mobx-psy",
   "author": "Stefan Zerkalica <zerkalica@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "postinstall": "yarn workspace mobx-psy-scripts run build",
-    "start": "yarn workspace mobx-psy-examples run start",
-    "watch": "yarn workspace mobx-psy-examples run watch",
+    "clean": "yarn workspaces run clean",
     "build": "yarn workspaces run build",
+    "test": "jest",
     "upgrade": "yarn workspaces run upgrade --all",
-    "clean": "yarn workspaces run clean"
+    "postinstall": "yarn workspace mobx-psy-scripts run build"
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "typescript": "^3.7.1-rc",
+    "yarn": "^1.19.1"
+  }
 }

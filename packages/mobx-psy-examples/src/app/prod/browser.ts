@@ -1,5 +1,7 @@
 import { FetchLike } from 'mobx-psy'
 
-import { browserInit } from '../common/browserInit'
+import { createBrowserApp } from '../common/createBrowserApp'
 
-browserInit({ window, fetch: window.fetch as FetchLike })
+import { browserConfig } from './browserConfig'
+
+createBrowserApp({ ...browserConfig, window, fetch: window.fetch as FetchLike })

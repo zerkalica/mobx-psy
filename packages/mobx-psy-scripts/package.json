@@ -7,31 +7,29 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "clean": "rm -rf dist/* *.tsbuildinfo",
+    "clean": "rm -rf *.tsbuildinfo",
     "build": "tsc",
+    "test": "jest",
     "watch": "tsc --watch"
   },
   "bin": {
-    "mobx-psy-scripts": "./bin/mobx-psy-scripts",
-    "mobx-psy-scripts-assets": "./bin/mobx-psy-scripts-assets"
+    "mobx-psy-scripts": "./bin/mobx-psy-scripts"
   },
   "dependencies": {
     "abortcontroller-polyfill": "^1.4.0",
+    "del": "^5.1.0",
+    "exits": "^2.0.1",
     "find-up": "^4.1.0",
-    "glob": "^7.1.5",
-    "parcel-bundler": "^1.12.4",
-    "rimraf": "^3.0.0",
-    "shelljs": "^0.8.3",
+    "globby": "^10.0.1",
     "source-map-support": "^0.5.16",
-    "tsc-watch": "^4.0.0",
     "yargs": "^14.2.0"
   },
   "devDependencies": {
-    "@types/find-up": "^4.0.0",
-    "@types/glob": "^7.1.1",
-    "@types/rimraf": "^2.0.3",
-    "@types/shelljs": "^0.8.5",
-    "@types/yargs": "^13.0.3"
+    "@types/jest": "^24.0.21",
+    "@types/node": "^12.12.3",
+    "@types/yargs": "^13.0.3",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0"
   },
   "peerDependencies": {
     "typescript": "*"

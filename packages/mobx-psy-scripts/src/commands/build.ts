@@ -1,44 +1,43 @@
-import child_process from 'child_process'
-import Bundler from 'parcel-bundler'
 import path from 'path'
-import util from 'util'
+import { Argv } from 'yargs'
+import { ContextOptions } from '../context/createContext'
+import { makeAssets, makeAssetsCommand } from './makeAssets'
+import { spawn, del, exists } from '../utils'
 
-import { ContextOptions } from '../addContextOptions'
-import { makeAssets } from './makeAssets'
+export interface BuildConfig {
+  publicUrl: string
+  minify?: boolean
+}
 
-const exec = util.promisify(child_process.exec)
+export async function build({
+  target,
+  assetMask,
+  srcDir,
+  outDir,
+  projectDir,
+}: ContextOptions &
+  Parameters<typeof makeAssets>[0] & {
+    target: string
+  }) {
+  await spawn('tsc', ['--build'], projectDir)
+  await del(['**/__tests__'], { cwd: outDir })
+  await makeAssets({ assetMask, srcDir, outDir })
 
-export const srcDir = 'src'
-export const distDir = 'dist'
-
-export const browserEntry = 'src/app/prod/browser.ts'
-export const bundleDir = 'dist/public'
-
-//"build": "tsc --build && mobx-psy-scripts-assets && parcel build src/app/prod/browser.ts --out-dir=dist/public --public-url=/mobx-psy",
-
-export async function build(props: ContextOptions) {
-  console.log('Compiling...')
-  const { stdout, stderr } = await exec('tsc --build', { cwd: props.project })
-  console.log(stdout)
-  if (stderr) throw new Error(stderr)
-  console.log(`Make assets in ${path.join(props.project, distDir)}`)
-  await makeAssets(props)
-  if (!props.lib) {
-    const bundlerBrowser = new Bundler(path.join(props.project, browserEntry), {
-      outDir: path.join(props.project, bundleDir),
-      publicUrl: props.public,
-      contentHash: false,
-      watch: false,
-    })
-
-    await bundlerBrowser.bundle()
+  const buildCmd = path.join(outDir, 'app', target, 'build.js')
+  const hasBuild = await exists(buildCmd)
+  if (hasBuild) {
+    await spawn('node', [buildCmd], projectDir)
   }
-
-  console.log('Done')
 }
 
 export const buildCommand = {
   command: 'build',
   describe: 'Create production build',
   handler: build,
+  builder: <V extends ContextOptions>(y: Argv<V>) =>
+    makeAssetsCommand.builder(y).positional('target', {
+      type: 'string',
+      default: 'prod',
+      description: 'src/app/<target>',
+    }),
 }

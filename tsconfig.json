@@ -1,30 +1,15 @@
 {
+    "extends": "mobx-psy-scripts/tsconfig.base.json",
     "exclude": [
         ".cache",
         "**/dist",
-        "**/node_modules",
-        "node_modules",
-        "dist"
+        "**/node_modules"
     ],
     "compilerOptions": {
-        "allowSyntheticDefaultImports": true,
-        "experimentalDecorators": true,
-        "esModuleInterop": true,
-        "sourceMap": true,
-        "declaration": true,
-        "strict": true,
-        "module": "commonjs",
-        "target": "es5",
-        "composite": true,
-        "moduleResolution": "node",
-        "lib": [
-            "dom",
-            "esnext"
-        ],
-        "jsx": "react",
         "baseUrl": "packages",
         "paths": {
             "mobx-psy": ["mobx-psy/src"],
+            "mobx-psy-scripts/*": ["mobx-psy-scripts/*"],
             "mobx-psy-*": ["mobx-psy-*/src"]
         }
     }

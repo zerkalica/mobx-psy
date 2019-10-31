@@ -6,7 +6,6 @@
     "jsx": "react"
   },
   "references": [
-    {"path": "../mobx-psy-scripts"},
     {"path": "../mobx-psy"},
     {"path": "../mobx-psy-ssr"}
   ]

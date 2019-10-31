@@ -4,17 +4,15 @@ import ReactDOM from 'react-dom'
 
 import { MobxPsyExamples, LocationStore, pkgName, stateKey } from '../..'
 
-export interface BrowserInitProps {
-  apiUrl?: string
-  fetch: FetchLike
-  window: Window
-}
-
-export function browserInit({
+export function createBrowserApp({
   window,
   fetch: fetchRaw,
   apiUrl = '/',
-}: BrowserInitProps) {
+}: {
+  apiUrl: string
+  fetch: FetchLike
+  window: Window
+}) {
   const location = new LocationStore(window.location, window.history, window)
   const cache = ((window as unknown) as { [stateKey]?: HydratedState })[
     stateKey

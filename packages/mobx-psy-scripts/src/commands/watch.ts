@@ -1,41 +1,41 @@
 import path from 'path'
-// @ts-ignore
-import TscWatchClient from 'tsc-watch/client'
+import { Argv } from 'yargs'
 
-import { ContextOptions } from '../addContextOptions'
-import { distDir } from './build'
-import { makeAssets } from './makeAssets'
+import { ContextOptions } from '../context'
+import { makeAssets, makeAssetsCommand } from './makeAssets'
+import { spawn, exists } from '../utils'
 
-// "watch": "tsc-watch --build --onFirstSuccess 'node dist/app/dev/server' --onSuccess 'mobx-psy-scripts-assets'"
+export async function watch({
+  target,
+  assetMask,
+  srcDir,
+  outDir,
+  projectDir,
+}: ContextOptions &
+  Parameters<typeof makeAssets>[0] & {
+    target: string
+  }) {
+  const devServer = path.join(outDir, 'app', target, 'watch.js')
+  const devServerSrc = path.join(srcDir, 'app', target, 'watch.ts')
+  const hasServer = await exists(devServerSrc)
 
-export const devServerPath = 'dist/app/dev/server'
-
-export async function watch(props: ContextOptions) {
-  let lock = false
-  const createAssets = async () => {
-    if (lock) return
-    console.log(`Making assets in ${path.join(props.project, distDir)}`)
-    lock = true
-    try {
-      await makeAssets(props)
-    } finally {
-      lock = false
-    }
-  }
-  await createAssets()
-  const client = new TscWatchClient()
-  client.on('success', createAssets)
-  const devServer = path.join(props.project, devServerPath)
-  console.log(`Running ${devServer}`)
-  if (props.lib) {
-    client.start('--build')
+  if (hasServer) {
+    await makeAssets({ srcDir, assetMask, outDir })
+    await spawn('tsc', ['--build'], projectDir)
+    await spawn('node', [devServer], projectDir)
   } else {
-    client.start('--build', `--onFirstSuccess`, `node ${devServer}`)
+    await spawn('tsc', ['--build', '--watch'], projectDir)
   }
 }
 
 export const watchCommand = {
   command: 'watch',
-  describe: 'Development watch server',
+  describe: 'Development server',
   handler: watch,
+  builder: <V extends ContextOptions>(y: Argv<V>) =>
+    makeAssetsCommand.builder(y).positional('target', {
+      type: 'string',
+      default: 'dev',
+      description: 'src/app/<target>',
+    }),
 }

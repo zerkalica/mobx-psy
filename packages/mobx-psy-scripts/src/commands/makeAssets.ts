@@ -1,43 +1,48 @@
 import path from 'path'
-import util from 'util'
-import globRaw from 'glob'
-import fs from 'fs'
+import { promises as fs } from 'fs'
 
-import { ContextOptions } from '../addContextOptions'
+import { Argv } from 'yargs'
+import { ContextOptions } from '../context/createContext'
+import { touch, glob } from '../utils'
 
-import { srcDir, distDir } from './build'
+let prevKey = ''
 
-const glob = util.promisify(globRaw)
-const open = util.promisify(fs.open)
-const close = util.promisify(fs.close)
-const mkdir = util.promisify(fs.mkdir)
+let prevFiles: string[] = []
 
-export const assetsMask = '**/*.{css,sass,less,html,png,gif,jpg,svg,md,txt,woff2,woff}'
+export async function makeAssets({
+  assetMask,
+  srcDir,
+  outDir,
+}: Pick<ContextOptions, 'srcDir' | 'outDir'> & { assetMask: string }) {
+  const files = await glob([assetMask], { cwd: srcDir })
+  const outFiles = files.map(file => path.join(outDir, file))
+  const key = outFiles.join(',')
+  if (key === prevKey) return
+  prevKey = key
 
-export async function makeAssets({ project }: ContextOptions) {
-  const files = await glob(assetsMask, { cwd: path.join(project, srcDir) })
-  const outFiles = files.map(file => path.join(project, distDir, file))
+  const outFilesSet = new Set(outFiles)
+  const deleteFiles = prevFiles.filter(file => !outFilesSet.has(file))
+  prevFiles = outFiles
 
-  const nonExistent = await Promise.all(outFiles.map(file => isExists(file)))
+  await Promise.all([
+    Promise.all(deleteFiles.map(fs.unlink)),
+    Promise.all(outFiles.map(touch)),
+  ])
 
-  const newFiles = nonExistent
-    .filter(([isExists]) => isExists)
-    .map(([, file]) => file)
+  if (outFiles.length > 0) console.log(`Created ${outFiles.length} assets`)
 
-  await Promise.all(newFiles.map(touch))
+  if (deleteFiles.length > 0)
+    console.log(`Deleted ${deleteFiles.length} assets`)
 }
 
-async function touch(file: string) {
-  await mkdir(path.dirname(file), { recursive: true })
-  const handle = await open(file, 'w')
-  await close(handle)
-}
-
-async function isExists(file: string) {
-  try {
-    await fs.promises.access(file)
-    return [true, file] as const
-  } catch (error) {
-    return [false, file] as const
-  }
+export const makeAssetsCommand = {
+  command: 'make-assets',
+  describe: 'Create asset stubs for running prerender server without webpack',
+  handler: makeAssets,
+  builder: <V extends ContextOptions>(y: Argv<V>) =>
+    y.option('assetMask', {
+      type: 'string',
+      default: '**/*.{css,sass,less,html,png,gif,jpg,svg,md,txt,woff2,woff}',
+      description: 'Assets glob mask, relative to src dir',
+    }),
 }

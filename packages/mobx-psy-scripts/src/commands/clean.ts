@@ -1,20 +1,26 @@
-import rimrafRaw from 'rimraf'
-import util from 'util'
+import { Argv } from 'yargs'
+import { ContextOptions } from '../context'
+import { del } from '../utils'
 
-import { ContextOptions } from '../addContextOptions'
-
-const rimraf = util.promisify(rimrafRaw)
-
-const removeMask = 'dist,*.tsbuildinfo,*.log'
-
-export async function clean(context: ContextOptions) {
-  console.log(`rimraf ${removeMask}`)
-  const cmds = removeMask.split(',')
-  await Promise.all(cmds.map(cmd => rimraf(cmd)))
+export async function clean({
+  cleanMask,
+  projectDir,
+}: {
+  cleanMask: string
+  projectDir: string
+}) {
+  const cmds = cleanMask.split(',')
+  await del(cmds, { cwd: projectDir })
 }
 
 export const cleanCommand = {
   command: 'clean',
   describe: 'Clean project dist directory',
   handler: clean,
+  builder: <V extends ContextOptions>(y: Argv<V>) =>
+    y.option('cleanMask', {
+      type: 'string',
+      default: 'dist,*.tsbuildinfo,*.log',
+      description: 'Clean file glob mask',
+    }),
 }

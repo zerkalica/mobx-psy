@@ -2,7 +2,7 @@ import { Refreshable, setRefreshable } from './Refreshable'
 import { isPromise, throwHidden } from '../utils'
 import { FiberHost } from './FiberHost'
 
-class FiberHostNotFound extends Error {
+export class FiberHostNotFound extends Error {
   constructor(message = `Run fiber inside fiber host: use @sync`) {
     super(message)
   }

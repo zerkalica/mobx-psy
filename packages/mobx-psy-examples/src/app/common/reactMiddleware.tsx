@@ -12,15 +12,18 @@ import {indexHtml} from './index.html'
 
 import { MobxPsyExamples, LocationStore, pkgName, stateKey } from '../..'
 
-interface ReactMiddlewareProps {
-  apiUrl?: string
-  fetch: FetchLike<any>
+export interface MobxPsyExamplesConfig {
+  apiUrl: string
   publicUrl: string
+}
+
+interface ReactMiddlewareProps extends MobxPsyExamplesConfig {
+  fetch: FetchLike<any>
   entry?: string
 }
 
 export function reactMiddleware({
-  apiUrl = '/',
+  apiUrl,
   fetch,
   publicUrl,
   entry = 'browser'
