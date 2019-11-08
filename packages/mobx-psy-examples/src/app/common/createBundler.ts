@@ -12,7 +12,9 @@ export function createBundler({
   minify = false,
   distRoot,
   watch = false,
+  scopeHoist= false
 }: {
+  scopeHoist?: boolean
   watch?: boolean
   publicUrl: string
   minify?: boolean
@@ -26,6 +28,7 @@ export function createBundler({
   const bundler: GenericBundler = new Bundler(browserEntry, {
     outDir,
     publicUrl,
+    scopeHoist,
     contentHash: false,
     watch,
     minify,

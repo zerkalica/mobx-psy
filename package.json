@@ -19,5 +19,8 @@
   "devDependencies": {
     "typescript": "^3.7.1-rc",
     "yarn": "^1.19.1"
+  },
+  "dependencies": {
+    "@types/styled-system": "^5.1.3"
   }
 }
