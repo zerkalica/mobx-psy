@@ -10,17 +10,19 @@
     "clean": "yarn workspaces run clean",
     "build": "yarn workspaces run build",
     "test": "jest",
-    "upgrade": "yarn workspaces run upgrade --all",
-    "postinstall": "yarn workspace mobx-psy-scripts run build"
+    "upgrade": "yarn workspaces run upgrade --all"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*/*",
+    "packages/*/app/*"
   ],
   "devDependencies": {
-    "typescript": "^3.7.1-rc",
-    "yarn": "^1.19.1"
-  },
-  "dependencies": {
+    "ts-build-scripts": "*",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.7.1",
+    "yarn": "^1.19.1",
+    "@types/jest": "^24.0.21",
     "@types/styled-system": "^5.1.3"
   }
 }

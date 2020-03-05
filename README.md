@@ -4,13 +4,14 @@ mobx-psy completely removes async functions, promises and streams from your MobX
 
 ## Packages
 
-- [mobx-psy](./packages/mobx-psy) - Core library
-- [mobx-psy-ssr](./packages/mobx-psy-ssr) - Helpers for using mobx-psy with server side rendering
-- [mobx-psy-examples](./packages/mobx-psy-examples) - Example application: filter form, list, pagination, loading indicator, parametrized url. Parcel, server side rendering, dev and prod server, state hydrate.
+- [mobx-psy](./packages/mobx-psy/core) - Core library
+- [mobx-psy-ssr](./packages/mobx-psy/ssr) - Helpers for using mobx-psy with server side rendering
+- [my/app/search](./packages/my/app/search) - Example application: filter form, list, pagination, loading indicator, parametrized url. Parcel, server side rendering, dev and prod server, state hydrate.
 
 Run demo application:
 
 ```
+cd packages/my/app/search
 yarn install
 yarn watch
 ```

@@ -1,0 +1,29 @@
+{
+  "name": "@my/server-polyfill",
+  "version": "1.0.0",
+  "description": "Example app common server staff",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf dist *.tsbuildinfo *.log",
+    "build": "tsc --build",
+    "watch": "tsc --build --watch",
+    "test": "jest"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "dependencies": {
+    "abortcontroller-polyfill": "^1.3.0",
+    "source-map-support": "^0.5.13"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.3"
+  },
+  "peerDependencies": {
+    "typescript": "*",
+    "jest": "*"
+  }
+}
