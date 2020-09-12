@@ -1,5 +1,5 @@
 import { action, computed, reaction } from 'mobx'
-import { disposer, draft } from 'mobx-psy'
+import { effect, draft } from 'mobx-psy'
 import { MyRouterLocation } from '@my/router'
 
 export const mySearchFlatModelFilterDefaults = {
@@ -11,17 +11,11 @@ export const mySearchFlatModelFilterDefaults = {
 
 export class MySearchFlatModelFilter {
   constructor(protected location: MyRouterLocation) {
-    disposer(this, 'values', () =>
-      reaction(
-        () => {
-          return JSON.stringify(this.draft)
-        },
-        this.submit,
-        {
-          delay: 300,
-        }
-      )
-    )
+    effect(this, 'values', () => reaction(
+      () => JSON.stringify(this.draft),
+      this.submit,
+      { delay: 300 }
+    ))
   }
 
   @computed protected get url() {

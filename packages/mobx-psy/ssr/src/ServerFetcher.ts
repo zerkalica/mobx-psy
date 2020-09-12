@@ -1,4 +1,4 @@
-import { HydratedState, FetchLike, SyncFetch, fiberizeFetch } from 'mobx-psy'
+import { HydratedState, FetchLike, SyncFetch, suspendify } from 'mobx-psy'
 
 export class ServerFetcher<Init = RequestInit> {
   protected promises: PromiseLike<[string, any]>[] = []
@@ -12,7 +12,7 @@ export class ServerFetcher<Init = RequestInit> {
       fetch: FetchLike<Init>
     }
   ) {
-    this.fetch = fiberizeFetch(this.normalizedFetch.bind(this), this.state, true)
+    this.fetch = suspendify(this.normalizedFetch.bind(this), this.state, true)
   }
 
   protected normalizedFetch(url: string, init: Init) {
@@ -24,16 +24,19 @@ export class ServerFetcher<Init = RequestInit> {
     return promise
   }
 
-  collectState() {
-    return Promise.all(this.promises).then(items => {
-      for (let [url, data] of items) this.state[url] = data
-      const end = items.length === 0
-      this.promises = []
+  async collectState() {
+    const items = await Promise.all(this.promises)
 
-      return {
-        state: this.state,
-        end,
-      }
-    })
+    for (let [url, data] of items) {
+      this.state[url] = data
+    }
+
+    const end = items.length === 0
+    this.promises = []
+
+    return {
+      state: this.state,
+      end,
+    }
   }
 }

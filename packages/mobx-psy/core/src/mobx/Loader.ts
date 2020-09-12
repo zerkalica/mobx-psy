@@ -1,30 +1,57 @@
 import { action, computed, observable } from 'mobx'
 
 import { FiberHost } from '../fibers'
-import { disposer } from './disposer'
+import { effect } from './effect'
 import { getDerivableName } from './getDerivableName'
 
+/**
+ * Suspendable calculations
+ * 
+ * @throws Error | PromiseLike<V>
+ */
+export type LoaderHandler<V> = () => V
+
+/**
+ * Run, restart and cache suspendable calculations in the handler.
+ */
 export class Loader<V> extends FiberHost {
   @observable protected counter = 0
-  protected init = true
+  protected initial = true
 
-  constructor(protected handler: () => V, protected dispose: () => void) {
+  constructor(
+    protected handler: LoaderHandler<V>,
+
+    /**
+     * Called after Loader.value become unobserved
+     */
+    protected dispose: () => void
+  ) {
     super('Loader#' + getDerivableName())
-    disposer(this, 'value', () => this.destructor.bind(this))
+    effect(this, 'value', () => this.destructor.bind(this))
   }
 
-  get initial() {
-    return this.init
+  get isFirstRun() {
+    return this.initial
   }
 
+  /**
+   * Observable value
+   *
+   * @throws Error | PromiseLike<V> 
+   */
   @computed get value(): V {
+    // Subscribe to observable counter to recalucate all value deps, if Loader.next called
     this.counter
     const prev = FiberHost.current
+
+    // Expose themself to handler fibers
     FiberHost.current = this
+
     try {
       const next = this.handler()
       this.clear()
-      this.init = false
+      this.initial = false
+
       return next
     } finally {
       FiberHost.current = prev
@@ -35,9 +62,12 @@ export class Loader<V> extends FiberHost {
     this.counter++
   }
 
+  /**
+   * Called on Loader.value become unobserved
+   */
   destructor() {
     this.clear()
-    this.init = true
+    this.initial = true
     this.dispose()
   }
 }

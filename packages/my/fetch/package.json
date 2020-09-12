@@ -18,10 +18,10 @@
   "dependencies": {
     "mobx-psy": "^1.0.0",
     "@my/router": "^1.0.0",
-    "react": "^16.9.0"
+    "react": "^16.13.1"
   },
   "devDependencies": {
-    "@types/react": "^16.9.0"
+    "@types/react": "^16.9.49"
   },
   "peerDependencies": {
     "typescript": "*",

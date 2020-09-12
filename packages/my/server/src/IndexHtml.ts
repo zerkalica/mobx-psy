@@ -2,6 +2,9 @@ export class MyServerIndexHtml {
   constructor(
     protected options: {
       title: string
+      /**
+       * Only absolute path allowed
+       */
       publicUrl: string
       pkgName: string
       entry?: string
@@ -9,7 +12,7 @@ export class MyServerIndexHtml {
   ) {}
 
   get header() {
-    return `<!DOCTYPE html>
+    return `<!doctype html>
   <html lang="en">
     <head>
       <meta charset="utf-8" />

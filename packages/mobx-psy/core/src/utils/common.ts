@@ -3,7 +3,7 @@ export function getId(t: Object, hk: string | symbol): string {
     t.constructor.name}.${hk.toString()}`
 }
 
-export function isPromise(target: any): target is Promise<any> {
+export function isPromise(target: any): target is PromiseLike<any> {
   return (
     target !== null &&
     typeof target === 'object' &&
@@ -18,6 +18,28 @@ export function namedFunction<F extends Function>(fn: F, name: string): F {
   return fn
 }
 
+/**
+ * Helps to disable pause in chrome dev tools while error rethrow
+ */
 export function throwHidden(error: Error | PromiseLike<any>): never {
   throw error // Set Never pause here in chrome devtools
+}
+
+const wm = new WeakMap<any, Error>()
+
+/**
+ * Convert non Error or PromiseLike to Error
+ */
+export function normalizeError(error: any): Error | PromiseLike<any> {
+  if (isPromise(error) || error instanceof Error) return error
+
+  // Weakmap used to keep instance of error with same input value
+  let converted = wm.get(error)
+  
+  if (converted) return converted
+
+  converted = new Error(error)
+  wm.set(converted, error)
+
+  return converted
 }

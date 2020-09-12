@@ -7,6 +7,16 @@ type Wrapped<V extends PackedBase> = {
   [P in keyof V]: () => V[P]
 }
 
+/**
+ * Execute suspendable calculations in parallel
+ *
+ * ```ts
+ * const { a, b } = parallel({
+ *   a: () => some.a // can throw Error | PromiseLike
+ *   b: () => some.b // can throw Error | PromiseLike
+ * })
+ * ```
+ */
 export function parallel<V extends PackedBase>(v: Wrapped<V>): V {
   const keys = Object.keys(v)
   const result = {} as V

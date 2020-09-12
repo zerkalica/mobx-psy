@@ -1,5 +1,5 @@
 export * from './Fiber'
 export * from './FiberHost'
 export * from './Refreshable'
-export * from './fiberizeFetch'
+export * from './suspendify'
 export * from './parallel'

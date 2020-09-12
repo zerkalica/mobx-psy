@@ -3,8 +3,16 @@ import React from 'react'
 import { Refreshable } from '../fibers'
 
 export interface FallbackLoadingProps {
+  /**
+   * User can retry errored request
+   */
   refreshable?: Refreshable
+
+  /**
+   * Last actual version of observed component node
+   */
   children?: React.ReactNode
+
   className?: string
   contentClassName?: string
 }
@@ -20,9 +28,20 @@ export function FallbackLoading({
 }
 
 export interface FallbackErrorProps {
+  /**
+   * Component last error
+   */
   error: Error
+  /**
+   * User can retry errored request
+   */
   refreshable?: Refreshable
+
+  /**
+   * Last actual version of observed component node
+   */
   children?: React.ReactNode
+
   className?: string
   contentClassName?: string
   errorClassName?: string

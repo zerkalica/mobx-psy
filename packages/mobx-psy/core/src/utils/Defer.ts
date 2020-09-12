@@ -5,29 +5,36 @@ const frame =
     ? (cb: () => void) => Promise.resolve().then(cb)
     : requestAnimationFrame
 
-export class Defer {
-  callbacks: DeferCallback[] = []
+/**
+ * Simple scheduler.
+ * Runs callbacks in series on each animation frame.
+ */
+class Defer {
+  protected callbacks: DeferCallback[] = []
   protected scheduled = false
 
   add(cb: DeferCallback): this {
     this.callbacks.push(cb)
+
     if (this.scheduled) return this
+
     this.scheduled = true
-    frame(this.rewind)
+    frame(this.rewind.bind(this))
 
     return this
   }
 
-  rewind = () => {
+  rewind() {
     this.scheduled = false
     const callbacks = this.callbacks
     this.callbacks = []
-    for (let cb of callbacks) {
+
+    for (const cb of callbacks) {
       try {
         cb()
       } catch (error) {
-        console.warn(error)
-      }
+        console.error(error)
+      }  
     }
   }
 }

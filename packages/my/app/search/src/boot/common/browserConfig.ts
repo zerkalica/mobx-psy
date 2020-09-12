@@ -1,4 +1,4 @@
 export const mySearchBootCommonBrowserConfig = {
-  publicUrl: './',
+  publicUrl: '/',
   apiUrl: '/'
 }

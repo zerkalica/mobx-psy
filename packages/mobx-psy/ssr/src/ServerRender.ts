@@ -27,7 +27,7 @@ export class ServerRenderer<Init> {
     }
   ) {}
 
-  protected getHtml(): Promise<string> {
+  protected getHtml() {
     const { render } = this.options
 
     return new Promise<string>((resolve, reject) => {
@@ -50,32 +50,34 @@ export class ServerRenderer<Init> {
     })
   }
 
-  protected getState(): Promise<ServerResult> {
-    const {
-      options: { fetcher },
-    } = this
+  protected async getState(): Promise<ServerResult> {
+    const fetcher = this.options.fetcher
+    const html = await this.getHtml()
+    const { end, state } = await fetcher.collectState()
 
-    return this.getHtml().then(html => {
-      return fetcher.collectState().then(({ state, end }) => {
-        if (end) return { html, state }
-        return this.getState()
-      })
-    })
+    if (end) return { html, state }
+
+    const next = await this.getState()
+
+    return next
   }
 
-  run() {
-    return this.getState()
-      .then(data => {
-        this.next(data)
-        this.complete()
+  async run() {
+    try {
+      const data = await this.getState()
+      this.next(data)
+      this.complete()  
+    } catch (error) {
+      this.error(error)
+    }
 
-        return this.options.response
-      })
-      .catch(this.error.bind(this))
+    return this.options.response
   }
 
   protected error(error: Error) {
-    if (this.options.error) this.options.error(error)
+    if (this.options.error) return this.options.error(error)
+    
+    console.error(error)
   }
 
   protected complete() {

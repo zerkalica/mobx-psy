@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "mobx-psy": "^1.0.0",
-    "mobx": "^5.0.0"
+    "mobx": "^5.15.6"
   },
   "peerDependencies": {
     "typescript": "*",

@@ -1,5 +1,5 @@
 import { action, computed, observable, reaction } from 'mobx'
-import { disposer, sync } from 'mobx-psy'
+import { effect, sync } from 'mobx-psy'
 import { MyFetchSync, useMyFetchContext } from '@my/fetch'
 import { MyRouterLocation } from '@my/router'
 import React from 'react'
@@ -26,7 +26,7 @@ export class MySearchFlatModel {
 
 export class MySearchFlatModelStore {
   constructor(protected location: MyRouterLocation, protected fetch: MyFetchSync) {
-    disposer(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
+    effect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
   }
 
   static use() {

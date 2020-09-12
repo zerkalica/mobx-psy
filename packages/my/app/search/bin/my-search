@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('../dist/app/prod/server')
+require('../dist/boot/prod/server')

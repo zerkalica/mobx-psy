@@ -1,4 +1,4 @@
-import { FetchLike, fiberizeFetch, HydratedState } from 'mobx-psy'
+import { FetchLike, suspendify, HydratedState } from 'mobx-psy'
 import { MyRouterLocation } from '@my/router'
 
 export function myBrowserContext({
@@ -14,7 +14,7 @@ export function myBrowserContext({
 }) {
   const location = new MyRouterLocation(window.location, window.history, window)
   const cache = ((window as unknown) as { [pkgName: string]: HydratedState })[pkgName]
-  const syncFetch = fiberizeFetch((url, params) => fetchRaw(apiUrl + url, params), cache)
+  const syncFetch = suspendify((url, params) => fetchRaw(apiUrl + url, params), cache)
   const id = `${pkgName}-main`
   const container = window.document.getElementById(id)
 

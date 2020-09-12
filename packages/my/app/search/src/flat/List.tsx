@@ -35,18 +35,18 @@ export const MySearchFlatList = observer(function MySearchFlatList({ id }: { id:
       <button id={`${id}-refresh`} onClick={flats.refresh}>
         Refresh list
       </button>
-      {mock(
-        () => (
+      {mock({
+        unsafe: () => (
           <ul id={`${id}-flats`}>
             {flats.filtered.map(flat => (
               <MySearchFlatDetails id={`${id}-flat[${flat.id}]`} key={flat.id} flat={flat} />
             ))}
           </ul>
         ),
-        () => (
+        fallback: () => (
           <div id={`${id}-load`}>Load...</div>
         )
-      )}
+        })}
       Page {flats.page} of {flats.totalPages}
       <br />
       <button id={`${id}-more`} onClick={flats.more} disabled={flats.moreDisabled}>

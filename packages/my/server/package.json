@@ -21,13 +21,13 @@
     "@my/router": "^1.0.0",
     "@my/fetch": "^1.0.0",
     "mobx-psy-ssr": "^1.0.0",
-    "react-dom": "^16.10.2"
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@my/build": "^1.0.0",
-    "@types/express": "^4.17.1",
-    "@types/node": "^12.12.3",
-    "@types/react-dom": "^16.9.2"
+    "@types/express": "^4.17.8",
+    "@types/node": "^14.10.1",
+    "@types/react-dom": "^16.9.8"
   },
   "peerDependencies": {
     "typescript": "*",

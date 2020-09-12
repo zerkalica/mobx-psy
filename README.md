@@ -77,11 +77,11 @@ After:
 
 ```tsx
 import { observable, action } from 'mobx'
-import { sync, observer, fiberizeFetch, disposer } from 'mobx-psy'
+import { sync, observer, suspendify, effect } from 'mobx-psy'
 import React from 'react'
 
 const baseUrl = '/'
-const fetchJson = fiberizeFetch((url, params) => fetch(baseUrl + url, params).then(r => r.json()))
+const fetchJson = suspendify((url, params) => fetch(baseUrl + url, params).then(r => r.json()))
 
 interface Todo {
   text: string
@@ -89,7 +89,7 @@ interface Todo {
 
 class TodoStore {
   constructor() {
-    disposer(this, 'todos', () => {
+    effect(this, 'todos', () => {
       const handle = setTmeout(() => sync.reset(() => this.todos), 3000)
       return () => clearTimeout(handle)
     })

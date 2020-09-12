@@ -9,9 +9,11 @@ export function locationFromNodeRequest(
   const parts = parse(req.url || '')
   const headers = req.headers
   let host = headers['x-forwarded-host'] || headers['host'] || ''
+
   if (Array.isArray(host)) host = host[0] || ''
 
   let protocol = headers['x-forwared-proto'] || (sequre ? 'https' : 'http')
+
   if (Array.isArray(protocol)) protocol = protocol[0] || ''
 
   // IPv6 literal support

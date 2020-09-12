@@ -1,5 +1,29 @@
 import { observable } from 'mobx'
 
+/**
+ * Create an observable mutable proxy of immutable object.
+ * Each property is observable.
+ *
+ * ```ts
+ * class A {
+ *   @observable a = '123'
+ * }
+ *
+ * const original = new A
+ * const copy = draft(original)
+ *
+ * autorun(() => {
+ *   console.log(copy, 'changed')
+ * })
+ *
+ * copy.a = '321' // changed
+ * original.a === '123'
+ *
+ * if (copy.changed) {
+ *   Object.assign(original, draft)
+ * }
+ * ```
+ */
 export function draft<O extends {}>(orig: O): O {
   return new Draft(orig).values
 }
