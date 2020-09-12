@@ -1,0 +1,36 @@
+{
+  "name": "@demo/lib-server",
+  "version": "1.0.0",
+  "description": "Example app common server staff",
+  "main": "-/index.js",
+  "types": "-/index.d.ts",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf - *.tsbuildinfo *.log",
+    "build": "tsc --build",
+    "watch": "tsc --build --watch",
+    "test": "jest --passWithNoTests"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mobx-psy": "^1.0.0",
+    "@demo/lib-router": "^1.0.0",
+    "@demo/lib-fetch": "^1.0.0",
+    "mobx-psy-ssr": "^1.0.0",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@demo/lib-build": "^1.0.0",
+    "@types/express": "^4.17.8",
+    "@types/node": "^14.10.1",
+    "@types/react-dom": "^16.9.8"
+  },
+  "peerDependencies": {
+    "typescript": "*",
+    "jest": "*"
+  }
+}

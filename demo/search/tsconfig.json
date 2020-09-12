@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "-",
+    "rootDir": ".",
+    "jsx": "react"
+  },
+  "references": [
+    {"path": "../../mobx-psy/core"},
+    {"path": "../../mobx-psy/ssr"},
+    {"path": "../lib/server"},
+    {"path": "../lib/server-polyfill"},
+    {"path": "../lib/browser"},
+    {"path": "../lib/browser-polyfill"},
+    {"path": "../lib/ui"},
+    {"path": "../lib/fetch"},
+    {"path": "../lib/router"},
+    {"path": "../lib/build"}
+  ]
+}

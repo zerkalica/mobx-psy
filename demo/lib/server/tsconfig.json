@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "-",
+    "rootDir": ".",
+    "jsx": "react"
+  },
+  "references": [
+    {"path": "../../../mobx-psy/core"},
+    {"path": "../../../mobx-psy/ssr"},
+    {"path": "../router"},
+    {"path": "../build"},
+    {"path": "../fetch"},
+  ]
+}

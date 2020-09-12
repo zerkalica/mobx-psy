@@ -1,0 +1,26 @@
+{
+  "name": "@demo/lib-router",
+  "version": "1.0.0",
+  "description": "Example app stack router",
+  "main": "-/index.js",
+  "types": "-/index.d.ts",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf - *.tsbuildinfo *.log",
+    "build": "tsc --build",
+    "watch": "tsc --build --watch",
+    "test": "jest --passWithNoTests"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "dependencies": {
+    "mobx-psy": "^1.0.0",
+    "mobx": "^5.15.6"
+  },
+  "peerDependencies": {
+    "typescript": "*",
+    "jest": "*"
+  }
+}

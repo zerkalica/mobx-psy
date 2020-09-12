@@ -1,31 +1,31 @@
 {
-    "compilerOptions": {
-        "experimentalDecorators": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "sourceMap": true,
-        "declaration": true,
-        "strict": true,
-        "composite": true,
-        "incremental": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "target": "ES2019",
-        "lib": [
-            "dom",
-            "esnext"
-        ],
-        "jsx": "react",
-        "baseUrl": "packages",
-        "paths": {
-            "mobx-psy": ["mobx-psy/core/src"],
-            "mobx-psy-*": ["mobx-psy/*/src"],
-            "@my/*": ["my/*/src"]
-        }
-    },
-    "exclude": [
-        ".cache",
-        "**/dist",
-        "**/node_modules"
-    ]
+  "compilerOptions": {
+      "experimentalDecorators": true,
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": true,
+      "sourceMap": true,
+      "declaration": true,
+      "strict": true,
+      "composite": true,
+      "incremental": true,
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "target": "ES2019",
+      "lib": [
+          "dom",
+          "esnext"
+      ],
+      "jsx": "react",
+      "baseUrl": ".",
+      "paths": {
+          "mobx-psy": ["mobx-psy/core"],
+          "mobx-psy-*": ["mobx-psy/*"],
+          "@demo/lib-*": ["demo/lib/*"]
+      }
+  },
+  "exclude": [
+      "**/.cache",
+      "**/-",
+      "**/node_modules"
+  ]
 }

@@ -1,0 +1,30 @@
+{
+  "name": "@demo/lib-fetch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Example app common models staff",
+  "main": "-/index.js",
+  "types": "-/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf - *.tsbuildinfo *.log",
+    "build": "tsc --build",
+    "watch": "tsc --build --watch",
+    "test": "jest --passWithNoTests"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "dependencies": {
+    "mobx-psy": "^1.0.0",
+    "@demo/lib-router": "^1.0.0",
+    "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.49"
+  },
+  "peerDependencies": {
+    "typescript": "*",
+    "jest": "*"
+  }
+}
