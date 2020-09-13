@@ -16,6 +16,10 @@
     "node": ">=12.0.0"
   },
   "dependencies": {
+    "@emotion/core": "^10.0.35",
+    "@emotion/styled": "^10.0.27",
+    "@demo/lib-ui": "^1.0.0",
+    "mobx": "^5.15.6",
     "mobx-psy": "^1.0.0",
     "@demo/lib-router": "^1.0.0"
   },

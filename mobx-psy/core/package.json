@@ -11,18 +11,20 @@
     "clean": "rm -rf - *.tsbuildinfo *.log",
     "build": "tsc --build",
     "watch": "tsc --build --watch",
-    "test": "jest"
+    "test": "jest --passWithNoTests",
+    "release": "yarn build && node ts-build-scripts prepublish && yarn publish -cwd -"
   },
   "devDependencies": {
     "mobx": "^5.15.6",
     "mobx-react-lite": "^2.2.1",
     "react": "^16.13.1",
-    "@types/react": "^16.9.49"
+    "@types/react": "^16.9.49",
+    "ts-build-scripts": "^1.0.1"
   },
   "peerDependencies": {
-    "mobx": "^5.15.6",
-    "mobx-react-lite": "^2.2.1",
-    "react": "^16.13.1",
+    "mobx": "*",
+    "mobx-react-lite": "*",
+    "react": "*",
     "jest": "*",
     "typescript": "*"
   }

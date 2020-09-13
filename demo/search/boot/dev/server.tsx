@@ -1,27 +1,29 @@
-import '@demo/lib-server-polyfill'
+import '@demo/lib-server/polyfill'
 
-import { demoLibServerDev } from '@demo/lib-server'
 import React from 'react'
 
-import { DemoSearch, demoLibSearchPkgName } from '../..'
-import { demoLibSearchBootDevMocks } from './mocks'
-import { demoLibSearchBootCommonServerConfig } from '../common/serverConfig'
-import { demoLibSearchBootDevBrowserConfig } from './browserConfig'
+import { demoLibServerDev } from '@demo/lib-server'
+
+import { demoSearchPkgName } from '../../pkgName'
+import { DemoSearch } from '../../search'
+import { demoSearchBootCommonServerConfig } from '../common/serverConfig'
+import { demoSearchBootDevBrowserConfig } from './browserConfig'
+import { demoSearchBootDevMocks } from './mocks'
 
 const distRoot = __dirname
 
-const fetch = demoLibSearchBootDevMocks({
+const fetch = demoSearchBootDevMocks({
   errorRate: 1,
   timeout: 100,
 })
 
 demoLibServerDev({
-  ...demoLibSearchBootCommonServerConfig,
-  ...demoLibSearchBootDevBrowserConfig,
+  ...demoSearchBootCommonServerConfig,
+  ...demoSearchBootDevBrowserConfig,
   fetch,
   distRoot,
-  pkgName: demoLibSearchPkgName,
+  pkgName: demoSearchPkgName,
   render: ({ location, fetcher }) => (
-    <DemoSearch id={demoLibSearchPkgName} location={location} fetch={fetcher.fetch} />
+    <DemoSearch id={demoSearchPkgName} location={location} fetch={fetcher.fetch} />
   ),
 })

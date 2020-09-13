@@ -1,4 +1,4 @@
-export const demoLibSearchBootCommonBrowserConfig = {
+export const demoSearchBootCommonBrowserConfig = {
   publicUrl: '/',
   apiUrl: '/'
 }

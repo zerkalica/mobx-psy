@@ -19,8 +19,8 @@ export function demoLibServerProd({
     distRoot: string
   }) {
   express()
-    .use(express.static(path.join(distRoot, 'public'), { index: false }))
     .use(demoLibServerContextMiddleware({ fetch, apiUrl }))
+    .use(express.static(path.join(distRoot, 'public'), { index: false }))
     .use(
       demoLibServerRenderMiddleware({
         ...options,

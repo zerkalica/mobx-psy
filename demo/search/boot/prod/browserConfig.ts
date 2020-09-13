@@ -1,5 +1,5 @@
-import { demoLibSearchBootCommonBrowserConfig } from '../common/browserConfig'
+import { demoSearchBootCommonBrowserConfig } from '../common/browserConfig'
 
-export const demoLibSearchBootProdBrowserConfig = {
-  ...demoLibSearchBootCommonBrowserConfig
+export const demoSearchBootProdBrowserConfig = {
+  ...demoSearchBootCommonBrowserConfig
 }

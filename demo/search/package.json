@@ -1,5 +1,5 @@
 {
-  "name": "@demo/lib-app-search",
+  "name": "@demo/demo-search",
   "version": "1.0.0",
   "private": true,
   "description": "Example flat search application",
@@ -12,10 +12,10 @@
     "build:dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/build",
     "watch": "tsc --build && NODE_ENV=development node ./-/boot/dev/server",
     "test": "jest --passWithNoTests",
-    "start": "bin/my-search"
+    "start": "bin/demo-search"
   },
   "bin": {
-    "my-search": "./bin/my-search"
+    "my-search": "./bin/demo-search"
   },
   "engines": {
     "node": ">=12.0.0"
@@ -24,11 +24,9 @@
     "@emotion/core": "^10.0.35",
     "@emotion/styled": "^10.0.27",
     "@demo/lib-browser": "^1.0.0",
-    "@demo/lib-browser-polyfill": "^1.0.0",
     "@demo/lib-fetch": "^1.0.0",
     "@demo/lib-router": "^1.0.0",
     "@demo/lib-server": "^1.0.0",
-    "@demo/lib-server-polyfill": "^1.0.0",
     "@demo/lib-ui": "^1.0.0",
     "express": "^4.17.1",
     "mobx": "^5.15.6",

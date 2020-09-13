@@ -1,23 +1,25 @@
-import '@demo/lib-server-polyfill'
+import '@demo/lib-server/polyfill'
 
-import { DemoLibFetch } from '@demo/lib-fetch'
-import { demoLibServerProd } from '@demo/lib-server'
 import fetch from 'node-fetch'
 import React from 'react'
 
-import { DemoSearch, demoLibSearchPkgName } from '../..'
-import { demoLibSearchBootCommonServerConfig } from '../common/serverConfig'
-import { demoLibSearchBootProdBrowserConfig } from './browserConfig'
+import { DemoLibFetch } from '@demo/lib-fetch'
+import { demoLibServerProd } from '@demo/lib-server'
+
+import { demoSearchPkgName } from '../../pkgName'
+import { DemoSearch } from '../../search'
+import { demoSearchBootCommonServerConfig } from '../common/serverConfig'
+import { demoSearchBootProdBrowserConfig } from './browserConfig'
 
 const distRoot = __dirname
 
 demoLibServerProd({
-  ...demoLibSearchBootProdBrowserConfig,
-  ...demoLibSearchBootCommonServerConfig,
-  pkgName: demoLibSearchPkgName,
+  ...demoSearchBootProdBrowserConfig,
+  ...demoSearchBootCommonServerConfig,
+  pkgName: demoSearchPkgName,
   fetch: fetch as DemoLibFetch,
   distRoot,
   render: ({ location, fetcher }) => (
-    <DemoSearch id={demoLibSearchPkgName} location={location} fetch={fetcher.fetch} />
+    <DemoSearch id={demoSearchPkgName} location={location} fetch={fetcher.fetch} />
   ),
 })

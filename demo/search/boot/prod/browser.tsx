@@ -1,21 +1,22 @@
-import '@demo/lib-browser-polyfill'
+import '@demo/lib-browser/polyfill'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
 
 import { demoLibBrowserContext } from '@demo/lib-browser'
 
-import { DemoSearch, demoLibSearchPkgName } from '../..'
-import { demoLibSearchBootProdBrowserConfig } from './browserConfig'
+import { DemoSearch } from '../../search'
+import { demoSearchPkgName } from '../../pkgName'
+import { demoSearchBootProdBrowserConfig } from './browserConfig'
 
 const context = demoLibBrowserContext({
-  ...demoLibSearchBootProdBrowserConfig,
+  ...demoSearchBootProdBrowserConfig,
   window,
   fetch: window.fetch,
-  pkgName: demoLibSearchPkgName,
+  pkgName: demoSearchPkgName,
 })
 
 ReactDOM.render(
-  <DemoSearch id={demoLibSearchPkgName} location={context.location} fetch={context.fetch} />,
+  <DemoSearch id={demoSearchPkgName} location={context.location} fetch={context.fetch} />,
   context.container
 )

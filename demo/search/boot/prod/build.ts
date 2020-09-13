@@ -1,13 +1,13 @@
-import '@demo/lib-server-polyfill'
+import '@demo/lib-server/polyfill'
 
 import { demoLibBuildBundler } from '@demo/lib-build'
 
-import { demoLibSearchBootProdBrowserConfig } from './browserConfig'
+import { demoSearchBootProdBrowserConfig } from './browserConfig'
 
 const distRoot = __dirname
 
 demoLibBuildBundler({
-  ...demoLibSearchBootProdBrowserConfig,
+  ...demoSearchBootProdBrowserConfig,
   minify: true,
   //scopeHoist: true,
   watch: false,

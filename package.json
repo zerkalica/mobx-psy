@@ -11,18 +11,19 @@
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
     "upgrade": "yarn workspaces run upgrade --all --latest",
-    "postinstall": "yarn workspace mobx-psy-config run build"
+    "postinstall": "yarn workspace ts-build-scripts run build"
   },
   "workspaces": [
     "mobx-psy/*",
     "demo/lib/*",
-    "demo/*"
+    "demo/*",
+    "ts-build-scripts"
   ],
   "devDependencies": {
     "@types/jest": "^26.0.13",
     "@types/styled-system": "^5.1.10",
     "jest": "^26.4.2",
-    "mobx-psy-config": "*",
+    "ts-build-scripts": "*",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2",
     "yarn": "^1.22.5"

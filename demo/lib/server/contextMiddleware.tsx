@@ -1,8 +1,10 @@
 import express from 'express'
-import { getContext, locationFromNodeRequest, ServerFetcher, setContext } from 'mobx-psy-ssr'
+import { locationFromNodeRequest, ServerFetcher } from 'mobx-psy-ssr'
 
 import { DemoLibFetch, DemoLibFetchRequestInit } from '@demo/lib-fetch'
 import { DemoLibRouterLocation } from '@demo/lib-router'
+
+import { demoLibServerGetContext, demoLibServerSetContext } from './getContext'
 
 export type DemoLibServerContext = {
   location: DemoLibRouterLocation
@@ -10,7 +12,7 @@ export type DemoLibServerContext = {
 }
 
 export function demoLibServerContext(req: Object) {
-  return getContext<DemoLibServerContext>(req)
+  return demoLibServerGetContext<DemoLibServerContext>(req)
 }
 
 export function demoLibServerContextMiddleware({ apiUrl, fetch }: { apiUrl: string; fetch: DemoLibFetch }) {
@@ -26,7 +28,7 @@ export function demoLibServerContextMiddleware({ apiUrl, fetch }: { apiUrl: stri
       fetcher,
     }
 
-    setContext(req, context)
+    demoLibServerSetContext(req, context)
     next()
   }
 }

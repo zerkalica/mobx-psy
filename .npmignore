@@ -1,0 +1,10 @@
+__test__
+coverage
+
+.travis.yml
+.jenkins.yml
+.codeclimate.yml
+.eslintrc*
+.tsbuildinfo
+.idea
+.editorconfig

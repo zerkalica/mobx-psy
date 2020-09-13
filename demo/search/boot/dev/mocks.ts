@@ -1,7 +1,8 @@
 import { promisify } from 'mobx-psy'
+
 import { DemoLibFetch } from '@demo/lib-fetch'
 
-import { DemoSearchFlatDto } from '../../flat'
+import { DemoSearchFlatModelProps } from '../../flat/model'
 
 function createCreateId(prefix: string) {
   let id = 0
@@ -11,7 +12,7 @@ function createCreateId(prefix: string) {
 }
 
 function createFlatsMock() {
-  const flatsAll: DemoSearchFlatDto[] = []
+  const flatsAll: DemoSearchFlatModelProps[] = []
   const create_id = createCreateId('f')
   const totalItems = 100
   const page_size = 10
@@ -24,9 +25,9 @@ function createFlatsMock() {
     })
   }
 
-  return (filter?: Partial<DemoSearchFlatDto & { page: number }>) => {
+  return (filter?: Partial<DemoSearchFlatModelProps & { page: number }>) => {
     const items = filter
-      ? flatsAll.filter(flat => {
+      ? flatsAll.filter((flat) => {
           if (filter.house && !flat.house) return false
           return !filter.rooms || filter.rooms === flat.rooms
         })
@@ -44,7 +45,13 @@ function createFlatsMock() {
   }
 }
 
-export function demoLibSearchBootDevMocks({ errorRate, timeout }: { errorRate: number; timeout: number }): DemoLibFetch {
+export function demoSearchBootDevMocks({
+  errorRate,
+  timeout,
+}: {
+  errorRate: number
+  timeout: number
+}): DemoLibFetch {
   const fetchFlats = createFlatsMock()
 
   return promisify(errorRate, timeout, (url, params) => {

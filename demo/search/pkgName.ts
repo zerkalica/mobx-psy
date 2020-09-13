@@ -1,1 +1,1 @@
-export const demoLibSearchPkgName = 'my-demo-search'
+export const demoSearchPkgName = 'my-demo-search'

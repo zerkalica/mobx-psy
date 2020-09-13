@@ -1,1 +1,1 @@
-module.exports = require('mobx-psy-config').createJestConfig(__dirname)
+module.exports = require('ts-build-scripts/jestConfig').jestConfig(__dirname)
