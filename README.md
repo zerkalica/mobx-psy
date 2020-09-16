@@ -1,11 +1,11 @@
 # Mobx pseudo synchronous
 
-mobx-psy completely removes async functions, promises and streams from your MobX application. Simple, responsive and cuncurrently code doing right.
+@psy/mobx completely removes async functions, promises and streams from your MobX application. Simple, responsive and cuncurrently code doing right.
 
 ## Packages
 
-- [mobx-psy](./packages/mobx-psy/core) - Core library
-- [mobx-psy-ssr](./packages/mobx-psy/ssr) - Helpers for using mobx-psy with server side rendering
+- [@psy/mobx](./packages/@psy/mobx/core) - Core library
+- [@psy/mobx-ssr](./packages/@psy/mobx/ssr) - Helpers for using @psy/mobx with server side rendering
 - [my/app/search](./packages/my/app/search) - Example application: filter form, list, pagination, loading indicator, parametrized url. Parcel, server side rendering, dev and prod server, state hydrate.
 
 Run demo application:
@@ -19,10 +19,10 @@ yarn watch
 ## Basic ideas
 
 * Each async calculation in observer component throws promise (like React.Suspense).
-* Each component wrapped into mobx-psy observer, which uses [mobx-react-lite](https://github.com/mobxjs/mobx-react-lite) internally, but try/catches promises and returns loading/error Fallback component.
-* Each async calculation wrapped into mobx-psy cache, after promise resolve, mobx-psy rerenders component and returns data from cache.
+* Each component wrapped into @psy/mobx observer, which uses [mobx-react-lite](https://github.com/mobxjs/mobx-react-lite) internally, but try/catches promises and returns loading/error Fallback component.
+* Each async calculation wrapped into @psy/mobx cache, after promise resolve, @psy/mobx rerenders component and returns data from cache.
 
-Mobx-psy emulates [fibers](https://gist.github.com/nin-jin/5408ef8f16f43f1b4fe9cbcea577aac6).
+@psy/mobx emulates [fibers](https://gist.github.com/nin-jin/5408ef8f16f43f1b4fe9cbcea577aac6).
 
 ## Compare to mobx-task
 
@@ -77,7 +77,7 @@ After:
 
 ```tsx
 import { observable, action } from 'mobx'
-import { sync, observer, suspendify, effect } from 'mobx-psy'
+import { sync, observer, suspendify, effect } from '@psy/mobx'
 import React from 'react'
 
 const baseUrl = '/'
@@ -174,7 +174,7 @@ export function FallbackLoading({children) {
 
 ```tsx
 
-import {configurePsy} from 'mobx-psy'
+import {configurePsy} from '@psy/mobx'
 
 configurePsy({
   loading: FallbackLoading,
@@ -186,7 +186,7 @@ configurePsy({
 ## Data mocking while loading
 
 ```tsx
-import { mock } from 'mobx-psy'
+import { mock } from '@psy/mobx'
 
 // ...
 const App = observer(function App() {
@@ -206,7 +206,7 @@ const App = observer(function App() {
 ## Parallel loading
 
 ```tsx
-import { parallel } from 'mobx-psy'
+import { parallel } from '@psy/mobx'
 
 // ...
 const store1 = new TodoStore()

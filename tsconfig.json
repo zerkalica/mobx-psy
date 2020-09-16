@@ -1,8 +1,6 @@
 {
-  "extends": "ts-build-scripts/tsconfig.base.json",
+  "extends": "@psy/boot/tsconfig.base.json",
   "exclude": [
-      "**/.cache",
-      "**/-",
-      "**/node_modules"
+    "**/-"
   ]
 }

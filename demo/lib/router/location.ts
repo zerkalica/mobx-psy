@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx'
-import { defer, LocationLike } from 'mobx-psy'
+import { defer, LocationLike } from '@psy/core'
 
 import { DefaultParams, DemoLibRouterRoute } from './route'
 import { DemoLibRouterParamMapper } from './serializer'

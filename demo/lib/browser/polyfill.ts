@@ -1,5 +1,5 @@
 import { configure } from 'mobx'
-import { configurePsy } from 'mobx-psy'
+import { configurePsy } from '@psy/mobx-react'
 
 import { DemoLibUiFallbackError } from '@demo/lib-ui/fallback/error'
 import { DemoLibUiFallbackLoading } from '@demo/lib-ui/fallback/loading'

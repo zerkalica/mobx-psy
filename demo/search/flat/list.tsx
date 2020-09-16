@@ -1,4 +1,4 @@
-import { mock, observer } from 'mobx-psy'
+import { mock, observer } from '@psy/mobx-react'
 import React from 'react'
 
 import { DemoSearchFlatDetails } from './details'

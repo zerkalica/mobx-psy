@@ -1,5 +1,5 @@
 import { action, computed, observable, reaction } from 'mobx'
-import { effect, sync } from 'mobx-psy'
+import { effect, sync } from '@psy/mobx'
 import React from 'react'
 
 import { DemoLibFetchSync, useDemoLibFetch } from '@demo/lib-fetch/fetch'

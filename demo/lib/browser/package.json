@@ -10,7 +10,9 @@
     "clean": "rm -rf - *.log",
     "build": "tsc --build",
     "watch": "tsc --build --watch",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --passWithNoTests --watch",
+    "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
     "@emotion/core": "^10.0.35",
@@ -18,7 +20,11 @@
     "@demo/lib-ui": "^1.0.0",
     "@demo/lib-router": "^1.0.0",
     "mobx": "^5.15.6",
-    "mobx-psy": "^1.0.0"
+    "@psy/core": "^1.0.0",
+    "@psy/mobx-react": "^1.0.0"
+  },
+  "devDependencies": {
+    "@psy/boot": "^1.0.0"
   },
   "peerDependencies": {
     "typescript": "*",

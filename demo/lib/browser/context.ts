@@ -1,7 +1,7 @@
-import { SyncFetch, FetchLike, suspendify, HydratedState } from 'mobx-psy'
+import { FetchLike, suspendify, HydratedState, FetchInitBase } from '@psy/core'
 import { DemoLibRouterLocation } from '@demo/lib-router/location'
 
-export function demoLibBrowserContext({
+export function demoLibBrowserContext<Init extends FetchInitBase>({
   fetch: fetchRaw,
   apiUrl = '/',
   pkgName,
@@ -9,12 +9,12 @@ export function demoLibBrowserContext({
 }: {
   pkgName: string
   apiUrl: string
-  fetch: FetchLike<RequestInit>
+  fetch: FetchLike<Init>
   window: Window
 }) {
   const location = new DemoLibRouterLocation(window.location, window.history, window)
   const cache = ((window as unknown) as { [pkgName: string]: HydratedState })[pkgName]
-  const syncFetch: SyncFetch = suspendify((url, params) => fetchRaw(apiUrl + url, params), cache)
+  const syncFetch = suspendify<Init>((url, params) => fetchRaw(apiUrl + url, params), cache)
   const id = `${pkgName}-main`
   const container = window.document.getElementById(id)
 

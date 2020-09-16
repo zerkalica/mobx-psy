@@ -1,5 +1,5 @@
 import { action, computed, reaction } from 'mobx'
-import { draft, effect } from 'mobx-psy'
+import { draft, effect } from '@psy/mobx'
 
 import { DemoLibRouterLocation } from '@demo/lib-router/location'
 

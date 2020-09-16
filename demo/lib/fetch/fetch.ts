@@ -1,4 +1,4 @@
-import { FetchLike, SyncFetch } from 'mobx-psy'
+import { FetchLike, SyncFetch } from '@psy/core'
 import React from 'react'
 
 import { DemoLibRouterLocation } from '@demo/lib-router/location'

@@ -1,13 +1,19 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "@psy/boot/tsconfig.json",
   "compilerOptions": {
     "outDir": "-",
     "rootDir": ".",
     "jsx": "react"
   },
+  "exclude": [
+    "-"
+  ],
   "references": [
-    {"path": "../../mobx-psy/core"},
-    {"path": "../../mobx-psy/ssr"},
+    {"path": "../../psy/core"},
+    {"path": "../../psy/mobx"},
+    {"path": "../../psy/mobx-ssr"},
+    {"path": "../../psy/mobx-react"},
+    {"path": "../../psy/boot"},
     {"path": "../lib/server"},
     {"path": "../lib/browser"},
     {"path": "../lib/ui"},

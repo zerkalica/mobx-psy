@@ -10,14 +10,18 @@
     "clean": "rm -rf - *.log",
     "build": "tsc --build",
     "watch": "tsc --build --watch",
-    "test": "jest --passWithNoTests"
-  },
-  "engines": {
-    "node": ">=12.0.0"
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --passWithNoTests --watch",
+    "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
-    "mobx-psy": "^1.0.0",
+    "@psy/core": "^1.0.0",
     "mobx": "^5.15.6"
+  },
+  "devDependencies": {
+    "@psy/boot": "^1.0.0",
+    "typescript": "^4.0.0",
+    "jest": "^26.4.2"
   },
   "peerDependencies": {
     "typescript": "*",

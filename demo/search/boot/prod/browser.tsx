@@ -3,7 +3,7 @@ import '@demo/lib-browser/polyfill'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { demoLibBrowserContext } from '@demo/lib-browser'
+import { demoLibBrowserContext } from '@demo/lib-browser/context'
 
 import { DemoSearch } from '../../search'
 import { demoSearchPkgName } from '../../pkgName'

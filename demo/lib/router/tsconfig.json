@@ -1,10 +1,14 @@
 {
-  "extends": "../../../tsconfig.json",
+  "extends": "@psy/boot/tsconfig.json",
   "compilerOptions": {
     "outDir": "-",
     "rootDir": "."
   },
+  "exclude": [
+    "-"
+  ],
   "references": [
-    {"path": "../../../mobx-psy/core"}
+    {"path": "../../../psy/core"},
+    {"path": "../../../psy/boot"}
   ]
 }

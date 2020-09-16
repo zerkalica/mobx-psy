@@ -10,17 +10,17 @@
     "clean": "rm -rf - *.log",
     "build": "tsc --build",
     "watch": "tsc --build --watch",
-    "test": "jest --passWithNoTests"
-  },
-  "engines": {
-    "node": ">=12.0.0"
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --passWithNoTests --watch",
+    "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
-    "mobx-psy": "^1.0.0",
+    "@psy/core": "^1.0.0",
     "@demo/lib-router": "^1.0.0",
     "react": "^16.13.1"
   },
   "devDependencies": {
+    "@psy/boot": "^1.0.0",
     "@types/react": "^16.9.49"
   },
   "peerDependencies": {

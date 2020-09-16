@@ -1,5 +1,5 @@
 {
-  "name": "mobx-psy-packages",
+  "name": "@psy/packages",
   "version": "1.0.0",
   "private": true,
   "description": "Mobx pseudo syncronous loader",
@@ -9,21 +9,21 @@
   "scripts": {
     "clean": "yarn workspaces run clean",
     "build": "yarn workspaces run build",
-    "test": "yarn workspaces run test",
-    "upgrade": "yarn workspaces run upgrade --all --latest",
-    "postinstall": "yarn workspace ts-build-scripts run build"
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --passWithNoTests --watch",
+    "up": "yarn upgrade --latest",
+    "postinstall": "yarn workspace @psy/boot run build",
+    "release": "lerna publish from-package"
   },
   "workspaces": [
-    "mobx-psy/*",
+    "psy/*",
     "demo/lib/*",
-    "demo/*",
-    "ts-build-scripts"
+    "demo/*"
   ],
   "devDependencies": {
     "@types/jest": "^26.0.13",
-    "@types/styled-system": "^5.1.10",
+    "lerna": "^3.22.1",
     "jest": "^26.4.2",
-    "ts-build-scripts": "*",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2",
     "yarn": "^1.22.5"

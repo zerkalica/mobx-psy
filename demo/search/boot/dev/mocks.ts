@@ -1,4 +1,4 @@
-import { promisify } from 'mobx-psy'
+import { promisify } from '@psy/core'
 
 import { DemoLibFetch } from '@demo/lib-fetch/fetch'
 

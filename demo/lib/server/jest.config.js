@@ -1,1 +1,1 @@
-module.exports = require('ts-build-scripts/jestConfig').jestConfig(__dirname)
+module.exports = require('@psy/boot').jestConfig(__dirname)
