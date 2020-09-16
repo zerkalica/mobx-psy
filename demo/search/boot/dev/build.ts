@@ -2,8 +2,9 @@ import '@demo/lib-server/polyfill'
 
 import { promises as fs } from 'fs'
 
-import { demoLibBuildBundler, demoLibBuildContext } from '@demo/lib-build'
-import { DemoLibServerIndexHtml } from '@demo/lib-server'
+import { demoLibBuildContext } from '@demo/lib-build/context'
+import { demoLibBuildBundler } from '@demo/lib-build/bundler'
+import { DemoLibServerIndexHtml } from '@demo/lib-server/IndexHtml'
 
 import { demoSearchPkgName } from '../../pkgName'
 import { demoSearchBootCommonServerConfig } from '../common/serverConfig'

@@ -1,3 +1,1 @@
-export * from './route'
-export * from './serializer'
-export * from './location'
+// Do not use reexports, use full import path

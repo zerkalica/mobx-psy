@@ -3,8 +3,8 @@ import '@demo/lib-server/polyfill'
 import fetch from 'node-fetch'
 import React from 'react'
 
-import { DemoLibFetch } from '@demo/lib-fetch'
-import { demoLibServerProd } from '@demo/lib-server'
+import { DemoLibFetch } from '@demo/lib-fetch/fetch'
+import { demoLibServerProd } from '@demo/lib-server/prod'
 
 import { demoSearchPkgName } from '../../pkgName'
 import { DemoSearch } from '../../search'

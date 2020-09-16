@@ -1,5 +1,5 @@
 import { SyncFetch, FetchLike, suspendify, HydratedState } from 'mobx-psy'
-import { DemoLibRouterLocation } from '@demo/lib-router'
+import { DemoLibRouterLocation } from '@demo/lib-router/location'
 
 export function demoLibBrowserContext({
   fetch: fetchRaw,

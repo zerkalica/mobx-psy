@@ -1,6 +1,6 @@
 import express from 'express'
 
-import { demoLibBuildBundler } from '@demo/lib-build'
+import { demoLibBuildBundler } from '@demo/lib-build/bundler'
 
 import { demoLibServerContextMiddleware } from './contextMiddleware'
 import { demoLibServerErrorMiddleware } from './errorMiddleware'

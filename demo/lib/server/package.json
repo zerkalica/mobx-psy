@@ -7,7 +7,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "clean": "rm -rf - *.tsbuildinfo *.log",
+    "clean": "rm -rf - *.log",
     "build": "tsc --build",
     "watch": "tsc --build --watch",
     "test": "jest --passWithNoTests"
@@ -20,6 +20,7 @@
     "abortcontroller-polyfill": "^1.5.0",
     "express": "^4.17.1",
     "mobx-psy": "^1.0.0",
+    "@demo/lib-browser": "^1.0.0",
     "@demo/lib-router": "^1.0.0",
     "@demo/lib-fetch": "^1.0.0",
     "mobx-psy-ssr": "^1.0.0",

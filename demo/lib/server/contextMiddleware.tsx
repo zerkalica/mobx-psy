@@ -1,8 +1,8 @@
 import express from 'express'
 import { locationFromNodeRequest, ServerFetcher } from 'mobx-psy-ssr'
 
-import { DemoLibFetch, DemoLibFetchRequestInit } from '@demo/lib-fetch'
-import { DemoLibRouterLocation } from '@demo/lib-router'
+import { DemoLibFetch, DemoLibFetchRequestInit } from '@demo/lib-fetch/fetch'
+import { DemoLibRouterLocation } from '@demo/lib-router/location'
 
 import { demoLibServerGetContext, demoLibServerSetContext } from './getContext'
 

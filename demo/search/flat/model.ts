@@ -2,8 +2,8 @@ import { action, computed, observable, reaction } from 'mobx'
 import { effect, sync } from 'mobx-psy'
 import React from 'react'
 
-import { DemoLibFetchSync, useDemoLibFetch } from '@demo/lib-fetch'
-import { DemoLibRouterLocation } from '@demo/lib-router'
+import { DemoLibFetchSync, useDemoLibFetch } from '@demo/lib-fetch/fetch'
+import { DemoLibRouterLocation } from '@demo/lib-router/location'
 
 import { DemoSearchFlatFilterModel } from './filter/model'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DemoLibFetchProps, DemoLibFetchProvider } from '@demo/lib-fetch'
+import { DemoLibFetchProps, DemoLibFetchProvider } from '@demo/lib-fetch/fetch'
 
 import { DemoSearchFlatList } from './flat/list'
 

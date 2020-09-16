@@ -1,7 +1,7 @@
 import { action, computed, reaction } from 'mobx'
 import { draft, effect } from 'mobx-psy'
 
-import { DemoLibRouterLocation } from '@demo/lib-router'
+import { DemoLibRouterLocation } from '@demo/lib-router/location'
 
 export const demoSearchFlatFilterModelDefaults = {
   rooms: 0,

@@ -1,6 +1,6 @@
 import '@demo/lib-server/polyfill'
 
-import { demoLibBuildBundler } from '@demo/lib-build'
+import { demoLibBuildBundler } from '@demo/lib-build/bundler'
 
 import { demoSearchBootProdBrowserConfig } from './browserConfig'
 

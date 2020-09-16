@@ -1,6 +1,6 @@
 import { promisify } from 'mobx-psy'
 
-import { DemoLibFetch } from '@demo/lib-fetch'
+import { DemoLibFetch } from '@demo/lib-fetch/fetch'
 
 import { DemoSearchFlatModelProps } from '../../flat/model'
 

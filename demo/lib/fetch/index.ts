@@ -1,1 +1,1 @@
-export * from './fetch'
+// Do not use reexports, use full import path

@@ -7,7 +7,7 @@
   "types": "-/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "clean": "rm -rf - *.tsbuildinfo *.log",
+    "clean": "rm -rf - *.log",
     "build": "tsc --build && node ./-/boot/prod/build",
     "build:dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/build",
     "watch": "tsc --build && NODE_ENV=development node ./-/boot/dev/server",

@@ -8,6 +8,7 @@
   "references": [
     {"path": "../../../mobx-psy/core"},
     {"path": "../../../mobx-psy/ssr"},
+    {"path": "../browser"},
     {"path": "../router"},
     {"path": "../build"},
     {"path": "../fetch"},

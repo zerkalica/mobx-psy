@@ -1,7 +1,7 @@
 import { FetchLike, SyncFetch } from 'mobx-psy'
 import React from 'react'
 
-import { DemoLibRouterLocation } from '@demo/lib-router'
+import { DemoLibRouterLocation } from '@demo/lib-router/location'
 
 export type DemoLibFetchRequestInit = RequestInit & {
   body?: RequestInit['body'] | Object

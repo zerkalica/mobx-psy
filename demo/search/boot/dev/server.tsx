@@ -2,7 +2,7 @@ import '@demo/lib-server/polyfill'
 
 import React from 'react'
 
-import { demoLibServerDev } from '@demo/lib-server'
+import { demoLibServerDev } from '@demo/lib-server/dev'
 
 import { demoSearchPkgName } from '../../pkgName'
 import { DemoSearch } from '../../search'
