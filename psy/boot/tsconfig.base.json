@@ -16,10 +16,5 @@
             "esnext"
         ],
         "jsx": "react"
-    },
-    "exclude": [
-      "**/.cache",
-      "**/-",
-      "**/node_modules"
-  ]
+    }
 }

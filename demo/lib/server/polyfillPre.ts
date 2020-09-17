@@ -7,4 +7,4 @@ import { patchModules, patchModulesCreateReplace } from '@psy/boot'
 
 useStaticRendering(true)
 
-patchModules(patchModulesCreateReplace(['@demo']))
+patchModules(patchModulesCreateReplace([ '@demo', '@psy' ]))

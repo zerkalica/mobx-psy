@@ -1,0 +1,10 @@
+{
+  "extends": "../../../tsconfig.build.json",
+  "compilerOptions": {
+    "outDir": "-",
+    "rootDir": "."
+  },
+  "references": [
+    {"path": "../../../psy/boot/tsconfig.build.json"}
+  ]
+}

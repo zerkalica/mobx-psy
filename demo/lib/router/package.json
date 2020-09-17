@@ -2,14 +2,14 @@
   "name": "@demo/lib-router",
   "version": "1.0.0",
   "description": "Example app stack router",
-  "main": "-/index.js",
-  "types": "-/index.d.ts",
   "private": true,
   "license": "MIT",
+  "main": "-/index.js",
+  "types": "-/index.d.ts",
   "scripts": {
     "clean": "rm -rf - *.log",
-    "build": "tsc --build",
-    "watch": "tsc --build --watch",
+    "build": "tsc --build tsconfig.build.json",
+    "watch": "tsc --build --watch tsconfig.build.json",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --passWithNoTests --watch",
     "prepublishOnly": "psy-boot prepublish"

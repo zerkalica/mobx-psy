@@ -1,13 +1,7 @@
 {
-  "extends": "@psy/boot/tsconfig.json",
-  "compilerOptions": {
-    "outDir": "-",
-    "rootDir": "."
-  },
-  "exclude": [
-    "-"
-  ],
-  "references": [
-    {"path": "../../../psy/boot"}
+  "extends": "../../../tsconfig.json",
+  "include": [
+    ".",
+    "../../../psy/boot"
   ]
 }
