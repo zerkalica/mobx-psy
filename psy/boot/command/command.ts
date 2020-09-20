@@ -2,7 +2,7 @@ import yargs, { Argv } from 'yargs'
 
 import { commandPrePublishYargs } from './prePublish'
 import { commandCleanYargs } from './clean'
-import { Info, info } from '../info/info'
+import { PsyBootInfo, psyBootInfo } from '../info/info'
 import { CommandContext } from './context'
 
 export async function command() {
@@ -24,14 +24,14 @@ export type Config = Partial<
 >
 
 export async function commandYargs() {
-  const context = await info()
+  const context = await psyBootInfo()
 
   return addContextOptions(yargs, context)
 }
 
 function addContextOptions(
   yargs: Argv,
-  p: Info
+  p: PsyBootInfo
 ): Argv<CommandContext> {
   return yargs
     .option('lib', {

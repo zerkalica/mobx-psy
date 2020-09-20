@@ -15,17 +15,20 @@
     "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "parcel-bundler": "^1.12.4"
+    "@psy/boot": "^1.0.0",
+    "ts-loader": "^8.0.4",
+    "webpack": "^4.44.2",
+    "webpack-dev-middleware": "^3.7.2",
+    "express": "^4.17.1"
   },
   "devDependencies": {
-    "@psy/boot": "^1.0.0",
-    "@types/parcel-bundler": "^1.12.1",
     "@types/express": "^4.17.8",
-    "@types/node": "^14.10.1"
+    "@types/node": "^14.10.1",
+    "@types/webpack": "^4.41.22",
+    "@types/webpack-dev-middleware": "^3.7.2"
   },
   "peerDependencies": {
-    "typescript": "*",
-    "jest": "*"
+    "jest": "*",
+    "typescript": "*"
   }
 }

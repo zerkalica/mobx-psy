@@ -8,7 +8,7 @@ attach()
 
 export { glob, del }
 
-export async function spawn(program: string, args: string[], cwd: string) {
+export async function psyBootSpawn(program: string, args: string[], cwd: string) {
   const key = `${program} ${args.join(' ')}`
   console.log(`exec "${key}"`)
   const spawned = exitsSpawn(program, args, {
@@ -20,13 +20,13 @@ export async function spawn(program: string, args: string[], cwd: string) {
   if (signal) console.log(`Exiting "${key}" ${signal}`)
 }
 
-export async function touch(file: string) {
+export async function psyBootTouch(file: string) {
   await fs.mkdir(path.dirname(file), { recursive: true })
   const handle = await fs.open(file, 'w')
   await handle.close()
 }
 
-export async function exists(file: string) {
+export async function psyBootExists(file: string) {
   try {
     await fs.access(file, constants.F_OK)
     return true
@@ -35,7 +35,7 @@ export async function exists(file: string) {
   }
 }
 
-export function createCopy() {
+export function psyBootCreateCopy() {
   return copy.bind(null, '', [])
 }
 
@@ -67,7 +67,7 @@ async function copy(
   await Promise.all([
     Promise.all(deleteFiles.map(fs.unlink)),
     Promise.all(createEmpty
-      ? outFiles.map(touch)
+      ? outFiles.map(psyBootTouch)
       : files.map(async name => {
           const dest = path.join(outDir, name)
 

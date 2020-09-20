@@ -1,7 +1,7 @@
 import findUp from 'find-up'
 import {readFileSync, promises as fs} from 'fs'
 
-export interface InfoPkg {
+export interface PsyBootInfoPkg {
   name: string
   version: string
   private?: boolean
@@ -14,28 +14,28 @@ export interface InfoPkg {
   source?: string[] | string
 }
 
-export async function infoPkg(pkgPath?: string) {
+export async function psyBootInfoPkg(pkgPath?: string) {
   pkgPath = pkgPath ?? (await findUp('package.json'))
 
   const packageJsonData = await (pkgPath
     ? fs.readFile(pkgPath)
     : '')
 
-  const pkg: Partial<InfoPkg> = packageJsonData
+  const pkg: Partial<PsyBootInfoPkg> = packageJsonData
     ? JSON.parse(packageJsonData.toString())
     : {}
 
   return {pkg, pkgPath}
 }
 
-export function infoPkgSync(pkgPath?: string) {
+export function psyBootInfoPkgSync(pkgPath?: string) {
   pkgPath = pkgPath ?? findUp.sync('package.json')
 
   const packageJsonData = (pkgPath
     ? readFileSync(pkgPath)
     : '')
 
-  const pkg: Partial<InfoPkg> = packageJsonData
+  const pkg: Partial<PsyBootInfoPkg> = packageJsonData
     ? JSON.parse(packageJsonData.toString())
     : {}
 

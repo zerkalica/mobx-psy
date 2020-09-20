@@ -1,3 +1,3 @@
-import { Info } from '../info/info';
+import { PsyBootInfo } from '../info/info';
 
-export type CommandContext = Pick<Info, 'lib' | 'projectDir' | 'outDir' | 'srcDir' | 'pkgPath'>
+export type CommandContext = Pick<PsyBootInfo, 'lib' | 'projectDir' | 'outDir' | 'srcDir' | 'pkgPath'>

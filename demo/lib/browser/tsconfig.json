@@ -1,6 +1,6 @@
 {
   "extends": "../../../tsconfig.json",
-  "references": [
+  "include": [
     ".",
     "../../../psy/core",
     "../../../psy/mobx-react",

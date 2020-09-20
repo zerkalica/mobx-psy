@@ -33,7 +33,6 @@ const bundlerMiddleware = demoLibBuildBundler({
   publicUrl: config.publicUrl,
   minify: false,
   distRoot: __dirname,
-  watch: true,
 }).middleware()
 
 express()

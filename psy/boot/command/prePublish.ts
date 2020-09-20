@@ -2,11 +2,11 @@ import path from 'path'
 import { promises as fs } from 'fs'
 
 import { Argv } from 'yargs'
-import { createCopy } from '../sys'
+import { psyBootCreateCopy } from '../sys'
 import { CommandContext } from './context'
-import { infoPkg } from '../info/pkg'
+import { psyBootInfoPkg } from '../info/pkg'
 
-const copy = createCopy()
+const copy = psyBootCreateCopy()
 
 const distRegex = /^.*\//
 
@@ -17,7 +17,7 @@ export async function commandPrePublish({
   pkgPath
 }: CommandContext & { resourcesMask: string }) {
   await copy({ resourcesMask, srcDir, outDir })
-  const { pkg: pkgSrc } = await infoPkg(pkgPath)
+  const { pkg: pkgSrc } = await psyBootInfoPkg(pkgPath)
 
   const pkg = {
     ...pkgSrc,

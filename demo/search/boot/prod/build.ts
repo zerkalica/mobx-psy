@@ -10,6 +10,5 @@ demoLibBuildBundler({
   ...demoSearchBootProdBrowserConfig,
   minify: true,
   //scopeHoist: true,
-  watch: false,
   distRoot,
 }).bundle()

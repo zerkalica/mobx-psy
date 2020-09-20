@@ -25,6 +25,7 @@
     "psy-boot": "./bin/psy-boot"
   },
   "dependencies": {
+    "find-yarn-workspace-root": "^2.0.0",
     "del": "^5.1.0",
     "exits": "^2.0.1",
     "find-up": "^5.0.0",

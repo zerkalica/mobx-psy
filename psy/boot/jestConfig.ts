@@ -1,8 +1,8 @@
 import path from 'path'
 import { pathsToModuleNameMapper } from 'ts-jest/utils'
-import { infoPkgSync } from './info/pkg'
+import { psyBootInfoPkgSync } from './info/pkg'
 
-import { infoTsConfig } from './info/tsConfig'
+import { psyBootInfoTsConfig } from './info/tsConfig'
 
 export function jestConfig(
   pkgDir: string,
@@ -16,9 +16,9 @@ export function jestConfig(
 ) {
   const {
     options: { rootDir, baseUrl, paths },
-  } = infoTsConfig(path.join(pkgDir, tsConfigJson))
+  } = psyBootInfoTsConfig(path.join(pkgDir, tsConfigJson))
 
-  const pkg = useYarnWorkspaces ? infoPkgSync(path.join(pkgDir, 'package.json')).pkg : undefined
+  const pkg = useYarnWorkspaces ? psyBootInfoPkgSync(path.join(pkgDir, 'package.json')).pkg : undefined
 
   const config = {
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],

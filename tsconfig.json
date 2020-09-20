@@ -3,10 +3,5 @@
   "compilerOptions": {
     "rootDir": "."
   },
-  "include": [],
-  "exclude": [
-    "**/node_modules",
-    "**/-",
-    "**/.cache"
-  ]
+  "include": []
 }
