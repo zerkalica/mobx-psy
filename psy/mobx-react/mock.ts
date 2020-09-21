@@ -3,7 +3,7 @@ import { throwHidden, normalizeError, getRefreshable } from '@psy/core'
 /**
  * Used internally in observer
  */
-export const mockState: {
+export const psyMobxReactMockState: {
   /**
    * Promise or error passed from mock to observer to show loading/error component
    */
@@ -43,7 +43,7 @@ interface MockParams<State, Fallback> {
  * })
  * ```
  */
-export function mock<State, Fallback>(p: MockParams<State, Fallback>): State | Fallback {
+export function psyMobxReactMock<State, Fallback>(p: MockParams<State, Fallback>): State | Fallback {
   try {
     return p.unsafe()
   } catch (e) {
@@ -57,7 +57,7 @@ export function mock<State, Fallback>(p: MockParams<State, Fallback>): State | F
     const result = p.fallback()
 
     // save promise or error and pass it to observer to suspend component or to show error component
-    mockState.called = error
+    psyMobxReactMockState.called = error
 
     return result
   }

@@ -1,7 +1,7 @@
 import { observer as mobxObserver } from 'mobx-react-lite'
 import { FallbackError, FallbackLoading, FallbackErrorProps, FallbackLoadingProps } from './Fallback'
 
-export type MobxPsyConfig = Parameters<typeof mobxObserver>[1] & {
+export type PsyMobxReactConfig = Parameters<typeof mobxObserver>[1] & {
   /**
    * Loading blend component on top of observed component (in children)
    */
@@ -13,11 +13,11 @@ export type MobxPsyConfig = Parameters<typeof mobxObserver>[1] & {
   error: React.FC<FallbackErrorProps>
 }
 
-export const config: MobxPsyConfig = {
+export const psyMobxReactConfig: PsyMobxReactConfig = {
   loading: FallbackLoading,
   error: FallbackError,
 }
 
-export function configurePsy(next: Partial<MobxPsyConfig>) {
-  Object.assign(config, next)
+export function psyMobxReactConfigure(next: Partial<PsyMobxReactConfig>) {
+  Object.assign(psyMobxReactConfig, next)
 }

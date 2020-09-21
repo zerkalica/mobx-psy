@@ -1,17 +1,18 @@
-import { mock, observer } from '@psy/mobx-react'
+import { psyMobxReactMock } from '@psy/mobx-react/mock'
+import { psyMobxReactObserver } from '@psy/mobx-react/observer'
 import React from 'react'
 
 import { DemoSearchFlatDetails } from './details'
 import { DemoSearchFlatFilter } from './filter/filter'
 import { DemoSearchFlatModelStore } from './model'
 
-export const DemoSearchFlatList = observer(function DemoSearchFlatList({ id }: { id: string }) {
+export const DemoSearchFlatList = psyMobxReactObserver(function DemoSearchFlatList({ id }: { id: string }) {
   const flats = DemoSearchFlatModelStore.use()
 
   return (
     <div id={id}>
       <DemoSearchFlatFilter id={`${id}-filter`} filter={flats.filter} refreshList={flats.refresh} />
-      {mock({
+      {psyMobxReactMock({
         unsafe: () => (
           <ul id={`${id}-flats`}>
             {flats.filtered.map((flat) => (

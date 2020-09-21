@@ -2,8 +2,8 @@ import { observer as mobxObserver } from 'mobx-react-lite'
 import React from 'react'
 import { getRefreshable, throwHidden, normalizeError } from '@psy/core'
 
-import { config, MobxPsyConfig } from './config'
-import { mockState } from './mock'
+import { psyMobxReactConfig, PsyMobxReactConfig } from './config'
+import { psyMobxReactMockState } from './mock'
 
 type RefComponent<Ref, Props> = React.RefForwardingComponent<Ref, Props>
 
@@ -22,11 +22,11 @@ type RefComponent<Ref, Props> = React.RefForwardingComponent<Ref, Props>
  * })
  * ```
  */
-export function observer<Props extends {}, Ref = {}>(
+export function psyMobxReactObserver<Props extends {}, Ref = {}>(
   baseComponent: RefComponent<Ref, Props>,
-  options: MobxPsyConfig = config
+  options: PsyMobxReactConfig = psyMobxReactConfig
 ) {
-  if (options !== config) options = { ...config, ...options }
+  if (options !== psyMobxReactConfig) options = { ...psyMobxReactConfig, ...options }
 
   const SafeComponent: RefComponent<Ref, Props> = (props, ref): React.ReactElement | null => {
     const node = React.useRef<React.ReactElement | null>(null)
@@ -34,7 +34,7 @@ export function observer<Props extends {}, Ref = {}>(
     try {
       node.current = baseComponent(props, ref)
 
-      if (mockState.called) return throwHidden(mockState.called)
+      if (psyMobxReactMockState.called) return throwHidden(psyMobxReactMockState.called)
 
       return node.current
     } catch (e) {
@@ -53,7 +53,7 @@ export function observer<Props extends {}, Ref = {}>(
 
       return <options.loading refreshable={refreshable} children={node.current} />
     } finally {
-      mockState.called = null
+      psyMobxReactMockState.called = null
     }
   }
 
