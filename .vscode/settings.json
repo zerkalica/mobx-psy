@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsdk": "/home/yuferev/projects/TypeScript/built/local",
   "search.exclude": {
     "**/node_modules": true,
     "**/-*": true

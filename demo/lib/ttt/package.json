@@ -1,10 +1,10 @@
 {
-  "name": "@demo/lib-fetch",
+  "name": "@demo/ttt",
   "version": "1.0.0",
   "private": true,
   "description": "Example app common models staff",
-  "main": "-/index.js",
-  "types": "-/index.d.ts",
+  "main": "./-/index.js",
+  "types": "./-/index.d.ts",
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf - *.log",
@@ -15,16 +15,6 @@
     "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
-    "@psy/core": "^1.0.0",
-    "@demo/lib-router": "^1.0.0",
-    "react": "^16.13.1"
-  },
-  "devDependencies": {
-    "@psy/boot": "^1.0.0",
-    "@types/react": "^16.9.49"
-  },
-  "peerDependencies": {
-    "typescript": "*",
-    "jest": "*"
+    "@demo/lib-browser": "^1.0.0"
   }
 }

@@ -1,9 +1,12 @@
 {
   "extends": "../../../tsconfig.json",
-  "include": [
-    ".",
-    "../../../psy/core",
-    "../../../psy/mobx-react",
-    "../router"
+  "compilerOptions": {
+    "outDir": "-",
+    "rootDir": "."
+  },
+  "references": [
+    {"path": "../../../psy/core"},
+    {"path": "../../../psy/mobx-react"},
+    {"path": "../router"}
   ]
 }

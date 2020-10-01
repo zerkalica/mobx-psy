@@ -1,8 +1,11 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [
-    ".",
-    "../core",
-    "../boot"
+  "compilerOptions": {
+    "outDir": "-",
+    "rootDir": "."
+  },
+  "references": [
+    {"path": "../core"},
+    {"path": "../boot"}
   ]
 }

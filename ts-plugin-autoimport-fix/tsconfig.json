@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
+    "declarationMap": true,
     "strict": true,
     "composite": true,
     "incremental": true,
@@ -15,6 +16,9 @@
         "dom",
         "esnext"
     ],
-    "jsx": "react"
+    "jsx": "react",
+
+    "outDir": "-",
+    "rootDir": "."
   }
 }

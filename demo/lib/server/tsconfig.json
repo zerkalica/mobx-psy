@@ -1,13 +1,16 @@
 {
   "extends": "../../../tsconfig.json",
-  "include": [
-    ".",
-    "../../../psy/core",
-    "../../../psy/mobx-ssr",
-    "../../../psy/boot",
-    "../browser",
-    "../router",
-    "../build",
-    "../fetch"
+  "compilerOptions": {
+    "outDir": "-",
+    "rootDir": "."
+  },
+  "references": [
+    {"path": "../../../psy/core"},
+    {"path": "../../../psy/mobx-ssr"},
+    {"path": "../../../psy/boot"},
+    {"path": "../browser"},
+    {"path": "../router"},
+    {"path": "../build"},
+    {"path": "../fetch"},
   ]
 }

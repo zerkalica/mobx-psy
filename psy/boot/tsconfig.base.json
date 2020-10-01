@@ -4,6 +4,7 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "sourceMap": true,
+        "declarationMap": true,
         "declaration": true,
         "strict": true,
         "composite": true,

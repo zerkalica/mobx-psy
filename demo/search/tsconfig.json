@@ -1,17 +1,20 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [
-    ".",
-    "../../psy/core",
-    "../../psy/mobx",
-    "../../psy/mobx-ssr",
-    "../../psy/mobx-react",
-    "../../psy/boot",
-    "../lib/server",
-    "../lib/browser",
-    "../lib/ui",
-    "../lib/fetch",
-    "../lib/router",
-    "../lib/build"
+  "compilerOptions": {
+    "outDir": "-",
+    "rootDir": "."
+  },
+  "references": [
+    {"path": "../../psy/core"},
+    {"path": "../../psy/mobx"},
+    {"path": "../../psy/mobx-ssr"},
+    {"path": "../../psy/mobx-react"},
+    {"path": "../../psy/boot"},
+    {"path": "../lib/server"},
+    {"path": "../lib/browser"},
+    {"path": "../lib/ui"},
+    {"path": "../lib/fetch"},
+    {"path": "../lib/router"},
+    {"path": "../lib/build"}
   ]
 }

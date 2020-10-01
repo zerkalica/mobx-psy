@@ -8,14 +8,14 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf - *.log .cache",
-    "build": "tsc --build tsconfig.build.json && node ./-/boot/prod/build",
-    "build:dev": "tsc --build tsconfig.build.json && NODE_ENV=development node ./-/boot/dev/build",
-    "watch": "tsc --build --watch tsconfig.build.json",
+    "build": "tsc --build && node ./-/boot/prod/build",
+    "build:dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/build",
+    "watch": "tsc --build --watch",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --passWithNoTests --watch",
     "prepublishOnly": "psy-boot prepublish",
     "start": "bin/demo-search",
-    "start:dev": "tsc --build tsconfig.build.json && NODE_ENV=development node ./-/boot/dev/server"
+    "start:dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/server"
   },
   "bin": {
     "my-search": "./bin/demo-search"

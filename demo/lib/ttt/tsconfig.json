@@ -1,10 +1,10 @@
 {
-  "extends": "../../tsconfig.build.json",
+  "extends": "../../../tsconfig.json",
   "compilerOptions": {
     "outDir": "-",
     "rootDir": "."
   },
   "references": [
-    {"path": "../boot/tsconfig.build.json"}
+    {"path": "../browser"}
   ]
 }
