@@ -1,0 +1,13 @@
+{
+  "name": "@demo/lib-b",
+  "version": "1.0.0",
+  "main": "-/b.js",
+  "types": "-/b.d.ts",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@demo/lib-a": "^1.0.0",
+    "@demo/lib-c": "^1.0.0"
+  }
+}
