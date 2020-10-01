@@ -7,6 +7,7 @@
   "references": [
     {"path": "../../../psy/core"},
     {"path": "../../../psy/mobx-react"},
-    {"path": "../router"}
+    {"path": "../router"},
+    {"path": "../ui"}
   ]
 }

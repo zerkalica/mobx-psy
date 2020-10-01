@@ -1,7 +1,7 @@
-import { psyBootInfoWorkspacesSync } from '@psy/boot/info/workspaces'
 import express from 'express'
 import path from 'path'
 import webpack from 'webpack'
+// @ts-ignore
 import webpackDevMiddleware from 'webpack-dev-middleware'
 
 import { demoLibBuildContext } from './context'
@@ -20,14 +20,14 @@ export function demoLibBuildBundler({
   publicUrl: string
   minify?: boolean
 }) {
-  const { outDir, browserEntry, srcRoot } = demoLibBuildContext({ distRoot })
-  const alias = psyBootInfoWorkspacesSync(srcRoot)?.reduce(
-    (acc, p) => ({
-      ...acc,
-      [`${p.pkg.name}$`]: `${p.pkg.name}/index`
-    }),
-    {} as Record<string, string>
-  )
+  const { outDir, browserEntry, srcRoot } = demoLibBuildContext({ distRoot, distEntry: true })
+  // const alias = psyBootInfoWorkspacesSync(srcRoot)?.reduce(
+  //   (acc, p) => ({
+  //     ...acc,
+  //     [`${p.pkg.name}$`]: `${p.pkg.name}/index`
+  //   }),
+  //   {} as Record<string, string>
+  // )
 
   const webpackConfig: webpack.Configuration = {
     entry: browserEntry,
@@ -40,37 +40,40 @@ export function demoLibBuildBundler({
     performance: {
       maxAssetSize: 400000,
       maxEntrypointSize: 400000,
-      assetFilter(name) {
+      assetFilter(name: string) {
         return name.endsWith('.js')
       },
     },
-    module: {
-      rules: [
-        {
-          test: /.tsx?$/,
-          use: [
-            {
-              loader: 'ts-loader',
-              options: {
-                configFile: 'tsconfig.json',
-                projectReferences: false,
-              },
-            },
-          ],
-          exclude: /node_modules/,
-        },
-      ],
-    },
+    // module: {
+    //   rules: [
+    //     {
+    //       test: /.tsx?$/,
+    //       use: [
+    //         {
+    //           loader: 'ts-loader',
+    //           options: {
+    //             configFile: 'tsconfig.json',
+    //             projectReferences: true,
+    //           },
+    //         },
+    //       ],
+    //       exclude: /node_modules/,
+    //     },
+    //   ],
+    // },
     plugins: [
       new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/tsbuildinfo$/,
       }),
-      new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
-      new webpack.ProgressPlugin(),
+      // new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
+      // new webpack.ProgressPlugin(),
     ],
     resolve: {
-      extensions: ['.tsx', '.ts', '.js'],
-      alias,
+      symlinks: false,
+      // fullySpecified: true
+      // exportsFields: ['exports'],
+      // extensions: ['.tsx', '.ts', '.js'],
+      // extensions: ['.js'],
     },
     output: {
       filename: path.basename(browserEntry).replace(/\.tsx$/, '.js'),
@@ -78,7 +81,7 @@ export function demoLibBuildBundler({
     },
   }
 
-  console.log({ browserEntry, srcRoot, outDir, alias })
+  console.log({ browserEntry, srcRoot, outDir })
 
   const bundler: DemoLibBuildBundler = {
     bundle() {
@@ -86,13 +89,13 @@ export function demoLibBuildBundler({
 
       return new Promise<void>((resolve, reject) => {
         compiler.run((error, stats) => {
-          if (error || stats.hasErrors()) {
-            console.error(stats.toString({ colors: true }))
+          if (error || stats?.hasErrors()) {
+            console.error(stats?.toString({ colors: true }))
             reject(error)
             return
           }
 
-          console.log(stats.toString({ colors: true }))
+          console.log(stats?.toString({ colors: true }))
           // stats.hash
           resolve()
         })
@@ -105,7 +108,7 @@ export function demoLibBuildBundler({
       })
 
       return webpackDevMiddleware(compiler, {
-        publicPath: publicUrl,
+        publicPath: publicUrl
       })
     },
   }

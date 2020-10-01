@@ -1,20 +1,12 @@
 {
+  "extends": "@psy/boot/tsconfig.base.json",
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "declaration": true,
-    "strict": true,
-    "composite": true,
-    "incremental": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "target": "ES2018",
-    "lib": [
-        "dom",
-        "esnext"
-    ],
-    "jsx": "react"
-  }
+    "plugins": [
+      {"name": "ts-plugin-autoimport-fix"}
+    ]
+  },
+  "exclude": [
+    "**/node_modules",
+    "**/-"
+  ]
 }

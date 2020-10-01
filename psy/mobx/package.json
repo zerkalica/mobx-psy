@@ -4,6 +4,10 @@
   "description": "Mobx pseudo syncronous loader",
   "main": "-/index.js",
   "types": "-/index.d.ts",
+  "exports": {
+    ".": "./-/index.js",
+    "./": "./-/"
+  },
   "repository": "https://github.com/zerkalica/mobx-psy",
   "author": "Stefan Zerkalica <zerkalica@gmail.com>",
   "license": "MIT",

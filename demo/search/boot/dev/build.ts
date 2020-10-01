@@ -12,7 +12,7 @@ import { demoSearchBootDevBrowserConfig } from './browserConfig'
 
 const distRoot = __dirname
 
-const context = demoLibBuildContext({
+const { indexHtml } = demoLibBuildContext({
   distRoot,
 })
 
@@ -28,4 +28,4 @@ demoLibBuildBundler({
   distRoot,
 })
   .bundle()
-  .then(() => fs.writeFile(context.indexHtml, `${html}`))
+  .then(() => fs.writeFile(indexHtml, `${html}`))

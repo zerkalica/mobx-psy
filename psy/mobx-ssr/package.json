@@ -4,6 +4,10 @@
   "description": "Mobx psy server side rendering tools",
   "main": "-/index.js",
   "types": "-/index.d.ts",
+  "exports": {
+    ".": "./-/index.js",
+    "./": "./-/"
+  },
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf - *.log",

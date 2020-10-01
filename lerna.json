@@ -16,9 +16,6 @@
         "feature/*"
       ],
       "message": "chore(release): %s [ci skip]"
-    },
-    "publish": {
-      "contents": "-"
     }
   },
   "version": "independent"

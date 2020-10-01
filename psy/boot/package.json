@@ -3,6 +3,10 @@
   "version": "1.0.1",
   "main": "-/index.js",
   "typings": "-/index.d.ts",
+  "exports": {
+    ".": "./-/index.js",
+    "./": "./-/"
+  },
   "description": "Typescript based projects build scripts",
   "repository": {
     "type": "git",
@@ -15,17 +19,15 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm - -rf *.log",
-    "build": "tsc --build  && cp tsconfig.base.json .npm* ./-/",
+    "build": "tsc --build",
     "watch": "tsc --build --watch",
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --passWithNoTests --watch",
-    "prepublishOnly": "node ./-/cli prepublish"
+    "test:watch": "jest --passWithNoTests --watch"
   },
   "bin": {
     "psy-boot": "./bin/psy-boot"
   },
   "dependencies": {
-    "find-yarn-workspace-root": "^2.0.0",
     "del": "^5.1.0",
     "exits": "^2.0.1",
     "find-up": "^5.0.0",
