@@ -10,6 +10,7 @@ export interface PsyBootInfoPkg {
   module?: string
   browser?: string
   typings?: string
+  exports?: Record<string, string>
   // @see https://github.com/parcel-bundler/parcel/blob/master/PARCEL_2_RFC.md#packagejsonsource
   source?: string[] | string
 }

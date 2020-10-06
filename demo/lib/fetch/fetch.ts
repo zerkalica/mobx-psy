@@ -1,7 +1,7 @@
 import { FetchLike, SyncFetch } from '@psy/core'
 import React from 'react'
 
-import { DemoLibRouterLocation } from '@demo/lib-router/location'
+import { DemoLibRouterLocation } from '@demo/lib-router/location.js'
 
 export type DemoLibFetchRequestInit = RequestInit & {
   body?: RequestInit['body'] | Object

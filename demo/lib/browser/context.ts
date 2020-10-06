@@ -1,5 +1,5 @@
 import { FetchLike, suspendify, HydratedState, FetchInitBase } from '@psy/core'
-import { DemoLibRouterLocation } from '@demo/lib-router/location'
+import { DemoLibRouterLocation } from '@demo/lib-router/location.js'
 
 export function demoLibBrowserContext<Init extends FetchInitBase>({
   fetch: fetchRaw,

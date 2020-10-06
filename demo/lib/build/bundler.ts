@@ -21,14 +21,6 @@ export function demoLibBuildBundler({
   minify?: boolean
 }) {
   const { outDir, browserEntry, srcRoot } = demoLibBuildContext({ distRoot, distEntry: true })
-  // const alias = psyBootInfoWorkspacesSync(srcRoot)?.reduce(
-  //   (acc, p) => ({
-  //     ...acc,
-  //     [`${p.pkg.name}$`]: `${p.pkg.name}/index`
-  //   }),
-  //   {} as Record<string, string>
-  // )
-
   const webpackConfig: webpack.Configuration = {
     entry: browserEntry,
     devtool: 'source-map',
@@ -44,23 +36,6 @@ export function demoLibBuildBundler({
         return name.endsWith('.js')
       },
     },
-    // module: {
-    //   rules: [
-    //     {
-    //       test: /.tsx?$/,
-    //       use: [
-    //         {
-    //           loader: 'ts-loader',
-    //           options: {
-    //             configFile: 'tsconfig.json',
-    //             projectReferences: true,
-    //           },
-    //         },
-    //       ],
-    //       exclude: /node_modules/,
-    //     },
-    //   ],
-    // },
     plugins: [
       new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/tsbuildinfo$/,
@@ -68,13 +43,6 @@ export function demoLibBuildBundler({
       // new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
       // new webpack.ProgressPlugin(),
     ],
-    resolve: {
-      symlinks: false,
-      // fullySpecified: true
-      // exportsFields: ['exports'],
-      // extensions: ['.tsx', '.ts', '.js'],
-      // extensions: ['.js'],
-    },
     output: {
       filename: path.basename(browserEntry).replace(/\.tsx$/, '.js'),
       path: outDir,

@@ -1,5 +1,5 @@
-import { psyMobxReactMock } from '@psy/mobx-react/mock'
-import { psyMobxReactObserver } from '@psy/mobx-react/observer'
+import { psyMobxReactMock } from '@psy/mobx-react/mock.js'
+import { psyMobxReactObserver } from '@psy/mobx-react/observer.js'
 import React from 'react'
 
 import { DemoSearchFlatDetails } from './details'

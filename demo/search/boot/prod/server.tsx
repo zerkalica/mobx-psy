@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 import path from 'path'
 import React from 'react'
 
-import { DemoLibFetchRequestInit } from '@demo/lib-fetch/fetch'
+import { DemoLibFetchRequestInit } from '@demo/lib-fetch/fetch.js'
 import { demoLibServerMdlConfig } from '@demo/lib-server/mdl/config'
 import { demoLibServerMdlError } from '@demo/lib-server/mdl/error'
 import { demoLibServerMdlRender } from '@demo/lib-server/mdl/render'

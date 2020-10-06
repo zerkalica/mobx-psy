@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { DemoLibUiCheckBox } from '@demo/lib-ui/checkbox'
-import { DemoLibUiNumberInput } from '@demo/lib-ui/numberInput'
+import { DemoLibUiCheckBox } from '@demo/lib-ui/checkbox.js'
+import { DemoLibUiNumberInput } from '@demo/lib-ui/numberInput.js'
 
 import { DemoSearchFlatFilterModel } from './model'
 

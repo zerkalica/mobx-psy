@@ -1,6 +1,6 @@
 import { promisify } from '@psy/core'
 
-import { DemoLibFetch } from '@demo/lib-fetch/fetch'
+import { DemoLibFetch } from '@demo/lib-fetch/fetch.js'
 
 import { DemoSearchFlatModelProps } from '../../flat/model'
 

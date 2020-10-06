@@ -1,7 +1,7 @@
 import express from 'express'
 
-import { DemoLibFetchRequestInit } from '@demo/lib-fetch/fetch'
-import { DemoLibRouterLocation } from '@demo/lib-router/location'
+import { DemoLibFetchRequestInit } from '@demo/lib-fetch/fetch.js'
+import { DemoLibRouterLocation } from '@demo/lib-router/location.js'
 import { createContext, FetchLike } from '@psy/core'
 import { locationFromNodeRequest, ServerFetcher } from '@psy/mobx-ssr'
 

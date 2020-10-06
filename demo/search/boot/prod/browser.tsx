@@ -1,9 +1,9 @@
-import '@demo/lib-browser/polyfill'
+import '@demo/lib-browser/polyfill.js'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { demoLibBrowserContext } from '@demo/lib-browser/context'
+import { demoLibBrowserContext } from '@demo/lib-browser/context.js'
 
 import { DemoSearch } from '../../search'
 import { demoSearchPkgName } from '../../pkgName'
