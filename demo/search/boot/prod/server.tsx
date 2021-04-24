@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 import path from 'path'
 import React from 'react'
 
-import { DemoLibFetchRequestInit } from '@demo/lib-fetch/fetch.js'
+import { DemoLibFetchProvider, DemoLibFetchRequestInit } from '@demo/lib-fetch/fetch.js'
 import { demoLibServerMdlConfig } from '@demo/lib-server/mdl/config'
 import { demoLibServerMdlError } from '@demo/lib-server/mdl/error'
 import { demoLibServerMdlRender } from '@demo/lib-server/mdl/render'
@@ -16,6 +16,7 @@ import { demoSearchPkgName } from '../../pkgName'
 import { DemoSearch } from '../../search'
 import { demoSearchBootCommonServerConfig } from '../common/serverConfig'
 import { demoSearchBootProdBrowserConfig } from './browserConfig'
+import { DemoLibUIContextBuilder } from '@demo/lib-ui/context'
 
 const distRoot = __dirname
 const config = {
@@ -37,7 +38,11 @@ express()
       render(host) {
         const { location, fetcher, pkgName } = demoLibServerMdlConfig.get(host)
 
-        return <DemoSearch id={pkgName} location={location} fetch={fetcher.fetch} />
+        const ctx = new DemoLibUIContextBuilder().v(DemoLibFetchProvider, {
+          fetch: fetcher.fetch,
+          location,
+        })
+        return <ctx.Provider><DemoSearch id={pkgName} /></ctx.Provider>
       },
     })
   )

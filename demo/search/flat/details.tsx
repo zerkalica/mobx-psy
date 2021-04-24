@@ -1,8 +1,16 @@
 import React from 'react'
 
+import { psyMobxReactObserver } from '@psy/mobx-react/observer.js'
+
 import { DemoSearchFlatModel } from './model'
 
-export function DemoSearchFlatDetails({ id, flat }: { id: string; flat: DemoSearchFlatModel }) {
+export const DemoSearchFlatDetails = psyMobxReactObserver(function DemoSearchFlatDetails({
+  id,
+  flat,
+}: {
+  id: string
+  flat: DemoSearchFlatModel
+}) {
   return (
     <div id={id} style={{ padding: '0.5rem 0' }}>
       Id: {flat.id}
@@ -12,4 +20,4 @@ export function DemoSearchFlatDetails({ id, flat }: { id: string; flat: DemoSear
       Rooms: {flat.rooms}
     </div>
   )
-}
+})

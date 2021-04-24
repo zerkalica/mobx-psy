@@ -14,6 +14,8 @@ import { DemoSearch } from '../../search'
 import { demoSearchBootCommonServerConfig } from '../common/serverConfig'
 import { demoSearchBootDevBrowserConfig } from './browserConfig'
 import { demoSearchBootDevMocks } from './mocks'
+import { DemoLibUIContextBuilder } from '@demo/lib-ui/context'
+import { DemoLibFetchProvider } from '@demo/lib-fetch/fetch'
 
 const config = {
   ...demoSearchBootCommonServerConfig,
@@ -43,7 +45,11 @@ express()
       render(host) {
         const { location, fetcher, pkgName } = demoLibServerMdlConfig.get(host)
 
-        return <DemoSearch id={pkgName} location={location} fetch={fetcher.fetch} />
+        const ctx = new DemoLibUIContextBuilder().v(DemoLibFetchProvider, {
+          fetch: fetcher.fetch,
+          location,
+        })
+        return <ctx.Provider><DemoSearch id={pkgName} /></ctx.Provider>
       },
     })
   )
