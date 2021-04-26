@@ -21,11 +21,11 @@
   "dependencies": {
     "@psy/core": "^1.0.0",
     "@demo/lib-router": "^1.0.0",
-    "react": "^16.13.1"
+    "react": "^17.0.2"
   },
   "devDependencies": {
     "@psy/boot": "^1.0.0",
-    "@types/react": "^16.9.49"
+    "@types/react": "^17.0.2"
   },
   "peerDependencies": {
     "typescript": "*",

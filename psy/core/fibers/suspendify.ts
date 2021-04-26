@@ -18,8 +18,8 @@ export type HydratedState = Record<string, Object | undefined>
 /**
  * Add fiber cache to fetch-like function.
  */
-export function suspendify<Init extends FetchInitBase>(
-  fetchFn: FetchLike<Init> & { displayName?: string },
+export function suspendify<Init extends FetchInitBase, F extends FetchLike<Init> & { displayName?: string }>(
+  fetchFn: F,
   cache?: HydratedState | undefined,
   keepCache = false
 ): SyncFetch<Init> {

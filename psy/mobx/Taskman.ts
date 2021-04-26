@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx'
+import { action, makeObservable, observable } from 'mobx'
 
 import { defer, isPromise, throwHidden, normalizeError, FiberHost } from '@psy/core'
 import { getDerivableName } from './getDerivableName'
@@ -62,6 +62,7 @@ export class Taskman extends FiberHost implements TaskmanStatus {
 
   constructor(id: string) {
     super(`${id}#${getDerivableName()}`)
+    makeObservable(this)
   }
 
   run(task: Task): void {

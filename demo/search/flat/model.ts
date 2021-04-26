@@ -1,4 +1,4 @@
-import { action, computed, observable, reaction } from 'mobx'
+import { action, computed, makeObservable, observable, reaction } from 'mobx'
 import { effect, sync } from '@psy/mobx'
 import React from 'react'
 
@@ -27,6 +27,7 @@ export class DemoSearchFlatModel {
 
 export class DemoSearchFlatModelStore {
   constructor(protected location: DemoLibRouterLocation, protected fetch: DemoLibFetchSync) {
+    makeObservable(this)
     effect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
   }
 

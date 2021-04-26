@@ -2,7 +2,7 @@ import React from 'react'
 
 export class DemoLibUIContextBuilder {
   constructor(
-    protected map = new Map<React.Provider<any>, any>()
+    protected map = new Map<React.Provider<any>, {p: React.Provider<any>, v: any}>()
   ) {}
 
   clone() {
@@ -16,6 +16,13 @@ export class DemoLibUIContextBuilder {
   }
 
   Provider = ({ children }: { children: React.ReactNode }) => this.component(children)
+
+  require<V>(provider: React.Provider<V>): V {
+    const item = this.map.get(provider);
+    if (! item?.v) throw new Error('No context provided: ' + provider)
+
+    return item.v
+  }
 
   protected component(children: React.ReactNode, items = Array.from(this.map.values()).reverse(), index = 0) {
     const current = items.length > index ? items[index] : undefined

@@ -1,4 +1,4 @@
-import { action, computed, observable } from 'mobx'
+import { action, computed, makeObservable, observable } from 'mobx'
 
 import { FiberHost } from '@psy/core'
 import { effect } from './effect'
@@ -27,6 +27,7 @@ export class Loader<V> extends FiberHost {
     protected dispose: () => void
   ) {
     super('Loader#' + getDerivableName())
+    makeObservable(this)
     effect(this, 'value', () => this.destructor.bind(this))
   }
 

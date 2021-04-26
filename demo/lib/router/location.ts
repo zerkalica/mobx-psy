@@ -1,4 +1,4 @@
-import { action, computed, observable } from 'mobx'
+import { action, computed, makeObservable, observable } from 'mobx'
 import { defer, LocationLike } from '@psy/core'
 
 import { DefaultParams, DemoLibRouterRoute } from './route'
@@ -25,6 +25,7 @@ export class DemoLibRouterLocation {
     protected history?: DemoLibRouterHistory,
     protected target?: Window
   ) {
+    makeObservable(this)
     if (target) {
       target.addEventListener('popstate', this.onPopState)
     }

@@ -19,11 +19,11 @@
     "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
-    "@emotion/core": "^10.0.35",
-    "@emotion/styled": "^10.0.27",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
     "@demo/lib-ui": "^1.0.0",
     "@demo/lib-router": "^1.0.0",
-    "mobx": "^5.15.6",
+    "mobx": "^6.0.0",
     "@psy/core": "^1.0.0",
     "@psy/mobx-react": "^1.0.0"
   },

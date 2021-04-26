@@ -1,5 +1,5 @@
 import { DemoLibRouterParamMapper, DemoLibRouterSerializer } from './serializer'
-import { computed } from 'mobx'
+import { computed, makeObservable } from 'mobx'
 
 export interface DemoLibRouterParams {
   get(key: string): string | undefined
@@ -30,6 +30,7 @@ export class DemoLibRouterRoute<O extends DefaultParams, K extends keyof O = key
     protected deleteDefault = true,
     protected query: DemoLibRouterParams = new DemoLibRouterParamsMock()
   ) {
+    makeObservable(this)
     this.serializer = new DemoLibRouterSerializer(defaults, mapper)
     const values = (this.values = {} as O)
     const keys = Object.keys(defaults)

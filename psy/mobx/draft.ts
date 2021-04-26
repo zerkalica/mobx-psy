@@ -1,4 +1,4 @@
-import { observable } from 'mobx'
+import { makeObservable, observable } from 'mobx'
 
 /**
  * Create an observable mutable proxy of immutable object.
@@ -32,6 +32,7 @@ class Draft<O extends {}, K extends keyof O = keyof O> {
   readonly values: O
 
   constructor(protected original: O) {
+    makeObservable(this)
     const values = (this.values = {} as O)
     const keys = Object.keys(original)
     for (let key of keys) {

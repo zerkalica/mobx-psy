@@ -1,4 +1,4 @@
-import { action, computed, reaction } from 'mobx'
+import { action, computed, makeObservable, reaction } from 'mobx'
 import { draft, effect } from '@psy/mobx'
 
 import { DemoLibRouterLocation } from '@demo/lib-router/location.js'
@@ -12,6 +12,7 @@ export const demoSearchFlatFilterModelDefaults = {
 
 export class DemoSearchFlatFilterModel {
   constructor(protected location: DemoLibRouterLocation) {
+    makeObservable(this)
     effect(this, 'values', () => reaction(() => JSON.stringify(this.draft), this.submit, { delay: 300 }))
   }
 

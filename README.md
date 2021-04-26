@@ -29,13 +29,17 @@ yarn watch
 Your code before:
 
 ```tsx
-import { observable, action } from 'mobx'
+import { observable, makeObservable, action } from 'mobx'
 import { task } from 'mobx-task'
 import React from 'react'
 import { observer } from 'mobx-react'
 
 class TodoStore {
   @observable todos = []
+
+  constructor() {
+    makeObservable(this)
+  }
 
   @task async fetchTodos() {
     await fetch('/todos')
@@ -76,7 +80,7 @@ const App = observer(() => {
 After:
 
 ```tsx
-import { observable, action } from 'mobx'
+import { observable, action, makeObservable } from 'mobx'
 import { sync, observer, suspendify, effect } from '@psy/mobx'
 import React from 'react'
 
@@ -89,6 +93,7 @@ interface Todo {
 
 class TodoStore {
   constructor() {
+    makeObservable(this)
     effect(this, 'todos', () => {
       const handle = setTmeout(() => sync.reset(() => this.todos), 3000)
       return () => clearTimeout(handle)
@@ -116,9 +121,12 @@ const App = observer(function App() {
 
 ```tsx
 // ...
-import { action } from 'mobx'
+import { action, makeObservable } from 'mobx'
 
 class TodoStore {
+  constructor() {
+    makeObservable(this)
+  }
   @sync get todos(): Todo[] {
     return fetchJson('/todos')
   }

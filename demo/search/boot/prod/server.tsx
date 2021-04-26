@@ -38,10 +38,11 @@ express()
       render(host) {
         const { location, fetcher, pkgName } = demoLibServerMdlConfig.get(host)
 
-        const ctx = new DemoLibUIContextBuilder().v(DemoLibFetchProvider, {
-          fetch: fetcher.fetch,
-          location,
-        })
+        const ctx = new DemoLibUIContextBuilder()
+          .v(DemoLibFetchProvider, {
+            fetch: fetcher.fetch,
+            location,
+          })
         return <ctx.Provider><DemoSearch id={pkgName} /></ctx.Provider>
       },
     })

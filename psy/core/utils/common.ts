@@ -36,10 +36,10 @@ export function normalizeError(error: any): Error | PromiseLike<any> {
   // Weakmap used to keep instance of error with same input value
   let converted = wm.get(error)
   
-  if (converted) return converted
-
-  converted = new Error(error)
-  wm.set(converted, error)
+  if (! converted) {
+    converted = new Error(error)
+    wm.set(converted, error)
+  }
 
   return converted
 }

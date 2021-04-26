@@ -27,14 +27,14 @@
     "@demo/lib-browser": "^1.0.0",
     "@demo/lib-router": "^1.0.0",
     "@demo/lib-fetch": "^1.0.0",
-    "react-dom": "^16.13.1"
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
     "@psy/boot": "^1.0.0",
     "@demo/lib-build": "^1.0.0",
     "@types/express": "^4.17.8",
     "@types/node": "^14.10.1",
-    "@types/react-dom": "^16.9.8"
+    "@types/react-dom": "^17.0.2"
   },
   "peerDependencies": {
     "typescript": "*",

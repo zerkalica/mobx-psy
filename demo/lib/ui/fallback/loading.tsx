@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { keyframes } from '@emotion/core'
+import { keyframes } from '@emotion/react'
 import styled from '@emotion/styled'
 
 export function DemoLibUiFallbackLoading({ children }: { children?: React.ReactNode }) {
