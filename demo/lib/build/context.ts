@@ -9,7 +9,7 @@ export function demoLibBuildContext({
 }) {
   const outDir = path.join(distRoot, 'public')
   const srcRoot = distRoot.replace(`${sep}-${sep}`, `${sep}`)
-  const browserEntry = distEntry ? path.join(distRoot, 'browser.js') : path.join(srcRoot, 'browser.tsx')
+  const browserEntry = distEntry ? path.join(distRoot, 'browser') : path.join(srcRoot, 'browser.tsx')
   const indexHtml = path.join(outDir, 'index.html')
 
   return {

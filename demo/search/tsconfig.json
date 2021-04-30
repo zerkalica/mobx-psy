@@ -10,10 +10,11 @@
     {"path": "../../psy/mobx-ssr"},
     {"path": "../../psy/mobx-react"},
     {"path": "../../psy/boot"},
+    {"path": "../../psy/context"},
     {"path": "../lib/server"},
     {"path": "../lib/browser"},
     {"path": "../lib/ui"},
-    {"path": "../lib/fetch"},
+    {"path": "../lib/io"},
     {"path": "../lib/router"},
     {"path": "../lib/build"}
   ]

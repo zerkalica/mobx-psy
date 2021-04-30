@@ -1,13 +1,15 @@
-import { psyMobxReactMock } from '@psy/mobx-react/mock.js'
-import { psyMobxReactObserver } from '@psy/mobx-react/observer.js'
 import React from 'react'
+
+import { usePsyContextMemoClass } from '@psy/context/memo'
+import { psyMobxReactMock } from '@psy/mobx-react/mock'
+import { psyMobxReactObserver } from '@psy/mobx-react/observer'
 
 import { DemoSearchFlatDetails } from './details'
 import { DemoSearchFlatFilter } from './filter/filter'
 import { DemoSearchFlatModelStore } from './model'
 
 export const DemoSearchFlatList = psyMobxReactObserver(function DemoSearchFlatList({ id }: { id: string }) {
-  const flats = DemoSearchFlatModelStore.use()
+  const flats = usePsyContextMemoClass(DemoSearchFlatModelStore)
 
   return (
     <div id={id}>

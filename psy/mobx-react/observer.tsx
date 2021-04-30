@@ -1,6 +1,7 @@
 import { observer as mobxObserver } from 'mobx-react-lite'
 import React from 'react'
-import { getRefreshable, throwHidden, normalizeError } from '@psy/core'
+
+import { errorsCollector, getRefreshable, normalizeError, throwHidden } from '@psy/core'
 
 import { psyMobxReactConfig, PsyMobxReactConfig } from './config'
 import { psyMobxReactMockState } from './mock'
@@ -43,6 +44,7 @@ export function psyMobxReactObserver<Props extends {}, Ref = {}>(
 
       if (error instanceof Error) {
         console.error(error)
+        if (errorsCollector.errors) errorsCollector.errors.add(error)
 
         if (!options.error) return throwHidden(error)
 

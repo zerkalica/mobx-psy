@@ -1,48 +1,35 @@
 import { action, computed, makeObservable, observable, reaction } from 'mobx'
-import { effect, sync } from '@psy/mobx'
-import React from 'react'
 
-import { DemoLibFetchSync, useDemoLibFetch } from '@demo/lib-fetch/fetch.js'
-import { DemoLibRouterLocation } from '@demo/lib-router/location.js'
+import { DemoLibIOContext } from '@demo/lib-io/io'
+import { effect, sync } from '@psy/mobx'
 
 import { DemoSearchFlatFilterModel } from './filter/model'
 
-export interface DemoSearchFlatModelProps {
-  id: string
-  house: boolean
-  rooms: number
+export abstract class DemoSearchFlatDTO {
+  id!: string
+  house!: boolean
+  rooms!: number
 }
 
-export class DemoSearchFlatModel {
-  readonly id: string
-  readonly rooms: number
-  readonly house: boolean
-
-  constructor(dto: DemoSearchFlatModelProps) {
-    this.id = dto.id
-    this.rooms = dto.rooms
-    this.house = dto.house
+export class DemoSearchFlatModel extends DemoSearchFlatDTO {
+  constructor(v: DemoSearchFlatDTO, protected io = DemoLibIOContext.use()) {
+    super()
+    Object.assign(this, v)
   }
 }
 
 export class DemoSearchFlatModelStore {
-  constructor(protected location: DemoLibRouterLocation, protected fetch: DemoLibFetchSync) {
+  constructor(protected io = DemoLibIOContext.use()) {
     makeObservable(this)
     effect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
   }
 
-  static use() {
-    const { fetch, location } = useDemoLibFetch()
-
-    return React.useMemo(() => new this(location, fetch), [fetch, location])
-  }
-
   @computed get filter() {
-    return new DemoSearchFlatFilterModel(this.location)
+    return new DemoSearchFlatFilterModel(this.io.location)
   }
 
   @computed protected get params() {
-    return this.location.route({
+    return this.io.location.route({
       page: 1,
     }).values
   }
@@ -99,13 +86,14 @@ export class DemoSearchFlatModelStore {
   }
 
   @sync get response() {
-    const response = this.fetch('flats', {
-      body: JSON.stringify({
+    const response = this.io.fetch({
+      kind: 'flats',
+      params: {
         ...this.params,
         ...this.filter.values,
-      }),
+      },
     }) as {
-      items: DemoSearchFlatModelProps[]
+      items: DemoSearchFlatDTO[]
       total_pages: number
     }
 
@@ -113,12 +101,8 @@ export class DemoSearchFlatModelStore {
 
     return {
       ...response,
-      items: response.items.map((item) => this.normalize(item)),
+      items: response.items.map(item => new DemoSearchFlatModel(item, this.io)),
     }
-  }
-
-  protected normalize(raw: DemoSearchFlatModelProps): DemoSearchFlatModel {
-    return new DemoSearchFlatModel(raw)
   }
 
   @action.bound refresh() {

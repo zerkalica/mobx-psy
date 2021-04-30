@@ -1,12 +1,9 @@
 import { IncomingMessage } from 'http'
-import { parse } from 'url'
+
 import { LocationLike } from '@psy/core'
 
-export function locationFromNodeRequest(
-  req: IncomingMessage,
-  sequre = true
-): LocationLike {
-  const parts = parse(req.url || '')
+export function locationFromNodeRequest(req: IncomingMessage, sequre = true) {
+  const parts = new URL(req.url || '')
   const headers = req.headers
   let host = headers['x-forwarded-host'] || headers['host'] || ''
 
@@ -32,4 +29,3 @@ export function locationFromNodeRequest(
 
   return location
 }
-

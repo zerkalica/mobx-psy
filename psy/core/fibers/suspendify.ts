@@ -1,51 +1,51 @@
 import { namedFunction, throwHidden } from '../utils'
 import { Fiber } from './Fiber'
 
-export type FetchInitBase = { signal?: AbortSignal | null }
+export interface FetchInitBase {
+  kind: string
+  params: Object
+}
 
-export type FetchLike<Init extends FetchInitBase> = (
-  url: string,
-  init: Init
-) => Promise<Object>
+export type FetchLike = (init: FetchInitBase, signal: AbortSignal) => Promise<Object>
 
-export type SyncFetch<Init extends FetchInitBase> = (
-  url: string,
-  init: Init
-) => Object
+export type SyncFetch = (init: FetchInitBase) => Object
 
-export type HydratedState = Record<string, Object | undefined>
+export const defaultHashFn = (p: FetchInitBase) => p.kind + '.' + JSON.stringify(p.params)
 
 /**
  * Add fiber cache to fetch-like function.
  */
-export function suspendify<Init extends FetchInitBase, F extends FetchLike<Init> & { displayName?: string }>(
-  fetchFn: F,
-  cache?: HydratedState | undefined,
-  keepCache = false
-): SyncFetch<Init> {
-  return (url: string, init: Init) => {
-    let fiber = Fiber.get<Object>(url)
+export function suspendify({
+  fetchFn,
+  cache,
+  keepCache = false,
+  hashFn = defaultHashFn,
+}: {
+  fetchFn: FetchLike & { displayName?: string }
+  cache?: Record<string, Object | undefined>
+  keepCache?: boolean
+  hashFn?: typeof defaultHashFn
+}) {
+  function syncFetch(args: FetchInitBase) {
+    const key = hashFn(args)
+    let fiber = Fiber.get<Object>(key)
 
-    if (! fiber) {
+    if (!fiber) {
       const fn = namedFunction((signal: AbortSignal) => {
-        const data = cache ? cache[url] : undefined
+        const data: Object | undefined = cache ? cache[key] : undefined
 
-        if (data === undefined) {
-          const params = { ...init , signal }
+        if (data === undefined) return throwHidden(fetchFn(args, signal))
 
-          return throwHidden(fetchFn(url, params))
-        }
-
-        if (cache && !keepCache) {
-          cache[url] = undefined
-        }
+        if (cache && !keepCache) cache[key] = undefined
 
         return data
       }, `${fetchFn.displayName ?? fetchFn.name ?? String(fetchFn)}#h`)
 
-      fiber = new Fiber(url, fn)
+      fiber = new Fiber<Object>(key, fn)
     }
 
     return fiber.get()
   }
+
+  return syncFetch
 }

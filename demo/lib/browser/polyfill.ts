@@ -1,8 +1,8 @@
 import { configure } from 'mobx'
-import { psyMobxReactConfigure } from '@psy/mobx-react/config.js'
+import { psyMobxReactConfigure } from '@psy/mobx-react/config'
 
-import { DemoLibUiFallbackError } from '@demo/lib-ui/fallback/error.js'
-import { DemoLibUiFallbackLoading } from '@demo/lib-ui/fallback/loading.js'
+import { DemoLibUiFallbackError } from '@demo/lib-ui/fallback/error'
+import { DemoLibUiFallbackLoading } from '@demo/lib-ui/fallback/loading'
 
 configure({
   enforceActions: 'observed',

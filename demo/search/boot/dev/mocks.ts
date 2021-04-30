@@ -1,8 +1,6 @@
 import { promisify } from '@psy/core'
 
-import { DemoLibFetch } from '@demo/lib-fetch/fetch.js'
-
-import { DemoSearchFlatModelProps } from '../../flat/model'
+import { DemoSearchFlatDTO } from '../../flat/model'
 
 function createCreateId(prefix: string) {
   let id = 0
@@ -12,7 +10,7 @@ function createCreateId(prefix: string) {
 }
 
 function createFlatsMock() {
-  const flatsAll: DemoSearchFlatModelProps[] = []
+  const flatsAll: DemoSearchFlatDTO[] = []
   const create_id = createCreateId('f')
   const totalItems = 100
   const page_size = 10
@@ -25,7 +23,7 @@ function createFlatsMock() {
     })
   }
 
-  return (filter?: Partial<DemoSearchFlatModelProps & { page: number }>) => {
+  return (filter?: Partial<DemoSearchFlatDTO & { page: number }>) => {
     const items = filter
       ? flatsAll.filter((flat) => {
           if (filter.house && !flat.house) return false
@@ -51,12 +49,22 @@ export function demoSearchBootDevMocks({
 }: {
   errorRate: number
   timeout: number
-}): DemoLibFetch {
+}) {
   const fetchFlats = createFlatsMock()
 
-  return promisify(errorRate, timeout, (url, params) => {
-    if (url === '/flats') return fetchFlats(typeof params?.body === 'string' ? JSON.parse(params.body) : {})
+  const fetchFn = promisify(errorRate, timeout, (url: string, params: RequestInit) => {
+    if (url === '/flats') return {
+      json: () => Promise.resolve(
+        fetchFlats(
+          typeof params?.body === 'string'
+            ? JSON.parse(params.body)
+            : {}
+          )
+        )
+    }
 
     throw new Error('404: ' + url)
-  })
+  }) as typeof fetch
+
+  return fetchFn
 }

@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "/home/yuferev/projects/TypeScript/built/local",
+  "typescript.tsdk": "node_modules/typescript/lib",
   "search.exclude": {
     "**/node_modules": true,
     "**/-*": true
@@ -7,5 +7,11 @@
   "files.exclude": {
     "**/node_modules": true,
     "**/-*": false
-  }
+  },
+  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 175,
+  "importSorter.sortConfiguration.removeUnusedImports": true,
+  "importSorter.generalConfiguration.sortOnBeforeSave": true,
+  "importSorter.generalConfiguration.sortImportsInDirectory": false,
+  "importSorter.importStringConfiguration.hasSemicolon": false,
+  "editor.formatOnSave": true
 }

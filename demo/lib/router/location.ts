@@ -1,4 +1,5 @@
 import { action, computed, makeObservable, observable } from 'mobx'
+
 import { defer, LocationLike } from '@psy/core'
 
 import { DefaultParams, DemoLibRouterRoute } from './route'
@@ -20,26 +21,16 @@ const defaultLocation: LocationLike = {
 export class DemoLibRouterLocation {
   @observable protected search: string = this.location.search
 
-  constructor(
-    protected location: LocationLike = defaultLocation,
-    protected history?: DemoLibRouterHistory,
-    protected target?: Window
-  ) {
+  constructor(protected location: LocationLike = defaultLocation, protected history?: DemoLibRouterHistory, protected target?: Window) {
     makeObservable(this)
-    if (target) {
-      target.addEventListener('popstate', this.onPopState)
-    }
+    if (target) target.addEventListener('popstate', this.onPopState)
   }
 
   @action.bound protected onPopState() {
     this.search = this.location.search
   }
 
-  route<O extends DefaultParams>(
-    defaults: O,
-    mapper?: DemoLibRouterParamMapper<O>,
-    deleteDefault = true
-  ): DemoLibRouterRoute<O> {
+  route<O extends DefaultParams>(defaults: O, mapper?: DemoLibRouterParamMapper<O>, deleteDefault = true): DemoLibRouterRoute<O> {
     return new DemoLibRouterRoute(defaults, mapper, deleteDefault, this)
   }
 

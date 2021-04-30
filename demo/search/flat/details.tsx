@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { psyMobxReactObserver } from '@psy/mobx-react/observer.js'
+import { psyMobxReactObserver } from '@psy/mobx-react/observer'
 
 import { DemoSearchFlatModel } from './model'
 

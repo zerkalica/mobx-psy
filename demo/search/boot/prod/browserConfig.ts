@@ -1,5 +1,5 @@
 import { demoSearchBootCommonBrowserConfig } from '../common/browserConfig'
 
-export const demoSearchBootProdBrowserConfig = {
+export const demoSearchBootProdBrowserConfig: typeof demoSearchBootCommonBrowserConfig = {
   ...demoSearchBootCommonBrowserConfig
 }

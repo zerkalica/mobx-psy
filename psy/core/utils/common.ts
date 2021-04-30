@@ -1,14 +1,9 @@
 export function getId(t: Object, hk: string | symbol): string {
-  return `${(t.constructor as any).displayName ||
-    t.constructor.name}.${hk.toString()}`
+  return `${(t.constructor as any).displayName || t.constructor.name}.${hk.toString()}`
 }
 
 export function isPromise(target: any): target is PromiseLike<any> {
-  return (
-    target !== null &&
-    typeof target === 'object' &&
-    typeof target.then === 'function'
-  )
+  return target !== null && typeof target === 'object' && typeof target.then === 'function'
 }
 
 export function namedFunction<F extends Function>(fn: F, name: string): F {
@@ -35,11 +30,15 @@ export function normalizeError(error: any): Error | PromiseLike<any> {
 
   // Weakmap used to keep instance of error with same input value
   let converted = wm.get(error)
-  
-  if (! converted) {
+
+  if (!converted) {
     converted = new Error(error)
     wm.set(converted, error)
   }
 
   return converted
+}
+
+export const errorsCollector = {
+  errors: undefined as Set<Error> | undefined,
 }

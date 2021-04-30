@@ -1,25 +1,28 @@
-import { HydratedState, FetchLike, SyncFetch, suspendify, FetchInitBase } from '@psy/core'
+import { defaultHashFn, FetchInitBase, FetchLike, suspendify } from '@psy/core'
 
-export class ServerFetcher<Init extends FetchInitBase> {
+export class ServerFetcher {
   protected promises: PromiseLike<[string, any]>[] = []
-  protected state: HydratedState = {}
+  protected state: Record<string, any> = {}
 
-  readonly fetch: SyncFetch<Init>
+  readonly fetch = suspendify({
+    fetchFn: this.normalizedFetch.bind(this),
+    cache: this.state,
+    keepCache: true,
+    hashFn: this.options.hashFn,
+  })
 
   constructor(
     protected options: {
-      apiUrl: string
-      fetch: FetchLike<Init>
+      fetchFn: FetchLike
+      hashFn?: typeof defaultHashFn
     }
-  ) {
-    this.fetch = suspendify(this.normalizedFetch.bind(this), this.state, true)
-  }
+  ) {}
 
-  protected normalizedFetch(url: string, init: Init) {
-    const { options } = this
-    const promise = options.fetch(options.apiUrl + url, init)
-
-    this.promises.push(promise.then(data => [url, data]))
+  protected normalizedFetch(init: FetchInitBase, signal: AbortSignal) {
+    const promise = this.options.fetchFn(init, signal)
+    const hashFn = this.options.hashFn ?? defaultHashFn
+    const key = hashFn(init)
+    this.promises.push(promise.then(data => [key, data]))
 
     return promise
   }

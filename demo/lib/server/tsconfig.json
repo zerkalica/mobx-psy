@@ -11,6 +11,6 @@
     {"path": "../browser"},
     {"path": "../router"},
     {"path": "../build"},
-    {"path": "../fetch"},
+    {"path": "../io"}
   ]
 }
