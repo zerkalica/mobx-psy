@@ -1,61 +1,76 @@
-import { action, computed, makeObservable, observable } from 'mobx'
+import { action, computed, makeObservable, observable, onBecomeUnobserved } from 'mobx'
 
-import { FiberHost } from '@psy/core'
-import { effect } from './effect'
-import { getDerivableName } from './getDerivableName'
-
-/**
- * Suspendable calculations
- * 
- * @throws Error | PromiseLike<V>
- */
-export type LoaderHandler<V> = () => V
+import { PsyContextRegistry } from '@psy/context/Registry'
+import { isPromise, throwHidden } from '@psy/core/common'
+import { Fetcher, FetchInitBase } from '@psy/ssr/Fetcher'
+import { Hydrator } from '@psy/ssr/Hydrator'
 
 /**
- * Run, restart and cache suspendable calculations in the handler.
+ * ```ts
+ * class F {
+ *   @computed get loader() { return new Loader(this.$, this.filters) }
+ *   user() {
+ *     return this.loader.value
+ *   }
+ * }
+ * ```
  */
-export class Loader<V> extends FiberHost {
-  @observable protected counter = 0
-  protected initial = true
-
+export class Loader<Result> {
   constructor(
-    protected handler: LoaderHandler<V>,
-
-    /**
-     * Called after Loader.value become unobserved
-     */
-    protected dispose: () => void
+    protected $: PsyContextRegistry,
+    protected args: FetchInitBase,
+    protected fetcher = $.v(Fetcher),
+    protected hydrator = $.v(Hydrator)
   ) {
-    super('Loader#' + getDerivableName())
     makeObservable(this)
-    effect(this, 'value', () => this.destructor.bind(this))
+    onBecomeUnobserved(this, 'value', this.destructor.bind(this))
   }
 
-  get isFirstRun() {
-    return this.initial
-  }
+  protected key = this.fetcher.hash(this.args)
 
-  /**
-   * Observable value
-   *
-   * @throws Error | PromiseLike<V> 
-   */
-  @computed get value(): V {
+  @observable protected counter = 0
+  protected raw: Result | Promise<Result> | Error | undefined = undefined
+  public initial = true
+
+  @computed get value(): Result {
     // Subscribe to observable counter to recalucate all value deps, if Loader.next called
     this.counter
-    const prev = FiberHost.current
 
-    // Expose themself to handler fibers
-    FiberHost.current = this
+    const raw = this.raw ?? this.hydrator.get<Result>(this.key)
+
+    if (raw instanceof Error || isPromise(raw)) return throwHidden(raw)
+    if (raw === undefined) {
+      const p = this.fetch()
+      this.hydrator.prepare(this.key, p)
+      return throwHidden(p)
+    }
+
+    return raw
+  }
+
+  protected ac = new AbortController()
+
+  protected async fetch() {
+    this.ac = new AbortController()
+    const p = this.fetcher.get(this.args, this.ac.signal) as Promise<Result>
+    this.raw = p
 
     try {
-      const next = this.handler()
-      this.clear()
+      const raw = await p
+      this.hydrator.set(this.key, raw)
+      this.raw = raw
       this.initial = false
+      this.next()
 
-      return next
-    } finally {
-      FiberHost.current = prev
+      return raw
+    } catch (e) {
+      const err = e instanceof Error ? e : new Error(e)
+      if (err !== e) (err as Error & { original: Error }).original = e
+      this.hydrator.set(this.key, err)
+      this.raw = err
+      this.next()
+
+      return throwHidden(err)
     }
   }
 
@@ -63,12 +78,14 @@ export class Loader<V> extends FiberHost {
     this.counter++
   }
 
-  /**
-   * Called on Loader.value become unobserved
-   */
-  destructor() {
-    this.clear()
+  reload() {
+    this.hydrator.set(this.key, undefined)
+    this.next()
+  }
+
+  protected destructor() {
+    this.hydrator.set(this.key, undefined)
+    this.ac.abort()
     this.initial = true
-    this.dispose()
   }
 }

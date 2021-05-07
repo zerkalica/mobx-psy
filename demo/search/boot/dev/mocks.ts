@@ -1,4 +1,4 @@
-import { promisify } from '@psy/core'
+import { promisify } from '@psy/core/promisify'
 
 import { DemoSearchFlatDTO } from '../../flat/model'
 
@@ -25,7 +25,7 @@ function createFlatsMock() {
 
   return (filter?: Partial<DemoSearchFlatDTO & { page: number }>) => {
     const items = filter
-      ? flatsAll.filter((flat) => {
+      ? flatsAll.filter(flat => {
           if (filter.house && !flat.house) return false
           return !filter.rooms || filter.rooms === flat.rooms
         })
@@ -43,25 +43,14 @@ function createFlatsMock() {
   }
 }
 
-export function demoSearchBootDevMocks({
-  errorRate,
-  timeout,
-}: {
-  errorRate: number
-  timeout: number
-}) {
+export function demoSearchBootDevMocks({ errorRate, timeout }: { errorRate: number; timeout: number }) {
   const fetchFlats = createFlatsMock()
 
   const fetchFn = promisify(errorRate, timeout, (url: string, params: RequestInit) => {
-    if (url === '/flats') return {
-      json: () => Promise.resolve(
-        fetchFlats(
-          typeof params?.body === 'string'
-            ? JSON.parse(params.body)
-            : {}
-          )
-        )
-    }
+    if (url === '/flats')
+      return {
+        json: () => Promise.resolve(fetchFlats(typeof params?.body === 'string' ? JSON.parse(params.body) : {})),
+      }
 
     throw new Error('404: ' + url)
   }) as typeof fetch

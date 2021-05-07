@@ -1,4 +1,4 @@
 export const demoSearchBootCommonBrowserConfig = {
   publicUrl: '/',
-  apiUrl: '/'
+  apiUrl: '/',
 }

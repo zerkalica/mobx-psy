@@ -1,26 +1,9 @@
 import express from 'express'
 
-import { psyContextInit } from '@psy/context/context.node'
-import { psyContextCreate } from '@psy/context/create'
-import { ServerFetcher } from '@psy/mobx-ssr/ServerFetcher'
-
 import { demoLibServerMdlError } from './error'
-
-export const DemoLibServerMdlExpressContext = psyContextCreate<{
-  fetcher: ServerFetcher
-  pkgName: string
-  publicUrl: string
-  browserConfig?: Object
-}>('DemoLibServerMdlConfigContext')
 
 export function demoLibServerMdlExpress(p: { port: number; init: (e: express.Express) => express.Express }) {
   let srv = express()
-
-  srv.use((req, res, next) => {
-    psyContextInit(() => {
-      next()
-    })
-  })
 
   srv = p.init(srv)
 

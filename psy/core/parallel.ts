@@ -1,4 +1,4 @@
-import { isPromise, throwHidden } from '../utils'
+import { isPromise, throwHidden } from './common'
 
 type Primitive = string | number | boolean | object
 type PackedBase = Record<string, Primitive | Primitive[]>

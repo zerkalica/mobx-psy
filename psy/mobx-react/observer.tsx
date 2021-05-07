@@ -1,7 +1,8 @@
 import { observer as mobxObserver } from 'mobx-react-lite'
 import React from 'react'
 
-import { errorsCollector, getRefreshable, normalizeError, throwHidden } from '@psy/core'
+import { errorsCollector, normalizeError, throwHidden } from '@psy/core/common'
+import { getRefreshable } from '@psy/core/Refreshable'
 
 import { psyMobxReactConfig, PsyMobxReactConfig } from './config'
 import { psyMobxReactMockState } from './mock'

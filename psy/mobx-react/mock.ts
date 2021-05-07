@@ -1,4 +1,5 @@
-import { throwHidden, normalizeError, getRefreshable } from '@psy/core'
+import { normalizeError, throwHidden } from '@psy/core/common'
+import { getRefreshable } from '@psy/core/Refreshable'
 
 /**
  * Used internally in observer
@@ -20,7 +21,7 @@ interface MockParams<State, Fallback> {
 
   /**
    * Returns main data
-   * 
+   *
    * @throws Error | PromiseLike<any>
    */
   unsafe: () => State
@@ -52,7 +53,7 @@ export function psyMobxReactMock<State, Fallback>(p: MockParams<State, Fallback>
     // throw, if any error or fiber, associated with promise, is completed
     // Call fallback on fist calculations, if calculations was completed and refreshed - throws promise.
     // observer catches promise and returns last actual rendered component with loading blend.
-    if (error instanceof Error || ! getRefreshable(error)?.isFirstRun) return throwHidden(error)
+    if (error instanceof Error || !getRefreshable(error)?.isFirstRun) return throwHidden(error)
 
     const result = p.fallback()
 

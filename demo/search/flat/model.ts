@@ -1,7 +1,9 @@
 import { action, computed, makeObservable, observable, reaction } from 'mobx'
 
-import { DemoLibIOContext } from '@demo/lib-io/io'
-import { effect, sync } from '@psy/mobx'
+import { DemoLibRouterLocation } from '@demo/lib-router/location'
+import { PsyContextRegistry } from '@psy/context/Registry'
+import { effect, Loader } from '@psy/mobx'
+import { Fetcher } from '@psy/ssr/Fetcher'
 
 import { DemoSearchFlatFilterModel } from './filter/model'
 
@@ -12,24 +14,24 @@ export abstract class DemoSearchFlatDTO {
 }
 
 export class DemoSearchFlatModel extends DemoSearchFlatDTO {
-  constructor(v: DemoSearchFlatDTO, protected io = DemoLibIOContext.use()) {
+  constructor(protected $: PsyContextRegistry, v: DemoSearchFlatDTO, protected io = $.v(Fetcher)) {
     super()
     Object.assign(this, v)
   }
 }
 
 export class DemoSearchFlatModelStore {
-  constructor(protected io = DemoLibIOContext.use()) {
+  constructor(protected $: PsyContextRegistry, protected id: string, protected location = $.v(DemoLibRouterLocation)) {
     makeObservable(this)
     effect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
   }
 
   @computed get filter() {
-    return new DemoSearchFlatFilterModel(this.io.location)
+    return new DemoSearchFlatFilterModel(this.$)
   }
 
   @computed protected get params() {
-    return this.io.location.route({
+    return this.location.route({
       page: 1,
     }).values
   }
@@ -85,28 +87,32 @@ export class DemoSearchFlatModelStore {
     return this.lastTotalPages
   }
 
-  @sync get response() {
-    const response = this.io.fetch({
+  @computed get loader() {
+    return new Loader<{
+      items: DemoSearchFlatDTO[]
+      total_pages: number
+    }>(this.$, {
       kind: 'flats',
       params: {
         ...this.params,
         ...this.filter.values,
       },
-    }) as {
-      items: DemoSearchFlatDTO[]
-      total_pages: number
-    }
+    })
+  }
+
+  @computed get response() {
+    const response = this.loader.value
 
     this.lastTotalPages = response.total_pages
 
     return {
       ...response,
-      items: response.items.map(item => new DemoSearchFlatModel(item, this.io)),
+      items: response.items.map(item => new DemoSearchFlatModel(this.$, item)),
     }
   }
 
   @action.bound refresh() {
-    sync.refresh(() => this.response)
+    this.loader.reload()
   }
 
   @computed get filtered() {

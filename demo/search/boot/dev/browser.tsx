@@ -1,4 +1,6 @@
-import '@demo/lib-browser/polyfill'
+import '@demo/lib-ui/polyfill'
+
+import { PsyContextRegistry } from '@psy/context/Registry'
 
 import { demoSearchBootCommonBrowser } from '../common/browser'
 import { demoSearchBootDevBrowserConfig } from './browserConfig'
@@ -9,7 +11,4 @@ const fetcher = demoSearchBootDevMocks({
   timeout: 500,
 })
 
-demoSearchBootCommonBrowser({
-  fetchFn: fetcher,
-  browserConfig: demoSearchBootDevBrowserConfig,
-})
+demoSearchBootCommonBrowser(PsyContextRegistry.root, window, demoSearchBootDevBrowserConfig)

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "mobx": "^6.3.0",
+    "@psy/context": "^1.0.0",
     "@psy/core": "^1.0.0"
   },
   "devDependencies": {

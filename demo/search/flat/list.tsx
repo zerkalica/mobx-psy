@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { usePsyContextMemoClass } from '@psy/context/memo'
+import { usePsyContextClass } from '@psy/context/react'
 import { psyMobxReactMock } from '@psy/mobx-react/mock'
 import { psyMobxReactObserver } from '@psy/mobx-react/observer'
 
@@ -9,7 +9,7 @@ import { DemoSearchFlatFilter } from './filter/filter'
 import { DemoSearchFlatModelStore } from './model'
 
 export const DemoSearchFlatList = psyMobxReactObserver(function DemoSearchFlatList({ id }: { id: string }) {
-  const flats = usePsyContextMemoClass(DemoSearchFlatModelStore)
+  const flats = usePsyContextClass(DemoSearchFlatModelStore, id)
 
   return (
     <div id={id}>
@@ -17,7 +17,7 @@ export const DemoSearchFlatList = psyMobxReactObserver(function DemoSearchFlatLi
       {psyMobxReactMock({
         unsafe: () => (
           <ul id={`${id}-flats`}>
-            {flats.filtered.map((flat) => (
+            {flats.filtered.map(flat => (
               <DemoSearchFlatDetails id={`${id}-flat[${flat.id}]`} key={flat.id} flat={flat} />
             ))}
           </ul>

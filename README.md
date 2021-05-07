@@ -5,7 +5,7 @@
 ## Packages
 
 - [@psy/mobx](./packages/@psy/mobx/core) - Core library
-- [@psy/mobx-ssr](./packages/@psy/mobx/ssr) - Helpers for using @psy/mobx with server side rendering
+- [@psy/ssr](./packages/@psy/mobx/ssr) - Helpers for using @psy/mobx with server side rendering
 - [my/app/search](./packages/my/app/search) - Example application: filter form, list, pagination, loading indicator, parametrized url. Parcel, server side rendering, dev and prod server, state hydrate.
 
 Run demo application:
@@ -18,9 +18,9 @@ yarn watch
 
 ## Basic ideas
 
-* Each async calculation in observer component throws promise (like React.Suspense).
-* Each component wrapped into @psy/mobx observer, which uses [mobx-react-lite](https://github.com/mobxjs/mobx-react-lite) internally, but try/catches promises and returns loading/error Fallback component.
-* Each async calculation wrapped into @psy/mobx cache, after promise resolve, @psy/mobx rerenders component and returns data from cache.
+- Each async calculation in observer component throws promise (like React.Suspense).
+- Each component wrapped into @psy/mobx observer, which uses [mobx-react-lite](https://github.com/mobxjs/mobx-react-lite) internally, but try/catches promises and returns loading/error Fallback component.
+- Each async calculation wrapped into @psy/mobx cache, after promise resolve, @psy/mobx rerenders component and returns data from cache.
 
 @psy/mobx emulates [fibers](https://gist.github.com/nin-jin/5408ef8f16f43f1b4fe9cbcea577aac6).
 
@@ -181,14 +181,12 @@ export function FallbackLoading({children) {
 ## Custom default loading message
 
 ```tsx
-
-import {configurePsy} from '@psy/mobx'
+import { configurePsy } from '@psy/mobx'
 
 configurePsy({
   loading: FallbackLoading,
   error: FallbackError,
 })
-
 ```
 
 ## Data mocking while loading

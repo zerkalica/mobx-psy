@@ -1,10 +1,9 @@
 {
-  "name": "@demo/lib-browser",
+  "name": "@psy/ssr",
   "version": "1.0.0",
-  "description": "Example browser stuff",
-  "private": true,
-  "main": "./-/index.js",
-  "types": "./-/index.d.ts",
+  "description": "Psy server side rendering tools",
+  "main": "-/index.js",
+  "types": "-/index.d.ts",
   "exports": {
     "./": "./-/"
   },
@@ -18,18 +17,16 @@
     "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
-    "@emotion/react": "^11.0.0",
-    "@emotion/styled": "^11.0.0",
-    "@demo/lib-ui": "^1.0.0",
-    "@demo/lib-router": "^1.0.0",
-    "mobx": "^6.0.0",
     "@psy/core": "^1.0.0",
-    "@psy/mobx-react": "^1.0.0"
+    "@psy/context": "^1.0.0"
   },
   "devDependencies": {
-    "@psy/boot": "^1.0.0"
+    "@types/node": "^14.10.1",
+    "@psy/boot": "^1.0.1"
   },
   "peerDependencies": {
+    "react": "*",
+    "react-dom": "*",
     "typescript": "*",
     "jest": "*"
   }

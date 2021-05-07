@@ -5,6 +5,7 @@
     "rootDir": "."
   },
   "references": [
-    {"path": "../boot"}
+    {"path": "../boot"},
+    {"path": "../core"}
   ]
 }

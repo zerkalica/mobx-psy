@@ -6,11 +6,10 @@
   },
   "references": [
     {"path": "../../../psy/core"},
-    {"path": "../../../psy/mobx-ssr"},
+    {"path": "../../../psy/context"},
+    {"path": "../../../psy/ssr"},
     {"path": "../../../psy/boot"},
-    {"path": "../browser"},
     {"path": "../router"},
-    {"path": "../build"},
-    {"path": "../io"}
+    {"path": "../build"}
   ]
 }

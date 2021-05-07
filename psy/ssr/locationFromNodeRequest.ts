@@ -1,6 +1,6 @@
 import { IncomingMessage } from 'http'
 
-import { LocationLike } from '@psy/core'
+import { LocationLike } from './LocationLike'
 
 export function locationFromNodeRequest(req: IncomingMessage, sequre = true) {
   const parts = new URL(req.url || '')

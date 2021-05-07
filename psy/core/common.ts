@@ -32,7 +32,7 @@ export function normalizeError(error: any): Error | PromiseLike<any> {
   let converted = wm.get(error)
 
   if (!converted) {
-    converted = new Error(error)
+    converted = new Error('' + error)
     wm.set(converted, error)
   }
 

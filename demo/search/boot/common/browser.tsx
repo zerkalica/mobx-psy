@@ -1,38 +1,38 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { demoLibIOFetchWrap } from '@demo/lib-io/fetchWrap'
-import { DemoLibIOContext } from '@demo/lib-io/io'
-import { DemoLibRouterLocation } from '@demo/lib-router/location'
-import { DemoLibUIContextBuilder } from '@demo/lib-ui/context'
-import { suspendify } from '@psy/core'
+import { demoLibRouterClient } from '@demo/lib-router/client'
+import { PsyContextProvide } from '@psy/context/react'
+import { PsyContextRegistry } from '@psy/context/Registry'
+import { Fetcher } from '@psy/ssr/Fetcher'
+import { FetcherBrowser } from '@psy/ssr/FetcherBrowser'
+import { Hydrator, HydratorBrowser } from '@psy/ssr/Hydrator'
 
 import { demoSearchPkgName } from '../../pkgName'
 import { DemoSearch } from '../../search'
 import { demoSearchBootCommonBrowserConfig } from './browserConfig'
 
-export function demoSearchBootCommonBrowser({
-  fetchFn: fetchRaw = fetch,
-  browserConfig = demoSearchBootCommonBrowserConfig,
-}: {
-  fetchFn?: typeof fetch
-  browserConfig?: typeof demoSearchBootCommonBrowserConfig
-} = {}) {
-  const cache = (window as any)[demoSearchPkgName]
-  const config = cache.__config ?? browserConfig
-  const loc = new DemoLibRouterLocation(location, history, window)
-  const fetchFn = demoLibIOFetchWrap({ fetchFn: fetchRaw, apiUrl: config.apiUrl })
-  const syncFetch = suspendify({ fetchFn, cache })
-
-  const Provider = new DemoLibUIContextBuilder().v(DemoLibIOContext.Provider, {
-    fetch: syncFetch,
-    location: loc,
-  }).Provider
+export function demoSearchBootCommonBrowser(
+  $: PsyContextRegistry,
+  win: typeof window & { [Symbol.toStringTag]?: string } & {
+    [demoSearchPkgName]?: Record<string, unknown> & { __config: typeof demoSearchBootCommonBrowserConfig }
+  } = window,
+  config = win[demoSearchPkgName]?.__config ?? demoSearchBootCommonBrowserConfig
+) {
+  const cache = win[demoSearchPkgName]
 
   ReactDOM.render(
-    <Provider>
+    <PsyContextProvide
+      parent={$}
+      deps={$ =>
+        $.set(demoLibRouterClient, win as typeof window & { [Symbol.toStringTag]: string })
+          .set(demoSearchBootCommonBrowserConfig, config)
+          .set(Hydrator, new HydratorBrowser(cache))
+          .set(Fetcher, new FetcherBrowser({ apiUrl: config.apiUrl }))
+      }
+    >
       <DemoSearch id={demoSearchPkgName} />
-    </Provider>,
+    </PsyContextProvide>,
     document.getElementById(`${demoSearchPkgName}-main`)
   )
 }

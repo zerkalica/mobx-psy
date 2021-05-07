@@ -18,10 +18,14 @@
     "test:watch": "jest --passWithNoTests --watch",
     "prepublishOnly": "psy-boot prepublish"
   },
-  "dependencies": {
+  "optionalDependencies": {
     "react": "^17.0.2"
   },
+  "dependencies": {
+    "@psy/core": "^1.0.0"
+  },
   "devDependencies": {
+    "react": "^17.0.2",
     "@types/react": "^17.0.2",
     "@psy/boot": "^1.0.1"
   },

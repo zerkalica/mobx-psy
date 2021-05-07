@@ -23,8 +23,6 @@
     "my-search": "./bin/demo-search"
   },
   "dependencies": {
-    "@demo/lib-browser": "^1.0.0",
-    "@demo/lib-io": "^1.0.0",
     "@demo/lib-router": "^1.0.0",
     "@demo/lib-server": "^1.0.0",
     "@demo/lib-ui": "^1.0.0",
@@ -34,7 +32,7 @@
     "@psy/context": "^1.0.0",
     "@psy/mobx": "^1.0.0",
     "@psy/mobx-react": "^1.0.0",
-    "@psy/mobx-ssr": "^1.0.0",
+    "@psy/ssr": "^1.0.0",
     "express": "^4.17.1",
     "mobx": "^6.0.0",
     "node-fetch": "^2.6.1",

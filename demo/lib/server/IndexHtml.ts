@@ -1,15 +1,16 @@
-export class DemoLibServerIndexHtml {
+import { ServerTemplate } from '@psy/ssr/ServerRender'
+
+export class DemoLibServerIndexHtml extends ServerTemplate {
   constructor(
-    protected options: {
+    protected options: Readonly<{
       title: string
-      /**
-       * Only absolute path allowed
-       */
-      publicUrl: string
-      pkgName: string
       entry?: string
-    }
-  ) {}
+      pkgName: string
+      publicUrl: string
+    }>
+  ) {
+    super()
+  }
 
   get header() {
     return `<!doctype html>
@@ -41,9 +42,5 @@ export class DemoLibServerIndexHtml {
     </body>
   </html>
   `
-  }
-
-  toString() {
-    return `${this.header}${this.body}{}${this.footer}`
   }
 }

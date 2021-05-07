@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Refreshable } from '@psy/core'
+import { Refreshable } from '@psy/core/Refreshable'
 
 export interface FallbackLoadingProps {
   /**
@@ -22,9 +22,7 @@ export function FallbackLoading({
   className = 'Fallback Fallback__loading',
   contentClassName = 'Fallback__content',
 }: FallbackLoadingProps) {
-  return (
-    <div className={className}>{children ? <div className={contentClassName}>{children}</div> : null}</div>
-  )
+  return <div className={className}>{children ? <div className={contentClassName}>{children}</div> : null}</div>
 }
 
 export interface FallbackErrorProps {

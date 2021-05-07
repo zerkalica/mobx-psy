@@ -7,14 +7,12 @@
   "references": [
     {"path": "../../psy/core"},
     {"path": "../../psy/mobx"},
-    {"path": "../../psy/mobx-ssr"},
+    {"path": "../../psy/ssr"},
     {"path": "../../psy/mobx-react"},
     {"path": "../../psy/boot"},
     {"path": "../../psy/context"},
     {"path": "../lib/server"},
-    {"path": "../lib/browser"},
     {"path": "../lib/ui"},
-    {"path": "../lib/io"},
     {"path": "../lib/router"},
     {"path": "../lib/build"}
   ]

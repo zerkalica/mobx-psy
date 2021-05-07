@@ -20,7 +20,10 @@
   "dependencies": {
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
-    "react": "^17.0.2"
+    "react": "^17.0.2",
+    "mobx": "^6.0.0",
+    "@psy/core": "^1.0.0",
+    "@psy/mobx-react": "^1.0.0"
   },
   "devDependencies": {
     "@psy/boot": "^1.0.0",

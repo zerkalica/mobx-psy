@@ -1,38 +1,35 @@
-import express from 'express'
+import { IncomingMessage, ServerResponse } from 'http'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 
-import { psyContextPassProvider } from '@psy/context/context'
-import { ServerRenderer } from '@psy/mobx-ssr/ServerRender'
+import { usePsyContextNode } from '@psy/context/node'
+import { PsyContextProvide } from '@psy/context/react'
+import { PsyErrorMix } from '@psy/core/ErrorMix'
+import { ServerRenderer, ServerTemplate } from '@psy/ssr/ServerRender'
 
-import { DemoLibServerIndexHtml } from '../IndexHtml'
-import { demoLibServerMdlAsync } from './async'
-import { DemoLibServerMdlExpressContext } from './express'
+export function demoLibServerMdlRender({ app, template }: { app: () => React.ReactNode; template: ServerTemplate }) {
+  return (req: IncomingMessage, response: ServerResponse, next: (err: Error) => void) => {
+    const registry = usePsyContextNode()
 
-export function demoLibServerMdlRender(app: (id: string) => React.ReactNode) {
-  return demoLibServerMdlAsync(async function demoLibServerMdlRender(req: express.Request, response: express.Response) {
-    const { fetcher, browserConfig, ...config } = DemoLibServerMdlExpressContext.use()
-
-    const Provider = psyContextPassProvider()
-    const render = () => {
-      return ReactDOMServer.renderToNodeStream(<Provider>{app(config.pkgName)}</Provider>)
-    }
-    const title = ''
-    const template = new DemoLibServerIndexHtml({ ...config, title })
-
-    const renderer = new ServerRenderer({
-      fetcher,
-      render,
+    new ServerRenderer(registry, {
       template,
-      write: val => response.write(val),
-      assertFatalErrors(errors) {
-        console.error(errors)
+      render: () => ReactDOMServer.renderToNodeStream(<PsyContextProvide parent={registry}>{app()}</PsyContextProvide>),
+      next: val => response.write(val),
+      complete: () => response.end(),
+      error: error => {
+        if (isFatal(error)) return next(error)
+        response.end()
       },
-      initialState: browserConfig ? { __config: browserConfig } : undefined,
-    })
+    }).run()
+  }
+}
 
-    await renderer.run()
+class DemoLibError extends Error {
+  nonFatal = false
+}
 
-    response.end()
-  })
+function isFatal(error: Error) {
+  if (error instanceof PsyErrorMix) return error.errors.forEach(isFatal)
+  if (error instanceof DemoLibError && error.nonFatal) return false
+  return true
 }

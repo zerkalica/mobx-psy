@@ -1,33 +1,24 @@
 import { action, computed, makeObservable, observable } from 'mobx'
 
-import { defer, LocationLike } from '@psy/core'
+import { PsyContextRegistry } from '@psy/context/Registry'
+import { defer } from '@psy/core/Defer'
 
+import { demoLibRouterClient } from './client'
 import { DefaultParams, DemoLibRouterRoute } from './route'
 import { DemoLibRouterParamMapper } from './serializer'
 
-export interface DemoLibRouterHistory {
-  pushState(data: any, title: string, url?: string | null): void
-  replaceState(data: any, title: string, url?: string | null): void
-}
-
-const defaultLocation: LocationLike = {
-  search: '',
-  origin: '',
-  pathname: '',
-  port: '',
-  hostname: '',
-}
-
 export class DemoLibRouterLocation {
-  @observable protected search: string = this.location.search
+  static $$psy = true
 
-  constructor(protected location: LocationLike = defaultLocation, protected history?: DemoLibRouterHistory, protected target?: Window) {
+  @observable protected search: string = this.client.location.search
+
+  constructor(protected $: PsyContextRegistry, protected client = $.v(demoLibRouterClient)) {
     makeObservable(this)
-    if (target) target.addEventListener('popstate', this.onPopState)
+    client.addEventListener('popstate', this.onPopState)
   }
 
   @action.bound protected onPopState() {
-    this.search = this.location.search
+    this.search = this.client.location.search
   }
 
   route<O extends DefaultParams>(defaults: O, mapper?: DemoLibRouterParamMapper<O>, deleteDefault = true): DemoLibRouterRoute<O> {
@@ -60,7 +51,7 @@ export class DemoLibRouterLocation {
   }
 
   fullUrl(next: { [id: string]: string } = {}): string {
-    return this.location.origin + this.url(next)
+    return this.client.location.origin + this.url(next)
   }
 
   protected scheduled = false
@@ -75,19 +66,18 @@ export class DemoLibRouterLocation {
     const params = { ...this.params, [key]: next }
     this.search = this.url(params)
     this.replaceLast = replace
-    if (!this.scheduled && this.history) {
+    if (!this.scheduled && this.client !== demoLibRouterClient) {
       this.scheduled = true
       defer.add(this.updateHistory.bind(this))
     }
   }
 
   protected updateHistory() {
-    const { history, search } = this
-    if (history) {
-      const s = search || '/'
-      if (this.replaceLast) history.replaceState(null, '', s)
-      else history.pushState(null, '', s)
-    }
+    const s = this.search || '/'
+
+    if (this.replaceLast) this.client.history.replaceState(null, '', s)
+    else this.client.history.pushState(null, '', s)
+
     this.scheduled = false
   }
 

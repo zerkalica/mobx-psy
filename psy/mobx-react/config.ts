@@ -1,5 +1,6 @@
 import { observer as mobxObserver } from 'mobx-react-lite'
-import { FallbackError, FallbackLoading, FallbackErrorProps, FallbackLoadingProps } from './Fallback'
+
+import { FallbackError, FallbackErrorProps, FallbackLoading, FallbackLoadingProps } from './Fallback'
 
 export type PsyMobxReactConfig = Parameters<typeof mobxObserver>[1] & {
   /**

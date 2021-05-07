@@ -1,7 +1,8 @@
 import { action, computed, makeObservable, reaction } from 'mobx'
-import { draft, effect } from '@psy/mobx'
 
 import { DemoLibRouterLocation } from '@demo/lib-router/location'
+import { PsyContextRegistry } from '@psy/context/Registry'
+import { draft, effect } from '@psy/mobx'
 
 export const demoSearchFlatFilterModelDefaults = {
   rooms: 0,
@@ -11,7 +12,7 @@ export const demoSearchFlatFilterModelDefaults = {
 }
 
 export class DemoSearchFlatFilterModel {
-  constructor(protected location: DemoLibRouterLocation) {
+  constructor(protected $: PsyContextRegistry, protected location = $.v(DemoLibRouterLocation)) {
     makeObservable(this)
     effect(this, 'values', () => reaction(() => JSON.stringify(this.draft), this.submit, { delay: 300 }))
   }
