@@ -27,10 +27,7 @@ export const demoLibRouterDefaultCodecs = [
     deserialize: (value: string) => value.split(','),
   },
   {
-    detect: (value: any): value is number[] =>
-      value instanceof Array &&
-      value.length > 0 &&
-      typeof value[0] === 'number',
+    detect: (value: any): value is number[] => value instanceof Array && value.length > 0 && typeof value[0] === 'number',
     serialize: (value: number[]) => value.join(','),
     deserialize: (value: string) => value.split(',').map(Number),
   },
@@ -58,11 +55,7 @@ function equalSet<T>(next: Set<T>, prev: Set<T>): boolean {
 }
 
 export class DemoLibRouterSerializer<O> {
-  constructor(
-    protected defaults: O,
-    protected mapper?: DemoLibRouterParamMapper<O>,
-    protected codecs = demoLibRouterDefaultCodecs
-  ) {}
+  constructor(protected defaults: O, protected mapper?: DemoLibRouterParamMapper<O>, protected codecs = demoLibRouterDefaultCodecs) {}
 
   protected cache = new Map<keyof O, any>()
 
@@ -82,20 +75,17 @@ export class DemoLibRouterSerializer<O> {
         }
       }
 
-    if (next === undefined)
-      throw new Error(`Codec not found for { ${key}: ${defaultValue} }`)
+    if (next === undefined) throw new Error(`Codec not found for { ${key}: ${defaultValue} }`)
 
     if (next instanceof Array) {
-      if (defaultValue instanceof Array && equalArray(next, defaultValue))
-        return defaultValue
+      if (defaultValue instanceof Array && equalArray(next, defaultValue)) return defaultValue
       const cached = this.cache.get(key)
       if (equalArray(next, cached)) return cached
       this.cache.set(key, next)
     }
 
     if (next instanceof Set) {
-      if (defaultValue instanceof Set && equalSet(next, defaultValue))
-        return defaultValue
+      if (defaultValue instanceof Set && equalSet(next, defaultValue)) return defaultValue
       const cached = this.cache.get(key)
       if (equalSet(next, cached)) return cached
       this.cache.set(key, next)

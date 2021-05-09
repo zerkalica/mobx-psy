@@ -1,9 +1,10 @@
 import { action, computed, makeObservable, observable, reaction } from 'mobx'
 
 import { DemoLibRouterLocation } from '@demo/lib-router/location'
-import { PsyContextRegistry } from '@psy/context/Registry'
-import { effect, Loader } from '@psy/mobx'
-import { Fetcher } from '@psy/ssr/Fetcher'
+import { PsyContext } from '@psy/core/context/Context'
+import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
+import { psySyncEffect } from '@psy/mobx/sync/effect'
+import { PsySyncLoader } from '@psy/mobx/sync/Loader'
 
 import { DemoSearchFlatFilterModel } from './filter/model'
 
@@ -14,16 +15,16 @@ export abstract class DemoSearchFlatDTO {
 }
 
 export class DemoSearchFlatModel extends DemoSearchFlatDTO {
-  constructor(protected $: PsyContextRegistry, v: DemoSearchFlatDTO, protected io = $.v(Fetcher)) {
+  constructor(protected $: PsyContext, v: DemoSearchFlatDTO, protected io = $.v(PsyFetcher)) {
     super()
     Object.assign(this, v)
   }
 }
 
 export class DemoSearchFlatModelStore {
-  constructor(protected $: PsyContextRegistry, protected id: string, protected location = $.v(DemoLibRouterLocation)) {
+  constructor(protected $: PsyContext, protected id: string, protected location = $.v(DemoLibRouterLocation.instance)) {
     makeObservable(this)
-    effect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
+    psySyncEffect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
   }
 
   @computed get filter() {
@@ -88,7 +89,7 @@ export class DemoSearchFlatModelStore {
   }
 
   @computed get loader() {
-    return new Loader<{
+    return new PsySyncLoader<{
       items: DemoSearchFlatDTO[]
       total_pages: number
     }>(this.$, {

@@ -1,5 +1,6 @@
-import { DemoLibRouterParamMapper, DemoLibRouterSerializer } from './serializer'
 import { computed, makeObservable } from 'mobx'
+
+import { DemoLibRouterParamMapper, DemoLibRouterSerializer } from './serializer'
 
 export interface DemoLibRouterParams {
   get(key: string): string | undefined
@@ -48,18 +49,12 @@ export class DemoLibRouterRoute<O extends DefaultParams, K extends keyof O = key
   }
 
   protected getValue(key: K): O[K] {
-    const value = this.serializer.deserialize(
-      key,
-      this.query.get(key as string)
-    )
+    const value = this.serializer.deserialize(key, this.query.get(key as string))
     return value
   }
 
   protected setValue(key: K, value: O[K]) {
-    const next =
-      this.deleteDefault && value === this.defaults[key]
-        ? undefined
-        : this.serializer.serialize(key, value)
+    const next = this.deleteDefault && value === this.defaults[key] ? undefined : this.serializer.serialize(key, value)
 
     this.query.set(key as string, next)
 
@@ -70,8 +65,7 @@ export class DemoLibRouterRoute<O extends DefaultParams, K extends keyof O = key
     const { defaults } = this
     let changed = false
     for (let key in defaults) {
-      if (defaults[key as keyof O] !== this.getValue((key as unknown) as K))
-        changed = true
+      if (defaults[key as keyof O] !== this.getValue((key as unknown) as K)) changed = true
     }
 
     return changed

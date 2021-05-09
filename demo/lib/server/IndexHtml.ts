@@ -1,6 +1,6 @@
-import { ServerTemplate } from '@psy/ssr/ServerRender'
+import { PsySsrTemplate } from '@psy/core/ssr/Template'
 
-export class DemoLibServerIndexHtml extends ServerTemplate {
+export class DemoLibServerIndexHtml extends PsySsrTemplate {
   constructor(
     protected options: Readonly<{
       title: string

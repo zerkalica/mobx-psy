@@ -10,11 +10,12 @@ import { DemoLibRouterLocation } from '@demo/lib-router/location'
 import { DemoLibServerIndexHtml } from '@demo/lib-server/IndexHtml'
 import { demoLibServerMdlExpress } from '@demo/lib-server/mdl/express'
 import { demoLibServerMdlRender } from '@demo/lib-server/mdl/render'
-import { psyContextProvideNode } from '@psy/context/node'
-import { Fetcher } from '@psy/ssr/Fetcher'
-import { FetcherServer } from '@psy/ssr/FetcherServer'
-import { Hydrator, HydratorServer } from '@psy/ssr/Hydrator'
-import { locationFromNodeRequest } from '@psy/ssr/locationFromNodeRequest'
+import { psyContextProvideNode } from '@psy/core/context/provide.node'
+import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
+import { PsyFetcherNode } from '@psy/core/fetcher/Fetcher.node'
+import { PsySsrHydrator } from '@psy/core/ssr/Hydrator'
+import { PsySsrHydratorNode } from '@psy/core/ssr/Hydrator.node'
+import { psySsrLocationNode } from '@psy/core/ssr/location.node'
 
 import { demoSearchPkgName } from '../../pkgName'
 import { DemoSearch } from '../../search'
@@ -47,14 +48,19 @@ export function demoSearchBootCommonServer({
       e
         .use((req, res, next) => {
           psyContextProvideNode(next, $ =>
-            $.set(Hydrator, new HydratorServer({ __config: browserConfig }))
+            $.set(PsySsrHydrator.instance, new PsySsrHydratorNode({ __config: browserConfig }))
               .set(demoSearchBootCommonServerConfig, serverConfig)
               .set(demoLibRouterClient, {
                 ...$.v(demoLibRouterClient),
-                location: locationFromNodeRequest(req, req.secure),
+                location: psySsrLocationNode(req, req.secure),
               })
-              .set(DemoLibRouterLocation, new DemoLibRouterLocation($))
-              .set(Fetcher, new FetcherServer(serverConfig.apiUrl))
+              .set(DemoLibRouterLocation.instance, new DemoLibRouterLocation($))
+              .set(
+                PsyFetcher,
+                class PsyFetcherNodeReq extends PsyFetcherNode {
+                  static baseUrl = serverConfig.apiUrl
+                }
+              )
           )
         })
         .use(staticMiddleware)

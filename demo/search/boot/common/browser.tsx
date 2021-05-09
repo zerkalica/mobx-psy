@@ -2,18 +2,19 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import { demoLibRouterClient } from '@demo/lib-router/client'
-import { PsyContextProvide } from '@psy/context/react'
-import { PsyContextRegistry } from '@psy/context/Registry'
-import { Fetcher } from '@psy/ssr/Fetcher'
-import { FetcherBrowser } from '@psy/ssr/FetcherBrowser'
-import { Hydrator, HydratorBrowser } from '@psy/ssr/Hydrator'
+import { PsyContext } from '@psy/core/context/Context'
+import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
+import { FetcherBrowser } from '@psy/core/fetcher/Fetcher.browser'
+import { PsySsrHydrator } from '@psy/core/ssr/Hydrator'
+import { PsySsrHydratorBrowser } from '@psy/core/ssr/Hydrator.browser'
+import { PsyContextProvide } from '@psy/react/context/provide'
 
 import { demoSearchPkgName } from '../../pkgName'
 import { DemoSearch } from '../../search'
 import { demoSearchBootCommonBrowserConfig } from './browserConfig'
 
 export function demoSearchBootCommonBrowser(
-  $: PsyContextRegistry,
+  $ = PsyContext.instance,
   win: typeof window & { [Symbol.toStringTag]?: string } & {
     [demoSearchPkgName]?: Record<string, unknown> & { __config: typeof demoSearchBootCommonBrowserConfig }
   } = window,
@@ -27,8 +28,13 @@ export function demoSearchBootCommonBrowser(
       deps={$ =>
         $.set(demoLibRouterClient, win as typeof window & { [Symbol.toStringTag]: string })
           .set(demoSearchBootCommonBrowserConfig, config)
-          .set(Hydrator, new HydratorBrowser(cache))
-          .set(Fetcher, new FetcherBrowser({ apiUrl: config.apiUrl }))
+          .set(PsySsrHydrator.instance, new PsySsrHydratorBrowser(cache))
+          .set(
+            PsyFetcher,
+            class FetcherBrowserConfigured extends FetcherBrowser {
+              static baseUrl = config.apiUrl
+            }
+          )
       }
     >
       <DemoSearch id={demoSearchPkgName} />

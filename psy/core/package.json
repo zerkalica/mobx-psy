@@ -1,11 +1,10 @@
 {
   "name": "@psy/core",
   "version": "1.0.0",
-  "description": "Mobx pseudo syncronous loader",
+  "description": "Mobx pseudo syncronous loader core",
   "main": "-/index.js",
   "types": "-/index.d.ts",
   "exports": {
-    ".": "./-/index.js",
     "./": "./-/"
   },
   "repository": "https://github.com/zerkalica/mobx-psy",

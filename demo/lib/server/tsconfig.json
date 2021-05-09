@@ -6,8 +6,7 @@
   },
   "references": [
     {"path": "../../../psy/core"},
-    {"path": "../../../psy/context"},
-    {"path": "../../../psy/ssr"},
+    {"path": "../../../psy/react"},
     {"path": "../../../psy/boot"},
     {"path": "../router"},
     {"path": "../build"}

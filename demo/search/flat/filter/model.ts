@@ -1,8 +1,9 @@
 import { action, computed, makeObservable, reaction } from 'mobx'
 
 import { DemoLibRouterLocation } from '@demo/lib-router/location'
-import { PsyContextRegistry } from '@psy/context/Registry'
-import { draft, effect } from '@psy/mobx'
+import { PsyContext } from '@psy/core/context/Context'
+import { psyObjectDraft } from '@psy/mobx/object/draft'
+import { psySyncEffect } from '@psy/mobx/sync/effect'
 
 export const demoSearchFlatFilterModelDefaults = {
   rooms: 0,
@@ -12,9 +13,9 @@ export const demoSearchFlatFilterModelDefaults = {
 }
 
 export class DemoSearchFlatFilterModel {
-  constructor(protected $: PsyContextRegistry, protected location = $.v(DemoLibRouterLocation)) {
+  constructor(protected $: PsyContext, protected location = $.v(DemoLibRouterLocation.instance)) {
     makeObservable(this)
-    effect(this, 'values', () => reaction(() => JSON.stringify(this.draft), this.submit, { delay: 300 }))
+    psySyncEffect(this, 'values', () => reaction(() => JSON.stringify(this.draft), this.submit, { delay: 300 }))
   }
 
   @computed protected get url() {
@@ -26,7 +27,7 @@ export class DemoSearchFlatFilterModel {
   }
 
   @computed protected get draft() {
-    return draft(this.url.values)
+    return psyObjectDraft(this.url.values)
   }
 
   @action.bound protected submit() {

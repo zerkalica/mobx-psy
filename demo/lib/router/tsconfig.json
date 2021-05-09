@@ -6,7 +6,6 @@
   },
   "references": [
     {"path": "../../../psy/core"},
-    {"path": "../../../psy/context"},
     {"path": "../../../psy/boot"}
   ]
 }

@@ -1,4 +1,4 @@
-import { promisify } from '@psy/core/promisify'
+import { psyMockPromisify } from '@psy/core/mock/promisify'
 
 import { DemoSearchFlatDTO } from '../../flat/model'
 
@@ -46,7 +46,7 @@ function createFlatsMock() {
 export function demoSearchBootDevMocks({ errorRate, timeout }: { errorRate: number; timeout: number }) {
   const fetchFlats = createFlatsMock()
 
-  const fetchFn = promisify(errorRate, timeout, (url: string, params: RequestInit) => {
+  const fetchFn = psyMockPromisify(errorRate, timeout, (url: string, params: RequestInit) => {
     if (url === '/flats')
       return {
         json: () => Promise.resolve(fetchFlats(typeof params?.body === 'string' ? JSON.parse(params.body) : {})),

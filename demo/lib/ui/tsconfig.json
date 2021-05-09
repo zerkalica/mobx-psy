@@ -5,7 +5,7 @@
     "rootDir": "."
   },
   "references": [
-    {"path": "../../../psy/mobx-react"},
+    {"path": "../../../psy/react"},
     {"path": "../../../psy/boot"}
   ]
 }

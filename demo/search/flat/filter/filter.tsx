@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DemoLibUiCheckBox } from '@demo/lib-ui/checkbox.js'
+import { DemoLibUiCheckBox } from '@demo/lib-ui/checkbox'
 import { DemoLibUiNumberInput } from '@demo/lib-ui/numberInput'
 
 import { DemoSearchFlatFilterModel } from './model'
@@ -19,14 +19,7 @@ export function DemoSearchFlatFilter({
       <label id={`${id}-label`}>
         Rooms:
         {filter.roomsVisible ? (
-          <DemoLibUiNumberInput
-            id={`${id}-rooms`}
-            name="rooms"
-            min={0}
-            max={3}
-            value={filter.rooms}
-            onChange={filter.setRooms}
-          />
+          <DemoLibUiNumberInput id={`${id}-rooms`} name="rooms" min={0} max={3} value={filter.rooms} onChange={filter.setRooms} />
         ) : null}
       </label>
       <label>

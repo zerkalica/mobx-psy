@@ -1,11 +1,10 @@
 {
   "name": "@psy/mobx",
   "version": "1.0.0",
-  "description": "Mobx pseudo syncronous loader",
+  "description": "Mobx pseudo syncronous loader core",
   "main": "-/index.js",
   "types": "-/index.d.ts",
   "exports": {
-    ".": "./-/index.js",
     "./": "./-/"
   },
   "repository": "https://github.com/zerkalica/mobx-psy",
@@ -21,16 +20,12 @@
   },
   "dependencies": {
     "mobx": "^6.3.0",
-    "@psy/context": "^1.0.0",
     "@psy/core": "^1.0.0"
   },
   "devDependencies": {
     "@psy/boot": "^1.0.1"
   },
   "peerDependencies": {
-    "mobx": "*",
-    "mobx-react-lite": "*",
-    "react": "*",
     "jest": "*",
     "typescript": "*"
   }

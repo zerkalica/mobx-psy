@@ -1,18 +1,18 @@
 import { action, computed, makeObservable, observable } from 'mobx'
 
-import { PsyContextRegistry } from '@psy/context/Registry'
-import { defer } from '@psy/core/Defer'
+import { PsyContext } from '@psy/core/context/Context'
+import { psyTaskDefer } from '@psy/core/task/Defer'
 
 import { demoLibRouterClient } from './client'
 import { DefaultParams, DemoLibRouterRoute } from './route'
 import { DemoLibRouterParamMapper } from './serializer'
 
 export class DemoLibRouterLocation {
-  static $$psy = true
+  static instance = new DemoLibRouterLocation()
 
-  @observable protected search: string = this.client.location.search
+  @observable protected search = this.client.location.search
 
-  constructor(protected $: PsyContextRegistry, protected client = $.v(demoLibRouterClient)) {
+  constructor(protected $ = PsyContext.instance, protected client = $.v(demoLibRouterClient)) {
     makeObservable(this)
     client.addEventListener('popstate', this.onPopState)
   }
@@ -68,7 +68,7 @@ export class DemoLibRouterLocation {
     this.replaceLast = replace
     if (!this.scheduled && this.client !== demoLibRouterClient) {
       this.scheduled = true
-      defer.add(this.updateHistory.bind(this))
+      psyTaskDefer.add(this.updateHistory.bind(this))
     }
   }
 
