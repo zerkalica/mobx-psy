@@ -13,32 +13,33 @@ import { demoSearchPkgName } from '../../pkgName'
 import { DemoSearch } from '../../search'
 import { demoSearchBootCommonBrowserConfig } from './browserConfig'
 
-export function demoSearchBootCommonBrowser(
+export function demoSearchBootCommonBrowser({
+  fetchFn = fetch,
   $ = PsyContext.instance,
-  win: typeof window & { [Symbol.toStringTag]?: string } & {
-    [demoSearchPkgName]?: Record<string, unknown> & { __config: typeof demoSearchBootCommonBrowserConfig }
-  } = window,
-  config = win[demoSearchPkgName]?.__config ?? demoSearchBootCommonBrowserConfig
-) {
-  const cache = win[demoSearchPkgName]
+  fallbackConfig = demoSearchBootCommonBrowserConfig,
+} = {}) {
+  const cacheStr = document.getElementById(`${demoSearchPkgName}-state`)?.innerText
+  const cache = cacheStr ? (JSON.parse(cacheStr) as Record<string, any> & { __config: typeof fallbackConfig }) : undefined
+  const config = cache?.__config ?? fallbackConfig
 
   ReactDOM.render(
     <PsyContextProvide
+      children={<DemoSearch id={demoSearchPkgName} />}
       parent={$}
-      deps={$ =>
-        $.set(demoLibRouterClient, win as typeof window & { [Symbol.toStringTag]: string })
+      deps={ctx =>
+        ctx
+          .set(demoLibRouterClient, window as typeof window & { [Symbol.toStringTag]: string })
           .set(demoSearchBootCommonBrowserConfig, config)
           .set(PsySsrHydrator.instance, new PsySsrHydratorBrowser(cache))
           .set(
             PsyFetcher,
-            class FetcherBrowserConfigured extends FetcherBrowser {
+            class DemoSearchBootCommonBrowserFetcher extends FetcherBrowser {
               static baseUrl = config.apiUrl
+              static fetch = fetchFn
             }
           )
       }
-    >
-      <DemoSearch id={demoSearchPkgName} />
-    </PsyContextProvide>,
+    />,
     document.getElementById(`${demoSearchPkgName}-main`)
   )
 }

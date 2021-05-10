@@ -1,14 +1,15 @@
 import { observer as mobxObserver } from 'mobx-react-lite'
 import React from 'react'
 
+import { PsyContext } from '@psy/core/context/Context'
 import { psyErrorThrowHidden } from '@psy/core/error/hidden'
 import { psyErrorNormalize } from '@psy/core/error/normalize'
 import { PsyLog } from '@psy/core/log/log'
 import { psySyncMockState } from '@psy/core/sync/mock'
 import { psySyncRefreshable } from '@psy/core/sync/refreshable'
 
-import { psyReactConfig } from './config'
-import { usePsyContext } from './context/context'
+import { usePsyContext } from '../context/context'
+import { psySyncConfig } from './config'
 
 type RefComponent<Ref, Props> = React.RefForwardingComponent<Ref, Props>
 
@@ -27,14 +28,17 @@ type RefComponent<Ref, Props> = React.RefForwardingComponent<Ref, Props>
  * })
  * ```
  */
-export function psyMobxReactObserver<Props extends {}, Ref = {}>(baseComponent: RefComponent<Ref, Props>, options = psyReactConfig) {
-  if (options !== psyReactConfig) options = { ...psyReactConfig, ...options }
+export function psySyncObserver<Props extends {}, Ref = {}>(baseComponent: RefComponent<Ref, Props>, options = psySyncConfig) {
+  if (options !== psySyncConfig) options = { ...psySyncConfig, ...options }
 
   const value = (baseComponent.displayName ?? baseComponent.name ?? String(baseComponent)) + '#psy'
 
   const SafeComponent: RefComponent<Ref, Props> = (props, ref): React.ReactElement | null => {
     const node = React.useRef<React.ReactElement | null>(null)
     const $ = usePsyContext()
+    const old = PsyContext.instance
+    PsyContext.instance = $
+
     try {
       node.current = baseComponent(props, ref)
 
@@ -46,7 +50,7 @@ export function psyMobxReactObserver<Props extends {}, Ref = {}>(baseComponent: 
       const refreshable = psySyncRefreshable(error)
 
       if (error instanceof Error) {
-        const log = $.v(PsyLog)
+        const log = $.get(PsyLog)
         log.error({ place: value, error })
 
         if (!options.error) return psyErrorThrowHidden(error)
@@ -59,6 +63,7 @@ export function psyMobxReactObserver<Props extends {}, Ref = {}>(baseComponent: 
       return <options.loading refreshable={refreshable} children={node.current} />
     } finally {
       psySyncMockState.called = null
+      PsyContext.instance = old
     }
   }
 

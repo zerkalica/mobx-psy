@@ -8,21 +8,18 @@ import { PsySyncLoader } from '@psy/mobx/sync/Loader'
 
 import { DemoSearchFlatFilterModel } from './filter/model'
 
-export abstract class DemoSearchFlatDTO {
-  id!: string
-  house!: boolean
-  rooms!: number
+export interface DemoSearchFlatDTO {
+  id: string
+  house: boolean
+  rooms: number
 }
 
-export class DemoSearchFlatModel extends DemoSearchFlatDTO {
-  constructor(protected $: PsyContext, v: DemoSearchFlatDTO, protected io = $.v(PsyFetcher)) {
-    super()
-    Object.assign(this, v)
-  }
+export class DemoSearchFlatModel {
+  constructor(protected $: PsyContext, readonly dto: Readonly<DemoSearchFlatDTO>, protected io = $.get(PsyFetcher)) {}
 }
 
 export class DemoSearchFlatModelStore {
-  constructor(protected $: PsyContext, protected id: string, protected location = $.v(DemoLibRouterLocation.instance)) {
+  constructor(protected $: PsyContext, protected options: { id: string }, protected location = $.get(DemoLibRouterLocation.instance)) {
     makeObservable(this)
     psySyncEffect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
   }
@@ -69,6 +66,7 @@ export class DemoSearchFlatModelStore {
   }
 
   @observable protected savedItems: DemoSearchFlatModel[] = []
+
   @action.bound more() {
     this.savedItems = this.filtered
     this.setPage(this.page + 1)
@@ -90,7 +88,7 @@ export class DemoSearchFlatModelStore {
 
   @computed get loader() {
     return new PsySyncLoader<{
-      items: DemoSearchFlatDTO[]
+      items: readonly DemoSearchFlatDTO[]
       total_pages: number
     }>(this.$, {
       kind: 'flats',

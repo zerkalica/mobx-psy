@@ -42,7 +42,7 @@ export class PsyContext {
     return this
   }
 
-  v<V>(p: PsyContextKey<V>) {
+  get<V>(p: PsyContextKey<V>) {
     const dep = this.opt(p)
     if (dep === undefined) throw new Error(`Provide value for ${p}`)
 
@@ -56,7 +56,7 @@ export class PsyContext {
 
     if (isReactContext<V>(p)) return p._currentValue
 
-    return p as V
+    return p
   }
 }
 

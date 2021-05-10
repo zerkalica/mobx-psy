@@ -1,8 +1,9 @@
 import React from 'react'
 
 import { PsyContext } from '@psy/core/context/Context'
+import { psyDataCompareDeep } from '@psy/core/data/compare'
 
-import { PsyContextReact } from './context'
+import { usePsyContext } from './context'
 
 /**
  * ```tsx
@@ -13,8 +14,8 @@ import { PsyContextReact } from './context'
  *
  * class User {
  *   constructor(
- *     protected $: PsyContextRegistry,
- *     protected id: string,
+ *     protected $: PsyContext,
+ *     protected options: { id: string },
  *     protected some = $.v(Some)
  *   ) {}
  *
@@ -28,9 +29,18 @@ import { PsyContextReact } from './context'
  * ```
  */
 
-export function usePsyContextMemo<Result, Args extends unknown[]>(cl: new (...args: [PsyContext, ...Args]) => Result, ...propDeps: Args) {
-  const registry = React.useContext(PsyContextReact)
-  const dep = React.useMemo(() => new cl(registry, ...propDeps), [...propDeps, registry])
+export function usePsyContextMemo<Result, Args extends unknown[]>(cl: new (ctx: PsyContext, ...args: Args) => Result, ...args: Args) {
+  const ctx = usePsyContext()
+  const memo = React.useRef<[Args, Result] | undefined>()
+  if (memo.current === undefined || !psyDataCompareDeep(args, memo.current[0])) {
+    const prev = PsyContext.instance
+    try {
+      PsyContext.instance = ctx
+      memo.current = [args, new cl(ctx, ...args)]
+    } finally {
+      PsyContext.instance = prev
+    }
+  }
 
-  return dep
+  return memo.current[1]
 }

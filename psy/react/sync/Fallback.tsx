@@ -2,7 +2,7 @@ import React from 'react'
 
 import { PsySyncRefreshable } from '@psy/core/sync/refreshable'
 
-export interface FallbackLoadingProps {
+export interface PsySyncFallbackLoadingProps {
   /**
    * User can retry errored request
    */
@@ -17,15 +17,15 @@ export interface FallbackLoadingProps {
   contentClassName?: string
 }
 
-export function FallbackLoading({
+export function PsySyncFallbackLoading({
   children,
   className = 'Fallback Fallback__loading',
   contentClassName = 'Fallback__content',
-}: FallbackLoadingProps) {
+}: PsySyncFallbackLoadingProps) {
   return <div className={className}>{children ? <div className={contentClassName}>{children}</div> : null}</div>
 }
 
-export interface FallbackErrorProps {
+export interface PsySyncFallbackErrorProps {
   /**
    * Component last error
    */
@@ -45,14 +45,14 @@ export interface FallbackErrorProps {
   errorClassName?: string
 }
 
-export function FallbackError({
+export function PsySyncFallbackError({
   refreshable,
   children,
   error,
   className = 'Fallback Fallback__error',
   errorClassName = 'Fallback__error__block',
   contentClassName = 'Fallback__content',
-}: FallbackErrorProps) {
+}: PsySyncFallbackErrorProps) {
   return (
     <div className={className}>
       <div className={errorClassName}>

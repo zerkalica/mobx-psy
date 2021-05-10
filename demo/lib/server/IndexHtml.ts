@@ -33,11 +33,11 @@ export class DemoLibServerIndexHtml extends PsySsrTemplate {
 
   get body() {
     return `</div>
-      <script>window["${this.options.pkgName}"] = `
+      <script id="${this.options.pkgName}-state" type="application/json" crossorigin="anonymous">`
   }
 
   get footer() {
-    return `;</script>
+    return `</script>
       <script src="${this.options.publicUrl}${this.options.entry ?? 'browser'}.js"></script>
     </body>
   </html>

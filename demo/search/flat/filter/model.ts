@@ -13,7 +13,7 @@ export const demoSearchFlatFilterModelDefaults = {
 }
 
 export class DemoSearchFlatFilterModel {
-  constructor(protected $: PsyContext, protected location = $.v(DemoLibRouterLocation.instance)) {
+  constructor(protected $: PsyContext, protected location = $.get(DemoLibRouterLocation.instance)) {
     makeObservable(this)
     psySyncEffect(this, 'values', () => reaction(() => JSON.stringify(this.draft), this.submit, { delay: 300 }))
   }

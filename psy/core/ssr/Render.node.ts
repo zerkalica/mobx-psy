@@ -25,12 +25,12 @@ export class PsySsrRender {
       complete(error?: Error): void
       next(val: string): void
     },
-    protected hydrator = $.v(PsySsrHydrator.instance),
+    protected hydrator = $.get(PsySsrHydrator.instance),
     protected renderErrors: Error[] = [],
     protected cloned = $.clone(r =>
       r.set(
         PsyLog,
-        class PsyLog2 extends PsyLog {
+        class PsySsrRenderLog extends PsyLog {
           static error(p: Parameters<typeof PsyLog['error']>[0]) {
             if (p.error) renderErrors.push(p.error)
             super.error(p)
@@ -71,7 +71,7 @@ export class PsySsrRender {
       const { state, loading } = await this.hydrator.collect()
 
       if (loading === 0 || this.buffer === undefined) {
-        this.next(`${this.options.template.body}${JSON.stringify(state)}${this.options.template.footer}`)
+        this.next(`${options.template.body}${JSON.stringify(state)}${options.template.footer}`)
         break
       }
     }

@@ -20,8 +20,8 @@ export class PsySyncLoader<Result> {
   constructor(
     protected $: PsyContext,
     protected args: PsyFetcherProps,
-    protected fetcher = $.v(PsyFetcher),
-    protected hydrator = $.v(PsySsrHydrator.instance)
+    protected fetcher = $.get(PsyFetcher),
+    protected hydrator = $.get(PsySsrHydrator.instance)
   ) {
     makeObservable(this)
     onBecomeUnobserved(this, 'value', this.destructor.bind(this))

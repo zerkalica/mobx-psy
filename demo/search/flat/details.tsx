@@ -1,23 +1,25 @@
 import React from 'react'
 
-import { psyMobxReactObserver } from '@psy/react/observer'
+import { psySyncObserver } from '@psy/react/sync/observer'
 
 import { DemoSearchFlatModel } from './model'
 
-export const DemoSearchFlatDetails = psyMobxReactObserver(function DemoSearchFlatDetails({
+export const DemoSearchFlatDetails = psySyncObserver(function DemoSearchFlatDetails({
   id,
   flat,
 }: {
   id: string
   flat: DemoSearchFlatModel
 }) {
+  const dto = flat.dto
+
   return (
     <div id={id} style={{ padding: '0.5rem 0' }}>
-      Id: {flat.id}
+      Id: {dto.id}
       <br />
-      House: {flat.house ? 'yes' : 'no'}
+      House: {dto.house ? 'yes' : 'no'}
       <br />
-      Rooms: {flat.rooms}
+      Rooms: {dto.rooms}
     </div>
   )
 })

@@ -9,4 +9,4 @@ const fetcher = demoSearchBootDevMocks({
   timeout: 500,
 })
 
-demoSearchBootCommonBrowser(undefined, window, demoSearchBootDevBrowserConfig)
+demoSearchBootCommonBrowser({ fetchFn: fetcher, fallbackConfig: demoSearchBootDevBrowserConfig })
