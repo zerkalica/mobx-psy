@@ -12,18 +12,7 @@ export function usePsyContextNode() {
 }
 
 export function psyContextProvideNode(next: () => void, cb: PsyContextUpdater) {
-  const prev = store.getStore() ?? new PsyContext()
+  const prev = store.getStore() ?? PsyContext.instance
 
   store.run(cb ? prev.clone(cb) : prev, next)
-}
-
-export function usePsyContextCreateNode<Result, Args extends unknown[]>(cl: new (...args: Args) => Result, ...args: Args) {
-  const ctx = usePsyContextNode()
-  const prev = PsyContext.instance
-  try {
-    PsyContext.instance = ctx
-    return new cl(...args)
-  } finally {
-    PsyContext.instance = prev
-  }
 }
