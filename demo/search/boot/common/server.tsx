@@ -28,7 +28,7 @@ export function demoSearchBootCommonServer({
   serverConfig = demoSearchBootCommonServerConfig,
   browserConfig = demoSearchBootCommonBrowserConfig,
   isDev = false,
-  fetcher: fetchRaw = (nodeFetch as unknown) as typeof fetch,
+  fetcher: fetchRaw = nodeFetch as unknown as typeof fetch,
 }) {
   const staticMiddleware = isDev
     ? demoLibBuildBundler({
@@ -45,12 +45,13 @@ export function demoSearchBootCommonServer({
           psyContextProvideNode(next, ctx =>
             ctx
               .set(PsySsrHydrator.instance, new PsySsrHydratorNode({ __config: browserConfig }))
-              .set(demoSearchBootCommonServerConfig, serverConfig)
-              .set(demoLibRouterClient, {
-                ...ctx.get(demoLibRouterClient),
-                location: psySsrLocationNode(req, req.secure),
-              })
-              .set(DemoLibRouterLocation.instance, new DemoLibRouterLocation(ctx))
+              .set(
+                DemoLibRouterLocation.instance,
+                new DemoLibRouterLocation(ctx, {
+                  ...demoLibRouterClient,
+                  location: psySsrLocationNode(req, req.secure),
+                })
+              )
               .set(
                 PsyFetcher,
                 class PsyFetcherNodeConfigured extends PsyFetcherNode {

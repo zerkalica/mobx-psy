@@ -18,10 +18,14 @@
     "test:watch": "jest --passWithNoTests --watch",
     "prepublishOnly": "psy-boot prepublish"
   },
+  "dependencies": {
+    "mobx": "^6.3.0"
+  },
   "devDependencies": {
     "@psy/boot": "^1.0.1"
   },
   "peerDependencies": {
+    "mobx": "*",
     "jest": "*",
     "typescript": "*"
   }

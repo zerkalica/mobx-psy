@@ -22,7 +22,7 @@ export class PsySsrRender {
       template: PsySsrTemplate
       maxIterations?: number
       render: PsySsrRenderFn
-      complete(error?: Error): void
+      complete(error?: Error, next?: string): void
       next(val: string): void
     },
     protected hydrator = $.get(PsySsrHydrator.instance),
@@ -87,9 +87,8 @@ export class PsySsrRender {
 
   protected complete(error?: Error) {
     if (this.buffer === undefined) return this.options.complete(error)
-    this.options.next(this.buffer)
+    this.options.complete(error, this.buffer)
     this.buffer = ''
-    this.options.complete(error)
   }
 
   protected next(html: string) {

@@ -1,10 +1,12 @@
 import { action, computed, makeObservable, observable, onBecomeUnobserved } from 'mobx'
 
-import { PsyContext } from '@psy/core/context/Context'
-import { psyDataIsPromise } from '@psy/core/data/isPromise'
-import { psyErrorThrowHidden } from '@psy/core/error/hidden'
-import { PsyFetcher, PsyFetcherProps } from '@psy/core/fetcher/Fetcher'
-import { PsySsrHydrator } from '@psy/core/ssr/Hydrator'
+import { PsyContext } from '../context/Context'
+import { psyDataIsPromise } from '../data/isPromise'
+import { psyErrorThrowHidden } from '../error/hidden'
+import { psyErrorNormalize } from '../error/normalize'
+import { PsyFetcher, PsyFetcherProps } from '../fetcher/Fetcher'
+import { PsySsrHydrator } from '../ssr/Hydrator'
+import { PsySyncRefreshable, psySyncRefreshable } from './refreshable'
 
 /**
  * ```ts
@@ -16,7 +18,7 @@ import { PsySsrHydrator } from '@psy/core/ssr/Hydrator'
  * }
  * ```
  */
-export class PsySyncLoader<Result> {
+export class PsySyncLoader<Result> implements PsySyncRefreshable {
   constructor(
     protected $: PsyContext,
     protected args: PsyFetcherProps,
@@ -31,13 +33,18 @@ export class PsySyncLoader<Result> {
 
   @observable protected counter = 0
   protected raw: Result | Promise<Result> | Error | undefined = undefined
-  public initial = true
+  protected initial = true
+
+  get isFirstRun() {
+    return this.initial
+  }
 
   @computed get value(): Result {
     // Subscribe to observable counter to recalucate all value deps, if Loader.next called
     this.counter
 
-    const raw = this.raw ?? this.hydrator.get<Result>(this.key)
+    let raw = this.raw
+    if (raw === undefined) raw = this.hydrator.get<Result>(this.key)
 
     if (raw instanceof Error || psyDataIsPromise(raw)) return psyErrorThrowHidden(raw)
     if (raw === undefined) {
@@ -65,8 +72,8 @@ export class PsySyncLoader<Result> {
 
       return raw
     } catch (e) {
-      const err = e instanceof Error ? e : new Error(e)
-      if (err !== e) (err as Error & { original: Error }).original = e
+      const err = psyErrorNormalize(e) as Error
+      psySyncRefreshable(e, this)
       this.hydrator.set(this.key, err)
       this.raw = err
       this.next()
@@ -79,7 +86,7 @@ export class PsySyncLoader<Result> {
     this.counter++
   }
 
-  reload() {
+  refresh() {
     this.hydrator.remove(this.key)
     this.next()
   }

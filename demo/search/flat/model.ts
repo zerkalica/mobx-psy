@@ -3,8 +3,8 @@ import { action, computed, makeObservable, observable, reaction } from 'mobx'
 import { DemoLibRouterLocation } from '@demo/lib-router/location'
 import { PsyContext } from '@psy/core/context/Context'
 import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
-import { psySyncEffect } from '@psy/mobx/sync/effect'
-import { PsySyncLoader } from '@psy/mobx/sync/Loader'
+import { psySyncEffect } from '@psy/core/sync/effect'
+import { PsySyncLoader } from '@psy/core/sync/Loader'
 
 import { DemoSearchFlatFilterModel } from './filter/model'
 
@@ -86,7 +86,7 @@ export class DemoSearchFlatModelStore {
     return this.lastTotalPages
   }
 
-  @computed get loader() {
+  @computed protected get loader() {
     return new PsySyncLoader<{
       items: readonly DemoSearchFlatDTO[]
       total_pages: number
@@ -111,7 +111,7 @@ export class DemoSearchFlatModelStore {
   }
 
   @action.bound refresh() {
-    this.loader.reload()
+    this.loader.refresh()
   }
 
   @computed get filtered() {

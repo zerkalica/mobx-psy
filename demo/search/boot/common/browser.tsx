@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { demoLibRouterClient } from '@demo/lib-router/client'
+import { DemoLibRouterLocation } from '@demo/lib-router/location'
 import { PsyContext } from '@psy/core/context/Context'
 import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
 import { FetcherBrowser } from '@psy/core/fetcher/Fetcher.browser'
@@ -28,9 +28,8 @@ export function demoSearchBootCommonBrowser({
       parent={$}
       deps={ctx =>
         ctx
-          .set(demoLibRouterClient, window as typeof window & { [Symbol.toStringTag]: string })
-          .set(demoSearchBootCommonBrowserConfig, config)
           .set(PsySsrHydrator.instance, new PsySsrHydratorBrowser(cache))
+          .set(DemoLibRouterLocation.instance, new DemoLibRouterLocation(ctx, window as typeof window & { [Symbol.toStringTag]: string }))
           .set(
             PsyFetcher,
             class DemoSearchBootCommonBrowserFetcher extends FetcherBrowser {

@@ -12,7 +12,7 @@ export class DemoLibRouterLocation {
 
   @observable protected search = this.client.location.search
 
-  constructor(protected $: PsyContext, protected client = $.get(demoLibRouterClient)) {
+  constructor(protected $: PsyContext, protected client = demoLibRouterClient) {
     makeObservable(this)
     client.addEventListener('popstate', this.onPopState)
   }

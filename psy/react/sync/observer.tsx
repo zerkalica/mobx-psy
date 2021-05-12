@@ -4,6 +4,7 @@ import React from 'react'
 import { PsyContext } from '@psy/core/context/Context'
 import { psyErrorThrowHidden } from '@psy/core/error/hidden'
 import { psyErrorNormalize } from '@psy/core/error/normalize'
+import { psyFunctionName } from '@psy/core/function/name'
 import { PsyLog } from '@psy/core/log/log'
 import { psySyncMockState } from '@psy/core/sync/mock'
 import { psySyncRefreshable } from '@psy/core/sync/refreshable'
@@ -33,7 +34,7 @@ export function psySyncObserver<Props extends {}, Ref = {}>(baseComponent: RefCo
 
   const value = (baseComponent.displayName ?? baseComponent.name ?? String(baseComponent)) + '#psy'
 
-  const SafeComponent: RefComponent<Ref, Props> = (props, ref): React.ReactElement | null => {
+  const SafeComponent: RefComponent<Ref, Props> = psyFunctionName((props, ref): React.ReactElement | null => {
     const node = React.useRef<React.ReactElement | null>(null)
     const $ = usePsyContext()
     const old = PsyContext.instance
@@ -65,10 +66,7 @@ export function psySyncObserver<Props extends {}, Ref = {}>(baseComponent: RefCo
       psySyncMockState.called = null
       PsyContext.instance = old
     }
-  }
-
-  Object.defineProperty(SafeComponent, 'name', { value })
-  SafeComponent.displayName = value
+  }, value)
 
   return mobxObserver(SafeComponent, options)
 }

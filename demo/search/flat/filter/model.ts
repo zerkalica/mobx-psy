@@ -2,8 +2,8 @@ import { action, computed, makeObservable, reaction } from 'mobx'
 
 import { DemoLibRouterLocation } from '@demo/lib-router/location'
 import { PsyContext } from '@psy/core/context/Context'
-import { psyObjectDraft } from '@psy/mobx/object/draft'
-import { psySyncEffect } from '@psy/mobx/sync/effect'
+import { psyObjectDraft } from '@psy/core/object/draft'
+import { psySyncEffect } from '@psy/core/sync/effect'
 
 export const demoSearchFlatFilterModelDefaults = {
   rooms: 0,
