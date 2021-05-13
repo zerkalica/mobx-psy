@@ -1,12 +1,7 @@
 import { psyDataIsPromise } from '../data/isPromise'
+import { PsyErrorWrap } from './Wrap'
 
-export const wm = new WeakMap<Object, Error>()
-
-export class PsyErrorNormalized extends Error {
-  constructor(message: string, readonly original: any) {
-    super(message)
-  }
-}
+const wm = new WeakMap<Object, Error>()
 
 /**
  * Convert non Error or PromiseLike to Error
@@ -18,7 +13,7 @@ export function psyErrorNormalize(error: any): Error | PromiseLike<any> {
   let converted = wm.get(error)
 
   if (!converted) {
-    converted = new PsyErrorNormalized(JSON.stringify(error, null, ' '), error)
+    converted = new PsyErrorWrap(JSON.stringify(error, null, ' '), error)
     wm.set(converted, error)
   }
 

@@ -1,8 +1,8 @@
 export class PsyErrorMix extends Error {
-  constructor(message: string, readonly errors: readonly Error[]) {
+  constructor(message: string, readonly errors?: readonly Error[]) {
     super(message)
 
-    if (errors.length) {
+    if (errors?.length) {
       const stacks = [...errors.map(error => error.message), this.stack]
 
       const diff = diffPath(
