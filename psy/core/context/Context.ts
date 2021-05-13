@@ -15,8 +15,6 @@ export class PsyContext {
 
   constructor(protected parent?: PsyContext) {}
 
-  static instance = new PsyContext()
-
   clone(cb: PsyContextUpdater) {
     const next = new PsyContext(this)
 
@@ -58,7 +56,11 @@ export class PsyContext {
 
     return p
   }
+
+  static instance: PsyContext
 }
+
+PsyContext.instance = new PsyContext()
 
 function isReactContext<V>(v: any): v is ReactLikeContext<V> {
   return typeof v === 'object' && typeof v.$$typeof === 'symbol' && typeof v.Provider === 'function'

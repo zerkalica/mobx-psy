@@ -8,13 +8,15 @@ import { DefaultParams, DemoLibRouterRoute } from './route'
 import { DemoLibRouterParamMapper } from './serializer'
 
 export class DemoLibRouterLocation {
-  static instance = new DemoLibRouterLocation(PsyContext.instance)
-
   @observable protected search = this.client.location.search
 
   constructor(protected $: PsyContext, protected client = demoLibRouterClient) {
     makeObservable(this)
     client.addEventListener('popstate', this.onPopState)
+  }
+
+  protected destructor() {
+    this.client.removeEventListener('popstate', this.onPopState)
   }
 
   @action.bound protected onPopState() {
@@ -84,4 +86,8 @@ export class DemoLibRouterLocation {
   replace(key: string, next: string | undefined) {
     this.set(key, next, true)
   }
+
+  static instance: DemoLibRouterLocation
 }
+
+DemoLibRouterLocation.instance = new DemoLibRouterLocation(PsyContext.instance)

@@ -1,8 +1,6 @@
 import { psyDataIsPromise } from '@psy/core/data/isPromise'
 
 export class PsySsrHydrator {
-  static instance = new PsySsrHydrator()
-
   constructor(protected state: Record<string, any> = {}) {}
 
   get<V>(key: string): V | Promise<V> | Error | undefined {
@@ -24,4 +22,8 @@ export class PsySsrHydrator {
 
     return { state: this.state, loading: parts.length }
   }
+
+  static instance: PsySsrHydrator
 }
+
+PsySsrHydrator.instance = new PsySsrHydrator()

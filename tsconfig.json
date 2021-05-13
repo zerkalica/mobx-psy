@@ -2,7 +2,7 @@
   "extends": "@psy/boot/tsconfig.base.json",
   "compilerOptions": {
     "plugins": [
-      // {"name": "ts-plugin-autoimport-fix"}
+      {"name": "ts-plugin-autoimport-fix"}
     ]
   },
   "exclude": [

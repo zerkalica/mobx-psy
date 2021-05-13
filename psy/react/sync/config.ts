@@ -2,7 +2,7 @@ import { observer as mobxObserver } from 'mobx-react-lite'
 
 import { PsySyncFallbackError, PsySyncFallbackErrorProps, PsySyncFallbackLoading, PsySyncFallbackLoadingProps } from './Fallback'
 
-type PsySyncConfig = Parameters<typeof mobxObserver>[1] & {
+export type PsySyncConfig = Parameters<typeof mobxObserver>[1] & {
   /**
    * Loading blend component on top of observed component (in children)
    */
