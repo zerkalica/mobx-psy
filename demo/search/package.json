@@ -17,7 +17,7 @@
     "test": "jest --passWithNoTests",
     "test:watch": "jest --passWithNoTests --watch",
     "start": "bin/demo-search",
-    "start:dev": "NODE_ENV=development tsc-watch --build --onFirstSuccess 'node ./-/boot/dev/server'"
+    "start:dev": "NODE_ENV=development tsc-watch --build --noClear --onFirstSuccess 'node ./-/boot/dev/server'"
   },
   "bin": {
     "my-search": "./bin/demo-search"

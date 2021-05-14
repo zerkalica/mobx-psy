@@ -42,7 +42,7 @@ export class PsyContext {
 
   get<V>(p: PsyContextKey<V>) {
     const dep = this.opt(p)
-    if (dep === undefined) throw new Error(`Provide value for ${p}`)
+    if (dep === undefined) throw new Error(`PsyContext, provide value for ${p}`)
 
     return dep
   }

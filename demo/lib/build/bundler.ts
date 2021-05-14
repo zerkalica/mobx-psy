@@ -11,15 +11,7 @@ export interface DemoLibBuildBundler {
   middleware(): express.RequestHandler
 }
 
-export function demoLibBuildBundler({
-  distRoot,
-  publicUrl,
-  minify = false,
-}: {
-  distRoot: string
-  publicUrl: string
-  minify?: boolean
-}) {
+export function demoLibBuildBundler({ distRoot, publicUrl, minify = false }: { distRoot: string; publicUrl: string; minify?: boolean }) {
   const { outDir, browserEntry, srcRoot } = demoLibBuildContext({ distRoot, distEntry: true })
   const webpackConfig: webpack.Configuration = {
     entry: browserEntry,
@@ -75,9 +67,13 @@ export function demoLibBuildBundler({
         mode: 'development',
       })
 
-      return webpackDevMiddleware(compiler, {
-        publicPath: publicUrl
+      const mdl = webpackDevMiddleware(compiler, {
+        publicPath: publicUrl,
       })
+
+      mdl.invalidate()
+
+      return mdl
     },
   }
 

@@ -3,15 +3,17 @@ import { IncomingMessage } from 'http'
 import { PsySsrLocationLike } from './LocationLike'
 
 export function psySsrLocationNode(req: IncomingMessage, sequre = true) {
-  const parts = new URL(req.url || '')
   const headers = req.headers
-  let host = headers['x-forwarded-host'] || headers['host'] || ''
-
-  if (Array.isArray(host)) host = host[0] || ''
 
   let protocol = headers['x-forwared-proto'] || (sequre ? 'https' : 'http')
-
   if (Array.isArray(protocol)) protocol = protocol[0] || ''
+
+  let host = headers['x-forwarded-host'] || headers['host'] || ''
+  if (Array.isArray(host)) host = host[0] || ''
+
+  const fullUrl = `${protocol}://${host}/${req.url}`
+
+  const parts = new URL(fullUrl)
 
   // IPv6 literal support
   const offset: number = host[0] === '[' ? host.indexOf(']') + 1 : 0

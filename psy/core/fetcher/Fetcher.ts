@@ -13,7 +13,7 @@ export class PsyFetcher {
     throw new Error('implement')
   }
 
-  static async get(args: PsyFetcherProps, signal: AbortSignal) {
+  static get(args: PsyFetcherProps, signal: AbortSignal) {
     const body = this.serializeBody(args.params)
 
     const init: RequestInit = {
@@ -22,9 +22,14 @@ export class PsyFetcher {
       body,
     }
 
-    const resp = await this.fetch(this.url(args), init)
+    const res = this.fetch(this.url(args), init).then(resp => resp.json()) as PromiseLike<unknown> & {
+      [Symbol.toStringTag]?: string
+    }
+    res.toString = () => res[Symbol.toStringTag] ?? 'Promise'
 
-    return resp.json()
+    res[Symbol.toStringTag] = args.kind
+
+    return res
   }
 
   static hash(p: PsyFetcherProps) {
