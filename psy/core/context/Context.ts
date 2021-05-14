@@ -57,10 +57,8 @@ export class PsyContext {
     return p
   }
 
-  static instance: PsyContext
+  static instance = new PsyContext()
 }
-
-PsyContext.instance = new PsyContext()
 
 function isReactContext<V>(v: any): v is ReactLikeContext<V> {
   return typeof v === 'object' && typeof v.$$typeof === 'symbol' && typeof v.Provider === 'function'

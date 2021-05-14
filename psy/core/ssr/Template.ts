@@ -22,7 +22,5 @@ export class PsySsrTemplate {
     return `${this.header}${this.body}{}${this.footer}`
   }
 
-  static instance: PsySsrTemplate
+  static instance = new PsySsrTemplate()
 }
-
-PsySsrTemplate.instance = new PsySsrTemplate()

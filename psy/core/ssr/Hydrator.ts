@@ -23,7 +23,9 @@ export class PsySsrHydrator {
     return { state: this.state, loading: parts.length }
   }
 
-  static instance: PsySsrHydrator
-}
+  private static cache: PsySsrHydrator | undefined = undefined
 
-PsySsrHydrator.instance = new PsySsrHydrator()
+  static get instance() {
+    return this.cache ?? (this.cache = new PsySsrHydrator())
+  }
+}

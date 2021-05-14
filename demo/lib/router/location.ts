@@ -87,7 +87,9 @@ export class DemoLibRouterLocation {
     this.set(key, next, true)
   }
 
-  static instance: DemoLibRouterLocation
-}
+  private static cache: DemoLibRouterLocation | undefined = undefined
 
-DemoLibRouterLocation.instance = new DemoLibRouterLocation(PsyContext.instance)
+  static get instance() {
+    return this.cache ?? (this.cache = new DemoLibRouterLocation(PsyContext.instance))
+  }
+}
