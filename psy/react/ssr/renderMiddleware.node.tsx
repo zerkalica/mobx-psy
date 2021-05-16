@@ -12,12 +12,12 @@ import { PsySsrTemplate } from '@psy/core/ssr/Template'
 import { PsyContextProvide } from '../context/provide'
 
 export function psySsrRenderMiddleware({ app, template }: { app: () => React.ReactNode; template: PsySsrTemplate }) {
-  return psySsrMdlAsync(async (req: IncomingMessage, response: ServerResponse, next) => {
+  return psySsrMdlAsync(async function psySsrRenderMiddleware$(req: IncomingMessage, response: ServerResponse, next) {
     const ctx = usePsyContextNode()
 
     const { error, passes, chunk, rendered } = await new PsySsrRender(ctx, {
       template,
-      render: innerCtx => ReactDOMServer.renderToNodeStream(<PsyContextProvide parent={innerCtx}>{app()}</PsyContextProvide>),
+      render: innerCtx => ReactDOMServer.renderToNodeStream(<PsyContextProvide parent={innerCtx} children={app()} />),
       next: val => response.write(val),
     }).run()
 

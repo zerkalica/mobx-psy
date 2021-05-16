@@ -16,14 +16,14 @@
     "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
-    "source-map-support": "^0.5.19",
-    "abortcontroller-polyfill": "^1.5.0",
-    "express": "^4.17.1",
     "@psy/core": "^1.0.0",
     "@psy/react": "^1.0.0",
-    "@snap/ui": "^1.0.0",
     "@snap/router": "^1.0.0",
-    "react-dom": "^17.0.2"
+    "@snap/ui": "^1.0.0",
+    "abortcontroller-polyfill": "^1.5.0",
+    "express": "^4.17.1",
+    "react-dom": "^17.0.2",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
     "@psy/boot": "^1.0.0",
@@ -33,7 +33,7 @@
     "@types/react-dom": "^17.0.2"
   },
   "peerDependencies": {
-    "typescript": "*",
-    "jest": "*"
+    "jest": "*",
+    "typescript": "*"
   }
 }

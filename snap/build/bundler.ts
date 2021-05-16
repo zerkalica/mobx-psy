@@ -8,30 +8,28 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import { snapBuildContext } from './context'
 
 export interface SnapBuildBundler {
-  bundle(): Promise<any>
+  bundle(): Promise<{ indexHtml: string }>
   middleware(): express.RequestHandler
 }
 
 export function snapBuildBundler({
   distRoot,
   publicUrl,
-  minify = false,
-  noWatch = false,
+  isDev = process.env.NODE_ENV === 'development',
+  noWatch = process.env.PSY_NO_WATCH === '1',
 }: {
+  isDev?: boolean
   noWatch?: boolean
   distRoot: string
   publicUrl: string
-  minify?: boolean
 }) {
-  const { outDir, browserEntry, srcRoot } = snapBuildContext({ distRoot, distEntry: true })
+  const { outDir, indexHtml, browserEntry, srcRoot } = snapBuildContext({ distRoot })
   const webpackConfig: webpack.Configuration = {
+    name: path.basename(browserEntry),
     entry: browserEntry,
     devtool: 'source-map',
-    mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    mode: isDev ? 'development' : 'production',
     stats: 'normal',
-    optimization: {
-      minimize: minify,
-    },
     performance: {
       maxAssetSize: 400000,
       maxEntrypointSize: 400000,
@@ -43,11 +41,15 @@ export function snapBuildBundler({
       new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/tsbuildinfo$/,
       }),
+      new webpack.LibManifestPlugin({
+        path: path.resolve(outDir, '[name]-manifest.json'),
+        name: '[name]_[fullhash]',
+      }),
       // new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
       // new webpack.ProgressPlugin(),
     ],
     output: {
-      filename: path.basename(browserEntry).replace(/\.tsx$/, '.js'),
+      filename: isDev ? '[name].js' : '[name].[contenthash].bundle.js',
       path: outDir,
     },
   }
@@ -58,7 +60,7 @@ export function snapBuildBundler({
     bundle() {
       const compiler = webpack(webpackConfig)
 
-      return new Promise<void>((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         compiler.run((error, stats) => {
           if (error || stats?.hasErrors()) {
             console.error(stats?.toString({ colors: true }))
@@ -68,7 +70,9 @@ export function snapBuildBundler({
 
           console.log(stats?.toString({ colors: true }))
           // stats.hash
-          resolve()
+          resolve({
+            indexHtml,
+          })
         })
       })
     },

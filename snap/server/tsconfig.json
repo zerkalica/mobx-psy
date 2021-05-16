@@ -1,13 +1,13 @@
 {
-  "extends": "../../../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "-",
     "rootDir": "."
   },
   "references": [
-    {"path": "../../../psy/core"},
-    {"path": "../../../psy/react"},
-    {"path": "../../../psy/boot"},
+    {"path": "../../psy/core"},
+    {"path": "../../psy/react"},
+    {"path": "../../psy/boot"},
     {"path": "../router"},
     {"path": "../build"}
   ]

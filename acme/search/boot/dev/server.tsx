@@ -15,5 +15,4 @@ acmeSearchBootCommonServer({
   distRoot: __dirname,
   fetcher,
   isDev: true,
-  noWatch: process.env.PSY_NO_WATCH === '1',
 })

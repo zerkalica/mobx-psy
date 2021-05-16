@@ -3,10 +3,9 @@ import { PsySsrTemplate } from '@psy/core/ssr/Template'
 export class SnapServerIndexHtml extends PsySsrTemplate {
   constructor(
     protected options: Readonly<{
-      title: string
+      title?: string
       entry?: string
       pkgName: string
-      publicUrl: string
     }>
   ) {
     super()
@@ -21,7 +20,7 @@ export class SnapServerIndexHtml extends PsySsrTemplate {
         name="viewport"
         content="width=device-width, initial-scale=1, shrink-to-fit=no"
       />
-      <title>${this.options.title}</title>
+      <title>${this.options.title ?? 'Debug title'}</title>
     </head>
   
     <body>
@@ -38,7 +37,7 @@ export class SnapServerIndexHtml extends PsySsrTemplate {
 
   get footer() {
     return `</script>
-      <script src="${this.options.publicUrl}${this.options.entry ?? 'browser'}.js"></script>
+      ${this.options.entry ? `<script src="${this.options.entry}"></script>` : ''}
     </body>
   </html>
   `

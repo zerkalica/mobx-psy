@@ -1,4 +1,6 @@
 export class PsySsrTemplate {
+  static readonly instance = new PsySsrTemplate()
+
   get header() {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -21,6 +23,4 @@ export class PsySsrTemplate {
   toString() {
     return `${this.header}${this.body}{}${this.footer}`
   }
-
-  static instance = new PsySsrTemplate()
 }

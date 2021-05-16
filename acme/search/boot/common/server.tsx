@@ -45,6 +45,7 @@ export function acmeSearchBootCommonServer({
     port: serverConfig.port,
     init: e =>
       e
+        .use(staticMiddleware)
         .use((req, res, next) => {
           psyContextProvideNode(next, ctx => {
             const requestId = (req.headers['x-request-id'] as string | undefined) ?? PsyTrace.id()
@@ -86,12 +87,12 @@ export function acmeSearchBootCommonServer({
               )
           })
         })
-        .use(staticMiddleware)
         .use(
           psySsrRenderMiddleware({
-            template: new SnapServerIndexHtml({ ...serverConfig }),
+            template: new SnapServerIndexHtml({ title: 'test', pkgName: acmeSearchPkgName, entry: serverConfig.publicUrl }),
             app: () => <AcmeSearch id={acmeSearchPkgName} />,
           })
         ),
+    // .use(snapServerMdlError({ template })),
   })
 }

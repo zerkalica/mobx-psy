@@ -8,7 +8,6 @@ const distRoot = __dirname
 
 snapBuildBundler({
   ...acmeSearchBootProdBrowserConfig,
-  minify: true,
   //scopeHoist: true,
   distRoot,
 }).bundle()
