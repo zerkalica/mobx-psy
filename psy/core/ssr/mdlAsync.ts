@@ -10,7 +10,7 @@ const nextStub = (e: any) => {
   psyErrorThrowHidden(new PsySsrMdlAsyncNext(e))
 }
 
-export function psySsrMdlAsync<Req, Res>(cb: (req: Req, res: Res, next?: (e?: any) => any) => Promise<unknown>) {
+export function psySsrMdlAsync<Req, Res>(cb: (req: Req, res: Res, next: (e?: Error) => never) => Promise<unknown>) {
   return async (req: Req, res: Res, next: (e?: any) => any) => {
     try {
       const val = await cb(req, res, nextStub)

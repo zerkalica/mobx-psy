@@ -3,14 +3,9 @@ export class PsyErrorMix extends Error {
     super(message)
 
     if (errors?.length) {
-      const stacks = [...errors.map(error => error.message), this.stack]
-
-      const diff = diffPath(
-        ...stacks.map(stack => {
-          if (!stack) return []
-          return stack.split('\n').reverse()
-        })
-      )
+      const groups = errors.map(stackGroup)
+      groups.push(stackGroup(this))
+      const diff = diffPath(groups)
 
       const head = diff.prefix.reverse().join('\n')
       const tails = diff.suffix
@@ -27,12 +22,27 @@ export class PsyErrorMix extends Error {
     }
   }
 
+  filterDeep<V>(cls: new (...args: any[]) => V, result = [] as V[]) {
+    if (!this.errors) return undefined
+
+    for (const e of this.errors) {
+      if (e instanceof PsyErrorMix) e.filterDeep(cls, result)
+      if (e instanceof cls) result.push(e)
+    }
+
+    return result
+  }
+
   toJSON() {
     return this.message
   }
 }
 
-function diffPath<Item>(...paths: Item[][]) {
+function stackGroup(e: Error) {
+  return e.stack?.split('\n').reverse() ?? []
+}
+
+function diffPath<Item>(paths: Item[][]) {
   const limit = Math.min(...paths.map(path => path.length))
 
   lookup: for (var i = 0; i < limit; ++i) {

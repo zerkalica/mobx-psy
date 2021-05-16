@@ -17,9 +17,8 @@
   },
   "workspaces": [
     "psy/*",
-    "demo/lib/*",
-    "demo/*",
-    "ts-plugin-*"
+    "snap/*",
+    "acme/*"
   ],
   "dependencies": {
     "typescript": "^4.0.2"

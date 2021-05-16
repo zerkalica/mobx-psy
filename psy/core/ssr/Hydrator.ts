@@ -1,26 +1,26 @@
-import { psyDataIsPromise } from '@psy/core/data/isPromise'
-
 export class PsySsrHydrator {
+  r = Math.random()
   constructor(protected state: Record<string, any> = {}) {}
 
-  get<V>(key: string): V | Promise<V> | Error | undefined {
+  get<V>(key: string): V | Promise<unknown> | Error | undefined {
     return this.state[key]
   }
 
-  prepare<V>(key: string, v: Promise<V>) {}
+  prepare<V>(key: string, v: Promise<unknown>) {}
 
-  set<V>(key: string, v: V | Error) {
-    throw new Error('use HydratorServer to fill state')
-  }
+  set<V>(key: string, v: V) {}
+
+  error(key: string, v: Error) {}
+
+  renderError(error: Error) {}
+  renderSuccess(component: unknown) {}
 
   remove(key: string) {
     this.state[key] = undefined
   }
 
-  async collect() {
-    const parts = await Promise.all(Object.values(this.state).filter(psyDataIsPromise))
-
-    return { state: this.state, loading: parts.length }
+  collect(): Promise<{ state: Record<string, any>; errors: readonly Error[]; pending: number; rendered: number }> {
+    throw new Error('implement')
   }
 
   private static cache: PsySsrHydrator | undefined = undefined

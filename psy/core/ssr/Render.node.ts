@@ -1,7 +1,6 @@
 import { PsyContext } from '../context/Context'
 import { PsyErrorMix } from '../error/Mix'
 import { psyErrorNormalize } from '../error/normalize'
-import { PsyLog } from '../log/log'
 import { PsySsrHydrator } from './Hydrator'
 import { PsySsrTemplate } from './Template'
 
@@ -13,6 +12,12 @@ export interface PsySsrRenderResult {
 
 export type PsySsrRenderFn = (r: PsyContext) => NodeJS.ReadableStream | string
 
+export class PsySsrRenderError extends PsyErrorMix {
+  constructor(message: string, errors: readonly Error[], readonly rendered: number, readonly passes: number) {
+    super(message, errors)
+  }
+}
+
 export class PsySsrRender {
   protected headerWrited = false
 
@@ -22,22 +27,9 @@ export class PsySsrRender {
       template: PsySsrTemplate
       maxIterations?: number
       render: PsySsrRenderFn
-      complete(error?: Error, next?: string): void
       next(val: string): void
     },
-    protected hydrator = $.get(PsySsrHydrator.instance),
-    protected renderErrors: Error[] = [],
-    protected cloned = $.clone(r =>
-      r.set(
-        PsyLog,
-        class PsySsrRenderLog extends PsyLog {
-          static error(p: Parameters<typeof PsyLog['error']>[0]) {
-            if (p.error) renderErrors.push(p.error)
-            super.error(p)
-          }
-        }
-      )
-    )
+    protected hydrator = $.get(PsySsrHydrator.instance)
   ) {}
 
   protected renderStream() {
@@ -47,7 +39,7 @@ export class PsySsrRender {
         resolve()
       }
 
-      const original = this.options.render(this.cloned)
+      const original = this.options.render(this.$)
 
       if (typeof original === 'string') return cb(original)
 
@@ -61,35 +53,34 @@ export class PsySsrRender {
 
   async run() {
     const options = this.options
-    const maxIterations = options.maxIterations ?? 10
-    let i = 0
+    const maxIterations = options.maxIterations ?? 3
+    let passes = 0
 
-    for (; i < maxIterations; i++) {
+    for (; passes < maxIterations; passes++) {
       this.buffer = ''
-      this.renderErrors = []
-      await this.renderStream()
-      const { state, loading } = await this.hydrator.collect()
+      this.headerWrited = false
 
-      if (loading === 0 || this.buffer === undefined) {
+      await this.renderStream()
+
+      const { state, pending, errors, rendered } = await this.hydrator.collect()
+
+      if (pending === 0 || this.buffer === undefined) {
         this.next(`${options.template.body}${JSON.stringify(state)}${options.template.footer}`)
-        break
+        const error = errors.length > 0 ? new PsySsrRenderError(`Server render component errors`, errors, rendered, passes) : undefined
+
+        return {
+          rendered,
+          passes,
+          error,
+          chunk: this.buffer,
+        }
       }
     }
 
-    const error = this.renderErrors.length > 0 ? new PsyErrorMix(`Server render component errors`, this.renderErrors) : undefined
-    this.renderErrors = []
-    this.complete(error)
-
-    return i
+    throw new Error(`Render max render passes reached: ${maxIterations}`)
   }
 
   protected buffer = this.options.maxIterations === 1 ? undefined : ''
-
-  protected complete(error?: Error) {
-    if (this.buffer === undefined) return this.options.complete(error)
-    this.options.complete(error, this.buffer)
-    this.buffer = ''
-  }
 
   protected next(html: string) {
     if (!html) return

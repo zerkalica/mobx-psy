@@ -2,8 +2,6 @@
   "name": "@psy/core",
   "version": "1.0.0",
   "description": "Mobx pseudo syncronous loader core",
-  "main": "-/index.js",
-  "types": "-/index.d.ts",
   "exports": {
     "./": "./-/"
   },

@@ -7,7 +7,7 @@ export class PsySsrHydratorBrowser extends PsySsrHydrator {
     this.state = {}
   }
 
-  get<V>(key: string): V | Promise<V> | Error | undefined {
+  get<V>(key: string): V | Promise<unknown> | Error | undefined {
     if (this.handle) clearTimeout(this.handle)
     this.handle = setTimeout(this.clear.bind(this), 500)
 

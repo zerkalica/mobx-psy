@@ -1,3 +1,4 @@
+import { psyDataIsPromise } from '../data/isPromise'
 import { psyErrorThrowHidden } from '../error/hidden'
 import { psyErrorNormalize } from '../error/normalize'
 import { psySyncRefreshable } from './refreshable'
@@ -49,8 +50,7 @@ export function psySyncMock<State, Fallback>(p: MockParams<State, Fallback>): St
   try {
     return p.unsafe()
   } catch (e) {
-    const error = psyErrorNormalize(e)
-
+    const error = psyDataIsPromise(e) ? e : psyErrorNormalize(e)
     // throw, if any error or fiber, associated with promise, is completed
     // Call fallback on fist calculations, if calculations was completed and refreshed - throws promise.
     // observer catches promise and returns last actual rendered component with loading blend.

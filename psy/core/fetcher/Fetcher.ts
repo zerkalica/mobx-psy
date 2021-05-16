@@ -1,10 +1,16 @@
+import { PsyContext } from '../context/Context'
+import { PsyTrace } from '../trace/trace'
+
 export interface PsyFetcherProps<P = unknown, K extends string = string> {
   kind: K
   params: P
 }
 
 export class PsyFetcher {
+  static $ = PsyContext.instance
   static baseUrl = '/'
+  static requestId = undefined as string | undefined
+
   static url(args: PsyFetcherProps) {
     return this.baseUrl + args.kind
   }
@@ -13,13 +19,23 @@ export class PsyFetcher {
     throw new Error('implement')
   }
 
+  protected static get trace() {
+    return this.$.get(PsyTrace)
+  }
+
   static get(args: PsyFetcherProps, signal: AbortSignal) {
     const body = this.serializeBody(args.params)
+    const sessionId = this.trace.sessionId
+    const requestId = this.trace.requestId()
 
     const init: RequestInit = {
       ...args,
       signal,
       body,
+      headers: {
+        'x-request-id': requestId,
+        'x-session-id': sessionId,
+      },
     }
 
     const res = this.fetch(this.url(args), init).then(resp => resp.json()) as PromiseLike<unknown> & {

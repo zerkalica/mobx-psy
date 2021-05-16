@@ -2,8 +2,6 @@
   "name": "@psy/react",
   "version": "1.0.0",
   "description": "Mobx pseudo syncronous loader",
-  "main": "-/index.js",
-  "types": "-/index.d.ts",
   "exports": {
     "./": "./-/"
   },
