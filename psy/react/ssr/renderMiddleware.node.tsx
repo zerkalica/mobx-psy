@@ -7,16 +7,15 @@ import { PsyErrorNotFound } from '@psy/core/error/NotFound'
 import { PsyLog } from '@psy/core/log/log'
 import { psySsrMdlAsync } from '@psy/core/ssr/mdlAsync'
 import { PsySsrRender } from '@psy/core/ssr/Render.node'
-import { PsySsrTemplate } from '@psy/core/ssr/Template'
 
 import { PsyContextProvide } from '../context/provide'
 
-export function psySsrRenderMiddleware({ app, template }: { app: () => React.ReactNode; template: PsySsrTemplate }) {
+export function psySsrRenderMiddleware(app: () => React.ReactNode) {
   return psySsrMdlAsync(async function psySsrRenderMiddleware$(req: IncomingMessage, response: ServerResponse, next) {
-    const ctx = usePsyContextNode()
+    const $ = usePsyContextNode()
+    const log = $.get(PsyLog)
 
-    const { error, passes, chunk, rendered } = await new PsySsrRender(ctx, {
-      template,
+    const { error, passes, chunk, rendered } = await new PsySsrRender($, {
       render: innerCtx => ReactDOMServer.renderToNodeStream(<PsyContextProvide parent={innerCtx} children={app()} />),
       next: val => response.write(val),
     }).run()
@@ -28,7 +27,7 @@ export function psySsrRenderMiddleware({ app, template }: { app: () => React.Rea
 
     if (notFound) response.statusCode = notFound.httpCode
 
-    if (error) ctx.get(PsyLog).warn({ place: 'psySsrRenderMiddleware', message: error, passes, rendered })
+    if (error) log.warn({ place: 'psySsrRenderMiddleware', message: error, passes, rendered })
 
     response.end(chunk)
   })

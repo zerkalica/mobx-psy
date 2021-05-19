@@ -1,3 +1,5 @@
+// @ts-ignore
+import CopyWebpackPlugin from 'copy-webpack-plugin'
 import express from 'express'
 import path from 'path'
 // @ts-ignore
@@ -8,16 +10,18 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 import { snapBuildContext } from './context'
 
 export interface SnapBuildBundler {
-  bundle(): Promise<{ indexHtml: string }>
+  bundle(): Promise<{ indexHtml: string; entry: string; files: Record<string, string> }>
   middleware(): express.RequestHandler
 }
 
 export function snapBuildBundler({
   distRoot,
   publicUrl,
+  pkgName,
   isDev = process.env.NODE_ENV === 'development',
   noWatch = process.env.PSY_NO_WATCH === '1',
 }: {
+  pkgName: string
   isDev?: boolean
   noWatch?: boolean
   distRoot: string
@@ -26,7 +30,15 @@ export function snapBuildBundler({
   const { outDir, indexHtml, browserEntry, srcRoot } = snapBuildContext({ distRoot })
   const webpackConfig: webpack.Configuration = {
     name: path.basename(browserEntry),
-    entry: browserEntry,
+    entry: {
+      [pkgName]: browserEntry,
+    },
+    optimization: {
+      splitChunks: {
+        filename: isDev ? `${pkgName}-[id]-chunk.js` : `${pkgName}-[id]-[contenthash].js`,
+        chunks: 'all',
+      },
+    },
     devtool: 'source-map',
     mode: isDev ? 'development' : 'production',
     stats: 'normal',
@@ -41,20 +53,28 @@ export function snapBuildBundler({
       new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/tsbuildinfo$/,
       }),
-      new webpack.LibManifestPlugin({
-        path: path.resolve(outDir, '[name]-manifest.json'),
-        name: '[name]_[fullhash]',
+      // new WebpackManifestPlugin(),
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: '**/*.{png,jpg,svg,gif,woff2}',
+            to: '[name]-[contenthash][ext]',
+            globOptions: {
+              ignore: ['**/-'],
+            },
+          },
+        ],
       }),
       // new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
-      // new webpack.ProgressPlugin(),
+      new webpack.ProgressPlugin(),
     ],
     output: {
-      filename: isDev ? '[name].js' : '[name].[contenthash].bundle.js',
+      filename: isDev ? `[name].js` : `[name]-[contenthash].js`,
       path: outDir,
     },
   }
 
-  console.log({ browserEntry, srcRoot, outDir })
+  console.log({ browserEntry, srcRoot, outDir, pkgName })
 
   const bundler: SnapBuildBundler = {
     bundle() {
@@ -69,10 +89,27 @@ export function snapBuildBundler({
           }
 
           console.log(stats?.toString({ colors: true }))
-          // stats.hash
-          resolve({
+          const compilation = stats?.compilation
+          if (!compilation) throw new Error('No compilation')
+
+          const files = {} as Record<string, string>
+          const pkgNameExt = `${pkgName}.js`
+          let entry = pkgNameExt
+
+          for (const [k, v] of compilation.assetsInfo) {
+            if (v.sourceFilename) files[v.sourceFilename] = k
+            else if (v.contenthash && k.replace(`-${v.contenthash}`, '') === pkgNameExt) entry = k
+          }
+
+          const out = {
             indexHtml,
-          })
+            files,
+            entry: publicUrl + entry,
+          }
+
+          console.log(out)
+
+          resolve(out)
         })
       })
     },

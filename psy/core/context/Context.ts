@@ -8,7 +8,7 @@ type PsyContextValue = Object | Function
 
 type PsyContextKey<V extends PsyContextValue = PsyContextValue> = ReactLikeContext<V> | V
 
-export type PsyContextUpdater = (r: PsyContext) => unknown
+export type PsyContextUpdater = (r: PsyContext) => PsyContext
 
 export class PsyContext {
   protected registry: Map<PsyContextKey, unknown> | undefined = undefined

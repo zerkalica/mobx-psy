@@ -24,11 +24,11 @@ export class PsySsrRender {
   constructor(
     protected $: PsyContext,
     protected options: {
-      template: PsySsrTemplate
       maxIterations?: number
       render: PsySsrRenderFn
       next(val: string): void
     },
+    protected template = $.get(PsySsrTemplate.instance),
     protected hydrator = $.get(PsySsrHydrator.instance)
   ) {}
 
@@ -65,7 +65,7 @@ export class PsySsrRender {
       const { state, pending, errors, rendered } = await this.hydrator.collect()
 
       if (pending === 0 || this.buffer === undefined) {
-        this.next(`${options.template.body}${JSON.stringify(state)}${options.template.footer}`)
+        this.next(this.template.renderEnd(state))
         const error = errors.length > 0 ? new PsySsrRenderError(`Server render component errors`, errors, rendered, passes) : undefined
 
         return {
@@ -84,7 +84,7 @@ export class PsySsrRender {
 
   protected next(html: string) {
     if (!html) return
-    if (!this.headerWrited) html = `${this.options.template.header}${html}`
+    if (!this.headerWrited) html = `${this.template.renderBegin()}${html}`
     this.headerWrited = true
 
     if (this.buffer === undefined) return this.options.next(html)

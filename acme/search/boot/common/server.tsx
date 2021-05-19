@@ -12,12 +12,13 @@ import { PsyLog } from '@psy/core/log/log'
 import { PsySsrHydrator } from '@psy/core/ssr/Hydrator'
 import { PsySsrHydratorNode } from '@psy/core/ssr/Hydrator.node'
 import { psySsrLocationNode } from '@psy/core/ssr/location.node'
+import { PsySsrTemplate } from '@psy/core/ssr/Template'
 import { PsyTrace } from '@psy/core/trace/trace'
 import { psySsrRenderMiddleware } from '@psy/react/ssr/renderMiddleware.node'
 import { snapBuildBundler } from '@snap/build/bundler'
 import { snapRouterClient } from '@snap/router/client'
 import { SnapRouterLocation } from '@snap/router/location'
-import { SnapServerIndexHtml } from '@snap/server/IndexHtml'
+import { snapServerMdlError } from '@snap/server/mdl/error'
 import { snapServerMdlExpress } from '@snap/server/mdl/express'
 
 import { acmeSearchPkgName } from '../../pkgName'
@@ -36,8 +37,10 @@ export function acmeSearchBootCommonServer({
   const staticMiddleware = isDev
     ? snapBuildBundler({
         publicUrl: serverConfig.publicUrl,
+        pkgName: acmeSearchPkgName,
         distRoot,
         noWatch,
+        isDev,
       }).middleware()
     : express.static(path.join(distRoot, 'public'), { index: false })
 
@@ -45,13 +48,19 @@ export function acmeSearchBootCommonServer({
     port: serverConfig.port,
     init: e =>
       e
-        .use(staticMiddleware)
         .use((req, res, next) => {
           psyContextProvideNode(next, ctx => {
             const requestId = (req.headers['x-request-id'] as string | undefined) ?? PsyTrace.id()
             const sessionId = (req.cookies['x-session-id'] as string | undefined) ?? PsyTrace.id()
 
+            const template = new PsySsrTemplate()
+
+            template.titleText = () => 'test'
+            template.pkgName = () => acmeSearchPkgName
+            template.bodyJs = () => [{ src: serverConfig.publicUrl + acmeSearchPkgName + '.js' }]
+
             return ctx
+              .set(PsySsrTemplate.instance, template)
               .set(
                 PsyTrace,
                 class PsyTraceNodeConfigured extends PsyTrace {
@@ -64,13 +73,6 @@ export function acmeSearchBootCommonServer({
                 }
               )
               .set(PsySsrHydrator.instance, new PsySsrHydratorNode({ __config: browserConfig }))
-              .set(
-                SnapRouterLocation.instance,
-                new SnapRouterLocation(ctx, {
-                  ...snapRouterClient,
-                  location: psySsrLocationNode(req, req.secure),
-                })
-              )
               .set(
                 PsyLog,
                 class PsyLogNodeConfgured extends PsyLog {
@@ -85,14 +87,17 @@ export function acmeSearchBootCommonServer({
                   static $ = ctx
                 }
               )
+              .set(
+                SnapRouterLocation.instance,
+                new SnapRouterLocation(ctx, {
+                  ...snapRouterClient,
+                  location: psySsrLocationNode(req, req.secure),
+                })
+              )
           })
         })
-        .use(
-          psySsrRenderMiddleware({
-            template: new SnapServerIndexHtml({ title: 'test', pkgName: acmeSearchPkgName, entry: serverConfig.publicUrl }),
-            app: () => <AcmeSearch id={acmeSearchPkgName} />,
-          })
-        ),
-    // .use(snapServerMdlError({ template })),
+        .use(staticMiddleware)
+        .use(psySsrRenderMiddleware(() => <AcmeSearch id={acmeSearchPkgName} />))
+        .use(snapServerMdlError),
   })
 }
