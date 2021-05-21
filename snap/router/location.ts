@@ -1,16 +1,16 @@
 import { action, computed, makeObservable, observable } from 'mobx'
 
+import { psyClient } from '@psy/core/client/client'
 import { PsyContext } from '@psy/core/context/Context'
 import { psyTaskDefer } from '@psy/core/task/Defer'
 
-import { snapRouterClient } from './client'
 import { DefaultParams, SnapRouterRoute } from './route'
 import { SnapRouterParamMapper } from './serializer'
 
 export class SnapRouterLocation {
   @observable protected search = this.client.location.search
 
-  constructor(protected $: PsyContext, protected client = snapRouterClient) {
+  constructor(protected $: PsyContext, protected client = typeof window === 'undefined' ? $.get(psyClient) : window) {
     makeObservable(this)
     client.addEventListener('popstate', this.onPopState)
   }
@@ -68,7 +68,7 @@ export class SnapRouterLocation {
     const params = { ...this.params, [key]: next }
     this.search = this.url(params)
     this.replaceLast = replace
-    if (!this.scheduled && this.client !== snapRouterClient) {
+    if (!this.scheduled) {
       this.scheduled = true
       psyTaskDefer.add(this.updateHistory.bind(this))
     }

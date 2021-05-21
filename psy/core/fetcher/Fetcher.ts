@@ -1,5 +1,4 @@
 import { PsyContext } from '../context/Context'
-import { PsyTrace } from '../trace/trace'
 
 export interface PsyFetcherProps<P = unknown, K extends string = string> {
   kind: K
@@ -9,7 +8,6 @@ export interface PsyFetcherProps<P = unknown, K extends string = string> {
 export class PsyFetcher {
   static $ = PsyContext.instance
   static baseUrl = '/'
-  static requestId = undefined as string | undefined
 
   static url(args: PsyFetcherProps) {
     return this.baseUrl + args.kind
@@ -19,25 +17,11 @@ export class PsyFetcher {
     throw new Error('implement')
   }
 
-  protected static get trace() {
-    return this.$.get(PsyTrace)
+  static requestId() {
+    return new Date().getTime() + '_' + String(Math.floor(Math.random() * 10e9))
   }
 
-  static get(args: PsyFetcherProps, signal: AbortSignal) {
-    const body = this.serializeBody(args.params)
-    const sessionId = this.trace.sessionId
-    const requestId = this.trace.requestId()
-
-    const init: RequestInit = {
-      ...args,
-      signal,
-      body,
-      headers: {
-        'x-request-id': requestId,
-        'x-session-id': sessionId,
-      },
-    }
-
+  protected static json(args: PsyFetcherProps, init: RequestInit) {
     const res = this.fetch(this.url(args), init).then(resp => resp.json()) as PromiseLike<unknown> & {
       [Symbol.toStringTag]?: string
     }
@@ -46,6 +30,21 @@ export class PsyFetcher {
     res[Symbol.toStringTag] = args.kind
 
     return res
+  }
+
+  static get(args: PsyFetcherProps, signal: AbortSignal) {
+    const body = this.serializeBody(args.params)
+
+    const init: RequestInit = {
+      ...args,
+      signal,
+      body,
+      headers: {
+        'x-request-id': this.requestId(),
+      },
+    }
+
+    return this.json(args, init)
   }
 
   static hash(p: PsyFetcherProps) {

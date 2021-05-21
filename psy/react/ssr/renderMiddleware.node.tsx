@@ -1,4 +1,4 @@
-import { IncomingMessage, ServerResponse } from 'http'
+import { ServerResponse } from 'http'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 
@@ -11,12 +11,12 @@ import { PsySsrRender } from '@psy/core/ssr/Render.node'
 import { PsyContextProvide } from '../context/provide'
 
 export function psySsrRenderMiddleware(app: () => React.ReactNode) {
-  return psySsrMdlAsync(async function psySsrRenderMiddleware$(req: IncomingMessage, response: ServerResponse, next) {
+  return psySsrMdlAsync(async function psySsrRenderMiddleware$(req, response: ServerResponse, next) {
     const $ = usePsyContextNode()
     const log = $.get(PsyLog)
 
     const { error, passes, chunk, rendered } = await new PsySsrRender($, {
-      render: innerCtx => ReactDOMServer.renderToNodeStream(<PsyContextProvide parent={innerCtx} children={app()} />),
+      render: ctx => ReactDOMServer.renderToNodeStream(<PsyContextProvide parent={ctx} children={app()} />),
       next: val => response.write(val),
     }).run()
 

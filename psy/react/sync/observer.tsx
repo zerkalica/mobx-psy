@@ -59,7 +59,7 @@ export function psySyncObserver<Props extends {}, Ref = {}>(baseComponent: RefCo
         hydrator.renderError(error)
 
         const log = $.get(PsyLog)
-        log.error({ place: value, message: error })
+        // log.error({ place: value, message: error })
 
         if (!options.error) return psyErrorThrowHidden(error)
 

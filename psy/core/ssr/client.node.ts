@@ -1,8 +1,8 @@
 import { IncomingMessage } from 'http'
 
-import { PsySsrLocationLike } from './LocationLike'
+import { psyClient } from '../client/client'
 
-export function psySsrLocationNode(req: IncomingMessage, sequre = true) {
+export function psySsrClient(req: IncomingMessage, sequre = true) {
   const headers = req.headers
 
   let protocol = headers['x-forwared-proto'] || (sequre ? 'https' : 'http')
@@ -11,23 +11,31 @@ export function psySsrLocationNode(req: IncomingMessage, sequre = true) {
   let host = headers['x-forwarded-host'] || headers['host'] || ''
   if (Array.isArray(host)) host = host[0] || ''
 
-  const fullUrl = `${protocol}://${host}/${req.url}`
-
-  const parts = new URL(fullUrl)
-
   // IPv6 literal support
   const offset: number = host[0] === '[' ? host.indexOf(']') + 1 : 0
   const index: number = host.indexOf(':', offset)
   const hostname: string = index !== -1 ? host.substring(0, index) : host
   const port: string = index !== -1 ? host.substring(index + 1) : ''
 
-  const location: PsySsrLocationLike = {
+  const fullUrl = `${protocol}://${host}${req.url}`
+  const parts = new URL(fullUrl)
+
+  const location = {
     search: parts.search || '',
     origin: `${protocol}://${hostname}`,
     pathname: parts.pathname || '',
+    href: fullUrl,
     port,
     hostname,
   }
 
-  return location
+  const userAgent = headers['user-agent'] ?? 'Node client'
+
+  return {
+    ...psyClient,
+    location,
+    navigator: {
+      userAgent,
+    },
+  }
 }

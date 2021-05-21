@@ -66,8 +66,8 @@ export class PsySsrRender {
 
       if (pending === 0 || this.buffer === undefined) {
         this.next(this.template.renderEnd(state))
-        const error = errors.length > 0 ? new PsySsrRenderError(`Server render component errors`, errors, rendered, passes) : undefined
-
+        const error =
+          errors.length > 0 ? new PsySsrRenderError(`Server render component errors`, errors, rendered, passes) : undefined
         return {
           rendered,
           passes,

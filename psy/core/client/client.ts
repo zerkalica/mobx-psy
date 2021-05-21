@@ -1,11 +1,15 @@
-export const snapRouterClient = {
-  [Symbol.toStringTag]: 'snapRouterClient',
+export const psyClient = {
+  [Symbol.toStringTag]: 'psyClient',
   location: {
     search: '',
     origin: '',
+    href: '',
     pathname: '',
     port: '',
     hostname: '',
+  },
+  navigator: {
+    userAgent: 'raw',
   },
   history: {
     pushState(data: any, title: string, url?: string | null): void {

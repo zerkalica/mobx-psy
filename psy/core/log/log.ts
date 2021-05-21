@@ -1,27 +1,41 @@
-import { PsyContext } from '../context/Context'
-import { PsyTrace } from '../trace/trace'
-
 export type PsyLogObject = { place: Object | string; message?: Error | string }
 
 export class PsyLog {
-  static $ = PsyContext.instance
-
-  protected static get trace() {
-    return this.$.get(PsyTrace)
+  static context() {
+    return {
+      ua: '',
+      url: '',
+      rid: '',
+      sid: '',
+    }
   }
 
-  protected static logged = new WeakMap<Error, boolean>()
+  protected static logged = new WeakSet<Error>()
+
+  protected static isLogged(p: PsyLogObject) {
+    if (p.message instanceof Error) {
+      if (this.logged.has(p.message)) return true
+      this.logged.add(p.message)
+    }
+
+    return false
+  }
+
+  protected static contextStr() {
+    return JSON.stringify(this.context())
+  }
+
+  protected static format(p: PsyLogObject) {
+    return p.message instanceof Error ? p.message.stack : p.message
+  }
 
   static warn<V extends PsyLogObject>(p: V) {
-    console.warn(`${p.place} [${this.trace.sessionId}]: ${p.message}`)
+    if (this.isLogged(p)) return
+    console.warn(`${p.place} ${this.contextStr()}: ${this.format(p)}`)
   }
 
   static error<V extends PsyLogObject>(p: V) {
-    if (p.message instanceof Error) {
-      if (this.logged.get(p.message)) return
-      this.logged.set(p.message, true)
-    }
-
-    console.error(`${p.place} [${this.trace.sessionId}]: ${p.message}`)
+    if (this.isLogged(p)) return
+    console.error(`${p.place} ${this.contextStr()}: ${this.format(p)}`)
   }
 }
