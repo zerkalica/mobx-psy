@@ -6,20 +6,17 @@ import nodeFetch from 'node-fetch'
 import path from 'path'
 import React from 'react'
 
-import { psyContextProvideNodeMdl, usePsyContextNode } from '@psy/core/context/provide.node'
+import { psyContextProvideNode, usePsyContextNode } from '@psy/core/context/provide.node'
 import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
 import { PsyFetcherNode } from '@psy/core/fetcher/Fetcher.node'
 import { PsyLog } from '@psy/core/log/log'
+import { psySsrClient } from '@psy/core/ssr/client.node'
 import { PsySsrHydrator } from '@psy/core/ssr/Hydrator'
 import { PsySsrHydratorNode } from '@psy/core/ssr/Hydrator.node'
-import { psySsrLocationNode } from '@psy/core/ssr/location.node'
+import { psySsrMdlAsync } from '@psy/core/ssr/mdlAsync'
 import { PsySsrTemplate } from '@psy/core/ssr/Template'
-import { PsyTrace } from '@psy/core/trace/trace'
-import { psySsrRenderMiddleware } from '@psy/react/ssr/renderMiddleware.node'
-import { snapRouterClient } from '@snap/router/client'
 import { SnapRouterLocation } from '@snap/router/location'
 import { SnapServerManifest, SnapServerManifestLoader } from '@snap/server/Manifest'
-import { snapServerMdlError } from '@snap/server/mdl/error'
 import { snapServerMdlExpress } from '@snap/server/mdl/express'
 
 import { acmeSearchPkgName } from '../../pkgName'
@@ -39,68 +36,60 @@ export async function acmeSearchBootCommonServer({
   const manifestLoader = new SnapServerManifestLoader()
 
   snapServerMdlExpress({
+    app: () => <AcmeSearch id={acmeSearchPkgName} />,
     port: serverConfig.port,
     init: e =>
       e
         .use(bundlerMdl ?? staticMiddleware)
         .use(
-          psyContextProvideNodeMdl(async ($, req, res) => {
-            let manifest = $.get(SnapServerManifest)
+          psySsrMdlAsync(async (req, res, next) => {
+            const ctx = usePsyContextNode()
+            let manifest = ctx.get(SnapServerManifest)
             if (manifest === SnapServerManifest) manifest = await manifestLoader.load({ outDir })
-            const Trace = $.get(PsyTrace)
-            const requestId = (req.headers['x-request-id'] as string | undefined) ?? Trace.id()
-            const sessionId = (req.cookies?.['x-session-id'] as string | undefined) ?? Trace.id()
 
-            const template = new PsySsrTemplate()
-            const publicUrl = browserConfig.publicUrl
+            psyContextProvideNode(next, $ => {
+              const requestId = (req.headers['x-request-id'] as string | undefined) ?? PsyFetcher.requestId()
+              const sessionId = (req.headers['x-session-id'] as string | undefined) ?? PsyFetcher.requestId()
 
-            template.titleText = () => 'test'
-            template.pkgName = () => acmeSearchPkgName
-            template.bodyJs = () => Object.values(manifest.entries).map(src => ({ src: publicUrl + src }))
+              const cli = psySsrClient(req, req.secure)
 
-            return $.set(PsySsrTemplate.instance, template)
-              .set(SnapServerManifest, manifest)
-              .set(
-                PsyTrace,
-                class PsyTraceNodeConfigured extends Trace {
-                  static get sessionId() {
-                    return sessionId
+              return $.set(SnapServerManifest, manifest)
+                .set(PsySsrHydrator.instance, new PsySsrHydratorNode({ __config: browserConfig, __files: manifest.files }))
+                .set(
+                  PsyLog,
+                  class PsyLogNodeConfgured extends $.get(PsyLog) {
+                    static context() {
+                      return {
+                        ua: cli.navigator.userAgent,
+                        url: cli.location.href,
+                        rid: requestId,
+                        sid: sessionId,
+                      }
+                    }
                   }
-                  static requestId() {
-                    return requestId
+                )
+                .set(
+                  PsyFetcher,
+                  class PsyFetcherNodeConfigured extends $.get(PsyFetcherNode) {
+                    static $ = $
+                    static baseUrl = serverConfig.apiUrl
+                    static fetch = fetchRaw
+                    static requestId = () => requestId
                   }
-                }
-              )
-              .set(PsySsrHydrator.instance, new PsySsrHydratorNode({ __config: browserConfig, __files: manifest.files }))
-              .set(
-                PsyLog,
-                class PsyLogNodeConfgured extends $.get(PsyLog) {
-                  static $ = $
-                }
-              )
-              .set(
-                PsyFetcher,
-                class PsyFetcherNodeConfigured extends $.get(PsyFetcherNode) {
-                  static baseUrl = serverConfig.apiUrl
-                  static fetch = fetchRaw
-                  static $ = $
-                }
-              )
-              .set(
-                SnapRouterLocation.instance,
-                new SnapRouterLocation($, {
-                  ...snapRouterClient,
-                  location: psySsrLocationNode(req, req.secure),
-                })
-              )
+                )
+                .set(SnapRouterLocation.instance, new SnapRouterLocation($, cli))
+            })
           })
         )
-        .get('/version', (req, res) => {
+        .use((req, res, next) => {
           const $ = usePsyContextNode()
           const manifest = $.get(SnapServerManifest)
-          res.send(manifest.version)
-        })
-        .use(psySsrRenderMiddleware(() => <AcmeSearch id={acmeSearchPkgName} />))
-        .use(snapServerMdlError),
+          const template = new PsySsrTemplate()
+          template.titleText = () => 'test'
+          template.pkgName = () => acmeSearchPkgName
+          template.bodyJs = () => Object.values(manifest.entries).map(src => ({ src: browserConfig.publicUrl + src }))
+          console.log('111111111111')
+          psyContextProvideNode(next, $ => $.set(PsySsrTemplate.instance, template))
+        }),
   })
 }
