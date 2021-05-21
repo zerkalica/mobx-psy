@@ -1,3 +1,5 @@
+export type PsySsrTemplateScriptProps = { src: string }
+
 export class PsySsrTemplate {
   static readonly instance = new PsySsrTemplate()
 
@@ -24,11 +26,11 @@ export class PsySsrTemplate {
     return 'unk'
   }
 
-  bodyJs() {
-    return [{ src: '' }]
+  bodyJs(): readonly PsySsrTemplateScriptProps[] {
+    return []
   }
 
-  script(item: { src: string }) {
+  script(item: PsySsrTemplateScriptProps) {
     return `<script src="${item.src}"></script>`
   }
 

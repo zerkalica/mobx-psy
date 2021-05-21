@@ -57,7 +57,7 @@ export function acmeSearchBootCommonServer({
 
             template.titleText = () => 'test'
             template.pkgName = () => acmeSearchPkgName
-            template.bodyJs = () => [{ src: serverConfig.publicUrl + acmeSearchPkgName + '.js' }]
+            template.bodyJs = () => [{ src: browserConfig.publicUrl + acmeSearchPkgName + '.js' }]
 
             return ctx
               .set(PsySsrTemplate.instance, template)
