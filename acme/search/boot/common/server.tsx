@@ -1,12 +1,12 @@
 import '@snap/server/polyfill'
 
 import express from 'express'
-import { promises as fs } from 'fs'
+import { IncomingMessage, ServerResponse } from 'http'
 import nodeFetch from 'node-fetch'
 import path from 'path'
 import React from 'react'
 
-import { psyContextProvideNodeMdl } from '@psy/core/context/provide.node'
+import { psyContextProvideNodeMdl, usePsyContextNode } from '@psy/core/context/provide.node'
 import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
 import { PsyFetcherNode } from '@psy/core/fetcher/Fetcher.node'
 import { PsyLog } from '@psy/core/log/log'
@@ -16,9 +16,9 @@ import { psySsrLocationNode } from '@psy/core/ssr/location.node'
 import { PsySsrTemplate } from '@psy/core/ssr/Template'
 import { PsyTrace } from '@psy/core/trace/trace'
 import { psySsrRenderMiddleware } from '@psy/react/ssr/renderMiddleware.node'
-import { SnapBuildBundler } from '@snap/build/bundler'
 import { snapRouterClient } from '@snap/router/client'
 import { SnapRouterLocation } from '@snap/router/location'
+import { SnapServerManifest, SnapServerManifestLoader } from '@snap/server/Manifest'
 import { snapServerMdlError } from '@snap/server/mdl/error'
 import { snapServerMdlExpress } from '@snap/server/mdl/express'
 
@@ -29,43 +29,24 @@ import { acmeSearchBootCommonServerConfig } from './serverConfig'
 
 export async function acmeSearchBootCommonServer({
   distRoot = __dirname,
+  outDir = path.join(distRoot, 'public'),
   serverConfig = acmeSearchBootCommonServerConfig,
   browserConfig = acmeSearchBootCommonBrowserConfig,
-  isDev = false,
-  noWatch = false,
   fetcher: fetchRaw = nodeFetch as unknown as typeof fetch,
+  bundlerMdl = undefined as undefined | ((req: IncomingMessage, res: ServerResponse, next: (err?: any) => any) => void),
 }) {
-  const bundler = new SnapBuildBundler({
-    publicUrl: serverConfig.publicUrl,
-    pkgName: acmeSearchPkgName,
-    distRoot,
-    noWatch,
-  })
-
-  const staticMiddleware = isDev ? bundler.middleware() : express.static(path.join(distRoot, 'public'), { index: false })
-
-  const manifestFile = path.join(distRoot, 'public', 'manifest.json')
-  let isExists = false
-  try {
-    isExists = (await fs.stat(manifestFile)).isFile()
-  } catch (e) {}
-  const manifestBuf = !isExists ? undefined : await fs.readFile(manifestFile)
-  let manifest = !manifestBuf
-    ? undefined
-    : (JSON.parse(manifestBuf.toString()) as {
-        entries: Record<string, string>
-        files: Record<string, string>
-        version: string
-      })
+  const staticMiddleware = express.static(outDir, { index: false })
+  const manifestLoader = new SnapServerManifestLoader()
 
   snapServerMdlExpress({
     port: serverConfig.port,
     init: e =>
       e
-        .use(staticMiddleware)
+        .use(bundlerMdl ?? staticMiddleware)
         .use(
-          psyContextProvideNodeMdl(async (req: express.Request & { locals?: any }, $) => {
-            if (!manifest && req.locals) manifest = await req.locals.devMiddleware.outputFileSystem.readFile('manifest.json')
+          psyContextProvideNodeMdl(async ($, req, res) => {
+            let manifest = $.get(SnapServerManifest)
+            if (manifest === SnapServerManifest) manifest = await manifestLoader.load({ outDir })
             const Trace = $.get(PsyTrace)
             const requestId = (req.headers['x-request-id'] as string | undefined) ?? Trace.id()
             const sessionId = (req.cookies?.['x-session-id'] as string | undefined) ?? Trace.id()
@@ -78,6 +59,7 @@ export async function acmeSearchBootCommonServer({
             template.bodyJs = () => Object.values(manifest.entries).map(src => ({ src: publicUrl + src }))
 
             return $.set(PsySsrTemplate.instance, template)
+              .set(SnapServerManifest, manifest)
               .set(
                 PsyTrace,
                 class PsyTraceNodeConfigured extends Trace {
@@ -113,6 +95,11 @@ export async function acmeSearchBootCommonServer({
               )
           })
         )
+        .get('/version', (req, res) => {
+          const $ = usePsyContextNode()
+          const manifest = $.get(SnapServerManifest)
+          res.send(manifest.version)
+        })
         .use(psySsrRenderMiddleware(() => <AcmeSearch id={acmeSearchPkgName} />))
         .use(snapServerMdlError),
   })

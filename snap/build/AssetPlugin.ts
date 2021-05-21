@@ -1,3 +1,4 @@
+import { promises as fsReal } from 'fs'
 import path from 'path'
 import { callbackify, promisify } from 'util'
 import webpack from 'webpack'
@@ -36,16 +37,21 @@ export class AcmeSnapBuildAssetPlugin {
   async emit(compilation: webpack.Compilation) {
     const out = acmeSnapBuildAssetPluginAssets(compilation)
 
-    const fs = compilation.compiler.outputFileSystem
-    // @ts-ignore
-    const mkdir = promisify(fs.mkdirp.bind(fs))
+    const fs = compilation.compiler.outputFileSystem as typeof compilation.compiler.outputFileSystem & {
+      mkdirp?(p: string, cb: (err?: unknown) => void): void
+    }
+
+    const mkdir = fs.mkdirp ? promisify(fs.mkdirp.bind(fs)) : (path: string) => fsReal.mkdir(path, { recursive: true })
     const writeFile = promisify(fs.writeFile.bind(fs))
     const stat = promisify(fs.stat.bind(fs))
     const join = fs.join ?? path.join
 
     const outDir = compilation.outputOptions.path
+
     if (!outDir) throw new Error('No outputOptions.path in webpack compilation')
+
     const manifestFile = join(outDir, this.opts.filename ?? 'manifest.json')
+
     await mkdir(outDir)
     await writeFile(manifestFile, JSON.stringify({ ...out, ...this.opts.meta }, null, this.opts.pretty ? '  ' : ''))
   }

@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@psy/boot": "^1.0.0",
-    "assets-webpack-plugin": "^7.1.0",
     "circular-dependency-plugin": "^5.2.2",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "copy-webpack-plugin": "^8.1.1",

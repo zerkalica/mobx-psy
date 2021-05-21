@@ -10,9 +10,11 @@ import { promisify } from 'util'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 
-import { AcmeSnapBuildAssetPlugin, acmeSnapBuildAssetPluginAssets } from './AssetPlugin'
+import { psyContextProvideNodeMdl } from '@psy/core/context/provide.node'
+import { psySsrMdlCombine } from '@psy/core/ssr/mdlCombine'
+import { SnapServerManifest } from '@snap/server/Manifest'
 
-type SnapBuildBundlerManifest = ReturnType<typeof acmeSnapBuildAssetPluginAssets> & { version: string }
+import { AcmeSnapBuildAssetPlugin, acmeSnapBuildAssetPluginAssets } from './AssetPlugin'
 
 export class SnapBuildBundler {
   constructor(
@@ -128,16 +130,18 @@ export class SnapBuildBundler {
   }
 
   middleware() {
-    const { noWatch, publicUrl } = this
+    const { noWatch } = this
     const { compiler } = this.compiler(true)
 
     const mdl = webpackDevMiddleware(compiler, {
-      publicPath: publicUrl,
       serverSideRender: true,
     })
 
     mdl.close()
-    if (noWatch) return mdl
+
+    const combined = psySsrMdlCombine(mdl, snapBuildBundlerMdl())
+
+    if (noWatch) return combined
 
     const c = new TscWatchClient()
     c.on('success', () => {
@@ -150,6 +154,27 @@ export class SnapBuildBundler {
     })
     c.start('--build', '.')
 
-    return mdl
+    return combined
   }
+}
+
+function snapBuildBundlerMdl() {
+  return psyContextProvideNodeMdl(async function snapBuildBundlerMdl$(
+    $,
+    req,
+    res: Object & {
+      locals?: {
+        webpack?: { devMiddleware?: { stats: webpack.Stats; outputFileSystem: webpack.Compiler['outputFileSystem'] } }
+      }
+    }
+  ) {
+    const compilation = res.locals?.webpack?.devMiddleware?.stats.compilation
+
+    if (!compilation) {
+      console.error(res.locals)
+      throw new Error('snapBuildBundlerMdl: compilation not found in res.locals.webpack.devMiddleware.stats.compilation')
+    }
+
+    return $.set(SnapServerManifest, { ...SnapServerManifest, ...acmeSnapBuildAssetPluginAssets(compilation) })
+  })
 }

@@ -18,11 +18,11 @@ export function psyContextProvideNode(next: () => void, cb: PsyContextUpdater) {
   return store.run(cb ? prev.clone(cb) : prev, next)
 }
 
-export function psyContextProvideNodeMdl<Req, Res = unknown>(cb: (req: Req, ctx: PsyContext) => Promise<PsyContext>) {
-  return psySsrMdlAsync(async (req: Req, res: Res) => {
+export function psyContextProvideNodeMdl<Req, Res = unknown>(cb: (ctx: PsyContext, req: Req, res: Res) => Promise<PsyContext>) {
+  return psySsrMdlAsync(async function psyContextProvideNodeMdl$(req: Req, res: Res, next) {
     const prev = store.getStore() ?? PsyContext.instance
-    const nextCtx = await cb(req, prev)
+    const nextCtx = await cb(prev, req, res)
 
-    return new Promise(resolve => store.run(nextCtx, resolve))
+    store.run(nextCtx, next)
   })
 }
