@@ -1,13 +1,13 @@
 import '@snap/server/polyfill'
 
-import { snapBuildBundler } from '@snap/build/bundler'
+import { SnapBuildBundler } from '@snap/build/bundler'
 
 import { acmeSearchPkgName } from '../../pkgName'
 import { acmeSearchBootProdBrowserConfig } from './browserConfig'
 
 const distRoot = __dirname
 
-snapBuildBundler({
+new SnapBuildBundler({
   publicUrl: acmeSearchBootProdBrowserConfig.publicUrl,
   pkgName: acmeSearchPkgName,
   distRoot,

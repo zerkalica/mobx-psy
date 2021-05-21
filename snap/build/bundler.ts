@@ -1,146 +1,155 @@
 // @ts-ignore
+import CircularDependencyPlugin from 'circular-dependency-plugin'
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
+// @ts-ignore
 import CopyWebpackPlugin from 'copy-webpack-plugin'
-import express from 'express'
-import path from 'path'
+import path, { sep } from 'path'
 // @ts-ignore
 import TscWatchClient from 'tsc-watch/client'
+import { promisify } from 'util'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 
-import { snapBuildContext } from './context'
+import { AcmeSnapBuildAssetPlugin, acmeSnapBuildAssetPluginAssets } from './AssetPlugin'
 
-export interface SnapBuildBundler {
-  bundle(): Promise<{ indexHtml: string; entry: string; files: Record<string, string> }>
-  middleware(): express.RequestHandler
-}
+type SnapBuildBundlerManifest = ReturnType<typeof acmeSnapBuildAssetPluginAssets> & { version: string }
 
-export function snapBuildBundler({
-  distRoot,
-  publicUrl,
-  pkgName,
-  isDev = process.env.NODE_ENV === 'development',
-  noWatch = process.env.PSY_NO_WATCH === '1',
-}: {
-  pkgName: string
-  isDev?: boolean
-  noWatch?: boolean
-  distRoot: string
-  publicUrl: string
-}) {
-  const { outDir, indexHtml, browserEntry, srcRoot } = snapBuildContext({ distRoot })
-  const webpackConfig: webpack.Configuration = {
-    name: path.basename(browserEntry),
-    entry: {
-      [pkgName]: browserEntry,
+export class SnapBuildBundler {
+  constructor(
+    opts: {
+      version?: string
+      pkgName: string
+      noWatch?: boolean
+      distRoot: string
+      publicUrl: string
     },
-    optimization: {
-      splitChunks: {
-        filename: isDev ? `${pkgName}-[id]-chunk.js` : `${pkgName}-[id]-[contenthash].js`,
-        chunks: 'all',
+    protected version = opts.version ?? new Date().toISOString(),
+    protected pkgName = opts.pkgName,
+    protected noWatch = opts.noWatch ?? process.env.PSY_NO_WATCH === '1',
+    protected distRoot = opts.distRoot,
+    protected publicUrl = opts.publicUrl
+  ) {}
+
+  get outDir() {
+    return path.join(this.distRoot, 'public')
+  }
+
+  get srcRoot() {
+    return this.distRoot.replace(`${sep}-${sep}`, `${sep}`)
+  }
+
+  get browserEntry() {
+    return path.join(this.distRoot, 'browser')
+  }
+
+  get manifestName() {
+    return 'manifest.json'
+  }
+
+  get manifest() {
+    return path.join(this.outDir, this.manifestName)
+  }
+
+  protected wpc(isDev: boolean): webpack.Configuration {
+    const { outDir, browserEntry, pkgName, version } = this
+
+    return {
+      name: path.basename(browserEntry),
+      entry: {
+        [pkgName]: browserEntry,
       },
-    },
-    devtool: 'source-map',
-    mode: isDev ? 'development' : 'production',
-    stats: 'normal',
-    performance: {
-      maxAssetSize: 400000,
-      maxEntrypointSize: 400000,
-      assetFilter(name: string) {
-        return name.endsWith('.js')
+      optimization: {
+        splitChunks: {
+          filename: isDev ? `${pkgName}-[id].js` : `${pkgName}-[id]-[contenthash].js`,
+          chunks: 'all',
+        },
       },
-    },
-    plugins: [
-      new webpack.IgnorePlugin({
-        resourceRegExp: /^\.\/tsbuildinfo$/,
-      }),
-      // new WebpackManifestPlugin(),
-      new CopyWebpackPlugin({
-        patterns: [
-          {
-            from: '**/*.{png,jpg,svg,gif,woff2}',
-            to: '[name]-[contenthash][ext]',
-            globOptions: {
-              ignore: ['**/-'],
+      devtool: 'source-map',
+      mode: isDev ? 'development' : 'production',
+      stats: 'normal',
+      performance: {
+        maxAssetSize: 400000,
+        maxEntrypointSize: 400000,
+        assetFilter(name: string) {
+          return name.endsWith('.js')
+        },
+      },
+      plugins: [
+        new CleanWebpackPlugin(),
+        new CircularDependencyPlugin({
+          failOnError: true,
+        }),
+        new AcmeSnapBuildAssetPlugin({ meta: { version }, filename: this.manifestName }),
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^\.\/tsbuildinfo$/,
+        }),
+        // new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
+        new webpack.ProgressPlugin(),
+        new CopyWebpackPlugin({
+          patterns: [
+            {
+              from: '**/*.{png,jpg,svg,gif,woff2}',
+              to: isDev ? '[name][ext]' : '[name]-[contenthash][ext]',
+              globOptions: {
+                ignore: ['**/-'],
+              },
             },
-          },
-        ],
-      }),
-      // new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]),
-      new webpack.ProgressPlugin(),
-    ],
-    output: {
-      filename: isDev ? `[name].js` : `[name]-[contenthash].js`,
-      path: outDir,
-    },
+          ],
+        }),
+      ],
+      output: {
+        filename: isDev ? `[name].js` : `[name]-[contenthash].js`,
+        path: outDir,
+      },
+    }
   }
 
-  console.log({ browserEntry, srcRoot, outDir, pkgName })
+  protected compiler(isDev = false) {
+    const { outDir, browserEntry, srcRoot, pkgName } = this
 
-  const bundler: SnapBuildBundler = {
-    bundle() {
-      const compiler = webpack(webpackConfig)
+    const compiler = webpack(this.wpc(isDev))
+    const run = promisify(compiler.run.bind(compiler))
 
-      return new Promise((resolve, reject) => {
-        compiler.run((error, stats) => {
-          if (error || stats?.hasErrors()) {
-            console.error(stats?.toString({ colors: true }))
-            reject(error)
-            return
-          }
+    console.log({ browserEntry, srcRoot, outDir, pkgName })
 
-          console.log(stats?.toString({ colors: true }))
-          const compilation = stats?.compilation
-          if (!compilation) throw new Error('No compilation')
-
-          const files = {} as Record<string, string>
-          const pkgNameExt = `${pkgName}.js`
-          let entry = pkgNameExt
-
-          for (const [k, v] of compilation.assetsInfo) {
-            if (v.sourceFilename) files[v.sourceFilename] = k
-            else if (v.contenthash && k.replace(`-${v.contenthash}`, '') === pkgNameExt) entry = k
-          }
-
-          const out = {
-            indexHtml,
-            files,
-            entry: publicUrl + entry,
-          }
-
-          console.log(out)
-
-          resolve(out)
-        })
-      })
-    },
-    middleware() {
-      const compiler = webpack({
-        ...webpackConfig,
-        mode: 'development',
-      })
-
-      const mdl = webpackDevMiddleware(compiler, {
-        publicPath: publicUrl,
-        serverSideRender: true,
-      })
-
-      mdl.close()
-      if (noWatch) return mdl
-
-      const c = new TscWatchClient()
-      c.on('success', () => {
-        console.log('invalidate')
-        mdl.invalidate()
-      })
-      c.on('compile_errors', () => {
-        console.error('error')
-        mdl.invalidate()
-      })
-      c.start('--build', '.')
-
-      return mdl
-    },
+    return { compiler, run }
   }
 
-  return bundler
+  async bundle() {
+    const { run } = this.compiler()
+
+    const stats = await run()
+
+    if (!stats) throw new Error('No stats')
+    console.log(stats.toString({ colors: true }))
+    const out = acmeSnapBuildAssetPluginAssets(stats.compilation)
+
+    return { ...out, indexHtml: path.join(this.outDir, 'index.html') }
+  }
+
+  middleware() {
+    const { noWatch, publicUrl } = this
+    const { compiler } = this.compiler(true)
+
+    const mdl = webpackDevMiddleware(compiler, {
+      publicPath: publicUrl,
+      serverSideRender: true,
+    })
+
+    mdl.close()
+    if (noWatch) return mdl
+
+    const c = new TscWatchClient()
+    c.on('success', () => {
+      console.log('invalidate')
+      mdl.invalidate()
+    })
+    c.on('compile_errors', () => {
+      console.error('error')
+      mdl.invalidate()
+    })
+    c.start('--build', '.')
+
+    return mdl
+  }
 }

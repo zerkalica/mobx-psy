@@ -67,6 +67,10 @@ export class PsySsrTemplate {
 `
   }
 
+  render(state?: Record<string, unknown>) {
+    return `${this.renderBegin()}${this.renderEnd(state)}`
+  }
+
   fallbackStr() {
     return 'Что-то пошло не так'
   }

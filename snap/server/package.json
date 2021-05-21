@@ -21,11 +21,9 @@
     "@snap/router": "^1.0.0",
     "@snap/ui": "^1.0.0",
     "abortcontroller-polyfill": "^1.5.0",
-    "copy-webpack-plugin": "^8.1.1",
     "express": "^4.17.1",
     "react-dom": "^17.0.2",
-    "source-map-support": "^0.5.19",
-    "webpack-manifest-plugin": "^3.1.1"
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
     "@psy/boot": "^1.0.0",
