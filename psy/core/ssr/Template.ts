@@ -24,8 +24,8 @@ export class PsySsrTemplate {
     return 'unk'
   }
 
-  bodyJs() {
-    return [{ src: '' }]
+  bodyJs(): { src: string }[] {
+    return []
   }
 
   script(item: { src: string }) {
@@ -63,6 +63,10 @@ export class PsySsrTemplate {
     .join('\n')}
 </body></html>
 `
+  }
+
+  render(state?: Record<string, unknown>) {
+    return `${this.renderBegin()}${this.renderEnd(state)}`
   }
 
   fallbackStr() {
