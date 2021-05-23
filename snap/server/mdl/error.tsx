@@ -5,7 +5,6 @@ import { PsyErrorMix } from '@psy/core/error/Mix'
 import { PsyErrorNotFound } from '@psy/core/error/NotFound'
 import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
 import { PsyLog } from '@psy/core/log/log'
-import { PsySsrRenderError } from '@psy/core/ssr/Render.node'
 import { PsySsrTemplate } from '@psy/core/ssr/Template'
 
 export function snapServerMdlError(
@@ -22,8 +21,7 @@ export function snapServerMdlError(
   try {
     const $ = usePsyContextNode()
     log = $.get(PsyLog)
-
-    const isRendered = error instanceof PsySsrRenderError && error.rendered > 0
+    const isRendered = true // error instanceof PsySsrRenderError && error.rendered > 0
     const requestId = $.get(PsyFetcher).requestId()
     if (isRendered) {
       const t = new PsySsrTemplate()

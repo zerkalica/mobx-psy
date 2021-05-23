@@ -4,6 +4,9 @@ export function createPrettierConfig() {
     tabWidth: 2,
     semi: false,
     singleQuote: true,
-    printWidth: 110,
+    printWidth: 130,
+    bracketSpacing: true,
+    jsxBracketSameLine: false,
+    arrowParens: 'avoid',
   }
 }

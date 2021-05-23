@@ -21,7 +21,6 @@ export function psySsrRenderMiddleware({ app, template }: { app: () => React.Rea
       next: val => response.write(val),
       template,
     }).run()
-
     if (rendered === 0 || !chunk) return next(error)
     if (!error) return response.end(chunk)
 

@@ -10,20 +10,17 @@
   "scripts": {
     "clean": "rm -rf - *.log .cache",
     "build": "tsc --build && node ./-/boot/prod/build",
-    "build:dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/build",
-    "watch": "tsc --build --watch",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --passWithNoTests --watch",
+    "build:dev": "tsc --build && node ./-/boot/dev/build",
     "start": "bin/acme-search",
-    "dev:web": "tsc --build && NODE_ENV=development node ./-/boot/dev/server",
-    "dev:node": "NODE_ENV=development PSY_NO_WATCH=1 tsc-watch --build --noClear --onSuccess 'node ./-/boot/dev/server'"
+    "dev": "tsc --build && node ./-/boot/dev/server",
+    "dev:node": "PSY_NO_WATCH=1 tsc-watch --build --noClear --onSuccess 'node ./-/boot/dev/server'"
   },
   "bin": {
     "acme-search": "./bin/acme-search"
   },
   "dependencies": {
-    "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
+    "@emotion/react": "^11.0.0",
     "@psy/core": "^1.0.0",
     "@psy/react": "^1.0.0",
     "@snap/router": "^1.0.0",

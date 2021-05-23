@@ -5,6 +5,10 @@ export class PsySsrTemplate {
     return `Debug title`
   }
 
+  version() {
+    return ''
+  }
+
   headMeta() {
     return `
   <meta charset="utf-8" />
@@ -51,7 +55,6 @@ export class PsySsrTemplate {
   <body>
   <noscript>${this.noScript()}</noscript>
   <div id="${this.pkgName()}-main">
-  ${this.body()}
 `
   }
 
@@ -71,6 +74,8 @@ export class PsySsrTemplate {
   }
 
   render(state?: Record<string, unknown>) {
-    return `${this.renderBegin()}${this.renderEnd(state)}`
+    return `${this.renderBegin()}
+    ${this.body()}
+    ${this.renderEnd(state)}`
   }
 }

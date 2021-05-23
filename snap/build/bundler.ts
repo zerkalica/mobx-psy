@@ -1,10 +1,11 @@
+import child_process from 'child_process'
 // @ts-ignore
 import CircularDependencyPlugin from 'circular-dependency-plugin'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 // @ts-ignore
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import { promises as fs } from 'fs'
-import path, { sep } from 'path'
+import path from 'path'
 // @ts-ignore
 import TscWatchClient from 'tsc-watch/client'
 import { promisify } from 'util'
@@ -28,7 +29,6 @@ export class SnapBuildBundler {
       publicUrl: string
       template?: PsySsrTemplate
     },
-    protected version = opts.version ?? new Date().toISOString(),
     protected pkgName = opts.pkgName,
     protected noWatch = opts.noWatch ?? process.env.PSY_NO_WATCH === '1',
     protected distRoot = opts.distRoot,
@@ -36,15 +36,21 @@ export class SnapBuildBundler {
     protected template = opts.template
   ) {}
 
+  protected versionCached: string | undefined = undefined
+
+  getVersion() {
+    return child_process.execSync('git rev-parse --short HEAD').toString().trim()
+  }
+
+  get version() {
+    return this.versionCached ?? (this.versionCached = this.getVersion())
+  }
+
   get outDir() {
     return path.join(this.distRoot, 'public')
   }
 
-  get srcRoot() {
-    return this.distRoot.replace(`${sep}-${sep}`, `${sep}`)
-  }
-
-  get browserEntry() {
+  protected get browserEntry() {
     return path.join(this.distRoot, 'browser')
   }
 
@@ -52,7 +58,7 @@ export class SnapBuildBundler {
     return 'manifest.json'
   }
 
-  get manifest() {
+  protected get manifest() {
     return path.join(this.outDir, this.manifestName)
   }
 
@@ -111,17 +117,19 @@ export class SnapBuildBundler {
   }
 
   protected compiler(isDev = false) {
-    const { outDir, browserEntry, srcRoot, pkgName } = this
+    const { outDir, browserEntry, pkgName, version } = this
 
     const compiler = webpack(this.wpc(isDev))
     const run = promisify(compiler.run.bind(compiler))
 
-    console.log({ browserEntry, srcRoot, outDir, pkgName })
+    console.log({ browserEntry, outDir, pkgName, version })
 
     return { compiler, run }
   }
 
   async bundle() {
+    this.tests()
+
     const { run } = this.compiler()
 
     const stats = await run()
@@ -137,6 +145,7 @@ export class SnapBuildBundler {
 
     const t = Object.assign(new PsySsrTemplate(), template)
     t.pkgName = () => this.pkgName
+    t.version = () => this.version
     t.bodyJs = () => [...t.bodyJs(), ...Object.values(manifest.entries).map(src => ({ src: this.publicUrl + src }))]
 
     await fs.writeFile(path.join(this.outDir, 'index.html'), template.render({ __files: manifest.files }))
@@ -144,9 +153,18 @@ export class SnapBuildBundler {
     return manifest
   }
 
+  tests() {
+    const p = child_process.spawnSync('jest', ['--passWithNoTests'], {
+      stdio: 'inherit',
+    })
+    if (p.status) throw p.error ?? new Error(`Jest returns ${p.status}${p.stderr ? `: ${p.stderr}` : ''}`)
+  }
+
   middleware() {
-    const { noWatch } = this
+    const { version, noWatch } = this
     const { compiler } = this.compiler(true)
+
+    if (noWatch) this.tests()
 
     const mdl = webpackDevMiddleware(compiler, {
       serverSideRender: true,
@@ -154,24 +172,25 @@ export class SnapBuildBundler {
 
     mdl.close()
 
-    const combined = psySsrMdlCombine(mdl, snapBuildBundlerMdl())
+    const combined = psySsrMdlCombine(mdl, snapBuildBundlerMdl({ version }))
 
     if (noWatch) return combined
 
-    const c = new TscWatchClient()
-    c.on('success', () => {
-      console.log('invalidate')
-      mdl.invalidate()
+    this.watch(mdl.invalidate.bind(mdl))
+  }
+
+  protected watch(invalidate: () => void) {
+    const tswc = new TscWatchClient()
+    tswc.on('success', () => {
+      invalidate()
+      this.tests()
     })
-    c.on('compile_errors', () => {
-      console.error('error')
-      mdl.invalidate()
-    })
-    c.start('--build', '.')
+    tswc.on('compile_errors', invalidate)
+    tswc.start('--build', '.')
   }
 }
 
-function snapBuildBundlerMdl() {
+function snapBuildBundlerMdl({ version }: { version: string }) {
   return psyContextProvideNodeMdl(async function snapBuildBundlerMdl$(
     $,
     req,
@@ -187,6 +206,10 @@ function snapBuildBundlerMdl() {
       throw new Error('snapBuildBundlerMdl: compilation not found in res.locals.webpack.devMiddleware.stats.compilation')
     }
 
-    return $.set(SnapServerManifest, { ...SnapServerManifest, ...acmeSnapBuildAssetPluginAssets(compilation) })
+    return $.set(SnapServerManifest, {
+      ...SnapServerManifest,
+      version,
+      ...acmeSnapBuildAssetPluginAssets(compilation),
+    })
   })
 }
