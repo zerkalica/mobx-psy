@@ -24,11 +24,11 @@ export class PsySsrRender {
   constructor(
     protected $: PsyContext,
     protected options: {
+      template: PsySsrTemplate
       maxIterations?: number
       render: PsySsrRenderFn
       next(val: string): void
     },
-    protected template = $.get(PsySsrTemplate.instance),
     protected hydrator = $.get(PsySsrHydrator.instance)
   ) {}
 
@@ -52,39 +52,42 @@ export class PsySsrRender {
   }
 
   async run() {
-    const options = this.options
-    const maxIterations = options.maxIterations ?? 3
-    let passes = 0
+    const maxIterations = this.options.maxIterations ?? 10
 
-    for (; passes < maxIterations; passes++) {
-      this.buffer = ''
+    for (let passes = 0; passes < maxIterations; passes++) {
+      this.buffer = this.bufferInitial
       this.headerWrited = false
 
       await this.renderStream()
 
       const { state, pending, errors, rendered } = await this.hydrator.collect()
 
-      if (pending === 0 || this.buffer === undefined) {
-        this.next(this.template.renderEnd(state))
-        const error =
-          errors.length > 0 ? new PsySsrRenderError(`Server render component errors`, errors, rendered, passes) : undefined
-        return {
-          rendered,
-          passes,
-          error,
-          chunk: this.buffer,
-        }
+      if (pending !== 0 && this.buffer !== undefined) continue
+
+      this.next(this.options.template.renderEnd(state))
+      const error =
+        errors.length > 0 ? new PsySsrRenderError(`Server render component errors`, errors, rendered, passes) : undefined
+
+      return {
+        rendered,
+        passes,
+        error,
+        chunk: this.buffer,
       }
     }
 
-    throw new Error(`Render max render passes reached: ${maxIterations}`)
+    throw new PsySsrRenderError(`Render max render passes reached: ${maxIterations}`, [], 0, maxIterations)
   }
 
-  protected buffer = this.options.maxIterations === 1 ? undefined : ''
+  protected get bufferInitial() {
+    return this.options.maxIterations === 1 ? undefined : ''
+  }
+
+  protected buffer = this.bufferInitial
 
   protected next(html: string) {
     if (!html) return
-    if (!this.headerWrited) html = `${this.template.renderBegin()}${html}`
+    if (!this.headerWrited) html = `${this.options.template.renderBegin()}${html}`
     this.headerWrited = true
 
     if (this.buffer === undefined) return this.options.next(html)

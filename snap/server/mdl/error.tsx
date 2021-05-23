@@ -8,7 +8,13 @@ import { PsyLog } from '@psy/core/log/log'
 import { PsySsrRenderError } from '@psy/core/ssr/Render.node'
 import { PsySsrTemplate } from '@psy/core/ssr/Template'
 
-export function snapServerMdlError(error: Error | undefined, req: express.Request, res: express.Response) {
+export function snapServerMdlError(
+  error: Error | undefined,
+  req: express.Request,
+  res: express.Response,
+  // Do not remove next in error handler middleware
+  next: (arg?: unknown) => unknown
+) {
   if (!error) error = new PsyErrorNotFound('Request not handlered')
   let chunk = error.stack
   let log: typeof PsyLog | undefined
@@ -17,11 +23,18 @@ export function snapServerMdlError(error: Error | undefined, req: express.Reques
     const $ = usePsyContextNode()
     log = $.get(PsyLog)
 
-    const template = $.get(PsySsrTemplate.instance)
     const isRendered = error instanceof PsySsrRenderError && error.rendered > 0
     const requestId = $.get(PsyFetcher).requestId()
+    if (isRendered) {
+      const t = new PsySsrTemplate()
 
-    chunk = `${isRendered ? '' : template.renderBegin()}${template.renderError(error, requestId)}${template.renderEnd()}`
+      t.titleText = () => 'Что-то пошло не так'
+      t.body = () => `<h2>Что-то пошло не так</h2>
+<pre>requestId: ${requestId}</pre>
+${process.env.NODE_ENV === 'development' ? `<pre>${error?.stack ?? 'unk'}</pre>` : ''}
+`
+      chunk = t.render()
+    }
   } catch (e) {
     if (log) log.error({ place: 'snapServerMdlError#template', message: e })
     else console.error(e)

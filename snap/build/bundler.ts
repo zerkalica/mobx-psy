@@ -3,6 +3,7 @@ import CircularDependencyPlugin from 'circular-dependency-plugin'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 // @ts-ignore
 import CopyWebpackPlugin from 'copy-webpack-plugin'
+import { promises as fs } from 'fs'
 import path, { sep } from 'path'
 // @ts-ignore
 import TscWatchClient from 'tsc-watch/client'
@@ -12,6 +13,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware'
 
 import { psyContextProvideNodeMdl } from '@psy/core/context/provide.node'
 import { psySsrMdlCombine } from '@psy/core/ssr/mdlCombine'
+import { PsySsrTemplate } from '@psy/core/ssr/Template'
 import { SnapServerManifest } from '@snap/server/Manifest'
 
 import { AcmeSnapBuildAssetPlugin, acmeSnapBuildAssetPluginAssets } from './AssetPlugin'
@@ -24,12 +26,14 @@ export class SnapBuildBundler {
       noWatch?: boolean
       distRoot: string
       publicUrl: string
+      template?: PsySsrTemplate
     },
     protected version = opts.version ?? new Date().toISOString(),
     protected pkgName = opts.pkgName,
     protected noWatch = opts.noWatch ?? process.env.PSY_NO_WATCH === '1',
     protected distRoot = opts.distRoot,
-    protected publicUrl = opts.publicUrl
+    protected publicUrl = opts.publicUrl,
+    protected template = opts.template
   ) {}
 
   get outDir() {
@@ -124,9 +128,20 @@ export class SnapBuildBundler {
 
     if (!stats) throw new Error('No stats')
     console.log(stats.toString({ colors: true }))
-    const out = acmeSnapBuildAssetPluginAssets(stats.compilation)
 
-    return { ...out, indexHtml: path.join(this.outDir, 'index.html') }
+    const manifest = acmeSnapBuildAssetPluginAssets(stats.compilation)
+
+    const template = this.template
+
+    if (!template) return manifest
+
+    const t = Object.assign(new PsySsrTemplate(), template)
+    t.pkgName = () => this.pkgName
+    t.bodyJs = () => [...t.bodyJs(), ...Object.values(manifest.entries).map(src => ({ src: this.publicUrl + src }))]
+
+    await fs.writeFile(path.join(this.outDir, 'index.html'), template.render({ __files: manifest.files }))
+
+    return manifest
   }
 
   middleware() {
@@ -153,8 +168,6 @@ export class SnapBuildBundler {
       mdl.invalidate()
     })
     c.start('--build', '.')
-
-    return combined
   }
 }
 
@@ -171,7 +184,6 @@ function snapBuildBundlerMdl() {
     const compilation = res.locals?.webpack?.devMiddleware?.stats.compilation
 
     if (!compilation) {
-      console.error(res.locals)
       throw new Error('snapBuildBundlerMdl: compilation not found in res.locals.webpack.devMiddleware.stats.compilation')
     }
 

@@ -1,8 +1,6 @@
 export type PsySsrTemplateScriptProps = { src: string }
 
 export class PsySsrTemplate {
-  static readonly instance = new PsySsrTemplate()
-
   titleText() {
     return `Debug title`
   }
@@ -53,7 +51,12 @@ export class PsySsrTemplate {
   <body>
   <noscript>${this.noScript()}</noscript>
   <div id="${this.pkgName()}-main">
+  ${this.body()}
 `
+  }
+
+  body() {
+    return ''
   }
 
   renderEnd(state?: Record<string, unknown>) {
@@ -69,15 +72,5 @@ export class PsySsrTemplate {
 
   render(state?: Record<string, unknown>) {
     return `${this.renderBegin()}${this.renderEnd(state)}`
-  }
-
-  fallbackStr() {
-    return 'Что-то пошло не так'
-  }
-
-  renderError(error: Error, traceId: string) {
-    return `<h2>${this.fallbackStr()}</h2>
-  <div>Id: <pre>${traceId}</pre></div>
-`
   }
 }
