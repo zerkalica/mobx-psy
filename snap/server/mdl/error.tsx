@@ -7,6 +7,8 @@ import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
 import { PsyLog } from '@psy/core/log/log'
 import { PsySsrTemplate } from '@psy/core/ssr/Template'
 
+import { SnapServerManifest } from '../Manifest'
+
 export function snapServerMdlError(
   error: Error | undefined,
   req: express.Request,
@@ -29,7 +31,7 @@ export function snapServerMdlError(
       t.titleText = () => 'Что-то пошло не так'
       t.body = () => `<h2>Что-то пошло не так</h2>
 <pre>requestId: ${requestId}</pre>
-${process.env.NODE_ENV === 'development' ? `<pre>${error?.stack ?? 'unk'}</pre>` : ''}
+${$.get(SnapServerManifest).isDev ? `<pre>${error?.stack ?? 'unk'}</pre>` : ''}
 `
       chunk = t.render()
     }

@@ -8,6 +8,7 @@ export const SnapServerManifest = {
   entries: {} as Record<string, string>,
   files: {} as Record<string, string>,
   version: 'dev-middleware',
+  isDev: false,
 }
 
 export class SnapServerManifestLoader {

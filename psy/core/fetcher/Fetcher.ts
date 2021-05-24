@@ -54,8 +54,8 @@ export class PsyFetcher {
   static serializeBody(body: unknown) {
     if (
       body &&
-      !(body instanceof Blob) &&
-      !(body instanceof FormData) &&
+      // !(body instanceof Blob) &&
+      // !(body instanceof FormData) &&
       !(body instanceof URLSearchParams) &&
       !(body instanceof ReadableStream)
     )

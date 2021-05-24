@@ -3,7 +3,7 @@ import path from 'path'
 import { callbackify, promisify } from 'util'
 import webpack from 'webpack'
 
-export function acmeSnapBuildAssetPluginAssets(compilation: webpack.Compilation) {
+export function snapBuildAssetPluginAssets(compilation: webpack.Compilation) {
   const files = {} as Record<string, string>
   const entries = {} as Record<string, string>
 
@@ -21,7 +21,7 @@ export function acmeSnapBuildAssetPluginAssets(compilation: webpack.Compilation)
   }
 }
 
-export class AcmeSnapBuildAssetPlugin {
+export class SnapBuildAssetPlugin {
   constructor(
     protected opts: {
       meta?: Record<string, any>
@@ -35,7 +35,7 @@ export class AcmeSnapBuildAssetPlugin {
   }
 
   async emit(compilation: webpack.Compilation) {
-    const out = acmeSnapBuildAssetPluginAssets(compilation)
+    const out = snapBuildAssetPluginAssets(compilation)
 
     const fs = compilation.compiler.outputFileSystem as typeof compilation.compiler.outputFileSystem & {
       mkdirp?(p: string, cb: (err?: unknown) => void): void

@@ -12,8 +12,8 @@
     "build": "tsc --build && node ./-/boot/prod/build",
     "build:dev": "tsc --build && node ./-/boot/dev/build",
     "start": "bin/acme-search",
-    "dev": "tsc --build && node ./-/boot/dev/server",
-    "dev:node": "PSY_NO_WATCH=1 tsc-watch --build --noClear --onSuccess 'node ./-/boot/dev/server'"
+    "dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/server",
+    "dev:node": "PSY_NO_WATCH=1 NODE_ENV=development tsc-watch --build --noClear --onSuccess 'node ./-/boot/dev/server'"
   },
   "bin": {
     "acme-search": "./bin/acme-search"

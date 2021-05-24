@@ -14,8 +14,6 @@ import { psySyncRefreshable } from '@psy/core/sync/refreshable'
 import { usePsyContext } from '../context/context'
 import { psySyncConfig } from './config'
 
-type RefComponent<Ref, Props> = React.RefForwardingComponent<Ref, Props>
-
 /**
  * Handles suspendable calculations in component.
  * Based on 'mobx-react-lite' observer.
@@ -31,14 +29,14 @@ type RefComponent<Ref, Props> = React.RefForwardingComponent<Ref, Props>
  * })
  * ```
  */
-export function psySyncObserver<Props extends {}, Ref = {}>(baseComponent: RefComponent<Ref, Props>, options = psySyncConfig) {
+export function psySyncObserver<Props extends {}>(baseComponent: React.FunctionComponent<Props>, options = psySyncConfig) {
   if (options !== psySyncConfig) options = { ...psySyncConfig, ...options }
 
   const value = (baseComponent.displayName ?? baseComponent.name ?? String(baseComponent)) + '#psy'
 
-  let result: ReturnType<typeof mobxObserver>
+  let result: React.FunctionComponent<Props>
 
-  const SafeComponent: RefComponent<Ref, Props> = psyFunctionName((props, ref): React.ReactElement | null => {
+  const SafeComponent = psyFunctionName((props: Props): React.ReactElement | null => {
     const node = React.useRef<React.ReactElement | null>(null)
     const $ = usePsyContext()
     const hydrator = $.get(PsySsrHydrator.instance)
@@ -46,7 +44,7 @@ export function psySyncObserver<Props extends {}, Ref = {}>(baseComponent: RefCo
     PsyContext.instance = $
 
     try {
-      node.current = baseComponent(props, ref)
+      node.current = baseComponent(props)
 
       if (psySyncMockState.called) return psyErrorThrowHidden(psySyncMockState.called)
       hydrator.renderSuccess(result)
@@ -59,7 +57,7 @@ export function psySyncObserver<Props extends {}, Ref = {}>(baseComponent: RefCo
         hydrator.renderError(error)
 
         const log = $.get(PsyLog)
-        // log.error({ place: value, message: error })
+        log.error({ place: value, message: error })
 
         if (!options.error) return psyErrorThrowHidden(error)
 
@@ -75,7 +73,7 @@ export function psySyncObserver<Props extends {}, Ref = {}>(baseComponent: RefCo
     }
   }, value)
 
-  result = mobxObserver(SafeComponent, options)
+  result = mobxObserver<Props>(SafeComponent, options)
 
   return result
 }

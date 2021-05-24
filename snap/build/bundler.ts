@@ -17,7 +17,7 @@ import { psySsrMdlCombine } from '@psy/core/ssr/mdlCombine'
 import { PsySsrTemplate } from '@psy/core/ssr/Template'
 import { SnapServerManifest } from '@snap/server/Manifest'
 
-import { AcmeSnapBuildAssetPlugin, acmeSnapBuildAssetPluginAssets } from './AssetPlugin'
+import { SnapBuildAssetPlugin, snapBuildAssetPluginAssets } from './AssetPlugin'
 
 export class SnapBuildBundler {
   constructor(
@@ -91,7 +91,7 @@ export class SnapBuildBundler {
         new CircularDependencyPlugin({
           failOnError: true,
         }),
-        new AcmeSnapBuildAssetPlugin({ meta: { version }, filename: this.manifestName }),
+        new SnapBuildAssetPlugin({ meta: { version }, filename: this.manifestName }),
         new webpack.IgnorePlugin({
           resourceRegExp: /^\.\/tsbuildinfo$/,
         }),
@@ -137,7 +137,7 @@ export class SnapBuildBundler {
     if (!stats) throw new Error('No stats')
     console.log(stats.toString({ colors: true }))
 
-    const manifest = acmeSnapBuildAssetPluginAssets(stats.compilation)
+    const manifest = snapBuildAssetPluginAssets(stats.compilation)
 
     const template = this.template
 
@@ -164,19 +164,16 @@ export class SnapBuildBundler {
     const { version, noWatch } = this
     const { compiler } = this.compiler(true)
 
-    if (noWatch) this.tests()
-
     const mdl = webpackDevMiddleware(compiler, {
       serverSideRender: true,
     })
 
     mdl.close()
 
-    const combined = psySsrMdlCombine(mdl, snapBuildBundlerMdl({ version }))
+    if (noWatch) this.tests()
+    else this.watch(mdl.invalidate.bind(mdl))
 
-    if (noWatch) return combined
-
-    this.watch(mdl.invalidate.bind(mdl))
+    return psySsrMdlCombine(mdl, snapBuildBundlerMdl({ version }))
   }
 
   protected watch(invalidate: () => void) {
@@ -208,8 +205,9 @@ function snapBuildBundlerMdl({ version }: { version: string }) {
 
     return $.set(SnapServerManifest, {
       ...SnapServerManifest,
+      isDev: true,
       version,
-      ...acmeSnapBuildAssetPluginAssets(compilation),
+      ...snapBuildAssetPluginAssets(compilation),
     })
   })
 }
