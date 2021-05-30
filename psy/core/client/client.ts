@@ -12,6 +12,7 @@ export const psyClient = {
     userAgent: 'raw',
   },
   history: {
+    state: undefined as undefined | unknown,
     pushState(data: any, title: string, url?: string | null): void {
       throw new Error('implement')
     },
