@@ -28,13 +28,14 @@ export function psyObjectDraft<O extends {}>(orig: O): O {
   return new PsyObjectDraft(orig).values
 }
 
-class PsyObjectDraft<O extends {}, K extends keyof O = keyof O> {
+export class PsyObjectDraft<O extends {}, K extends keyof O = keyof O> {
   readonly values: O
 
   constructor(protected original: O) {
     makeObservable(this)
     const values = (this.values = {} as O)
     const keys = Object.keys(original)
+
     for (let key of keys) {
       // subscribe to original changes
       original[key as K]

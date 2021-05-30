@@ -1,81 +1,79 @@
-import { action, computed, makeObservable, reaction } from 'mobx'
+import { action, computed, makeObservable } from 'mobx'
 
 import { PsyContext } from '@psy/core/context/Context'
-import { psyObjectDraft } from '@psy/core/object/draft'
 import { psySyncEffect } from '@psy/core/sync/effect'
-import { SnapRouterLocation } from '@snap/router/location'
+
+import { AcmeSearchFlatListRoute } from '../ListRoute'
 
 export const acmeSearchFlatFilterModelDefaults = {
   rooms: 0,
   house: false,
-  city: '',
+  region: '',
   nearestMetro: '',
 }
 
 export class AcmeSearchFlatFilterModel {
-  constructor(protected $: PsyContext, protected location = $.get(SnapRouterLocation.instance)) {
+  [Symbol.toStringTag] = 'AcmeSearchFlatFilterModel'
+  constructor(protected $: PsyContext, protected route = $.get(AcmeSearchFlatListRoute.instance)) {
     makeObservable(this)
-    psySyncEffect(this, 'values', () => reaction(() => JSON.stringify(this.draft), this.submit, { delay: 300 }))
+    psySyncEffect(this, 'values', () => this.values, this.submit, { delay: 300 })
   }
 
-  @computed protected get url() {
-    return this.location.route(acmeSearchFlatFilterModelDefaults)
+  @computed.struct get values() {
+    return { ...this.route.paramsReq() }
   }
 
-  @computed get values() {
-    return this.url.values
+  @computed.struct get valuesDefault() {
+    const { realty, regionId, deal } = this.values
+    return { realty, regionId, deal }
   }
 
-  @computed protected get draft() {
-    return psyObjectDraft(this.url.values)
+  @computed get changed() {
+    return JSON.stringify(this.values) !== JSON.stringify(this.valuesDefault)
+  }
+
+  @action.bound protected reset() {
+    this.route.push(this.valuesDefault)
   }
 
   @action.bound protected submit() {
-    this.url.update(this.draft)
-  }
-
-  get urlChanged() {
-    return this.url.changed
-  }
-
-  @action.bound resetUrl() {
-    this.url.update()
+    this.route.push(this.values)
   }
 
   get rooms() {
-    return this.draft.rooms
+    return this.values.rooms
   }
 
   @action.bound setRooms(next: number) {
-    this.draft.rooms = next
+    this.values.rooms = next
   }
 
-  get house() {
-    return this.draft.house
+  get realty() {
+    return this.values.realty
   }
 
   get roomsVisible() {
     return true
   }
 
-  @action.bound setHouse(next: boolean) {
-    this.draft.house = next
+  @action.bound setRealty(next: boolean) {
+    this.values.realty = next
   }
 
-  get city() {
-    return this.draft.city
+  get region() {
+    return this.values.regionId
   }
 
-  @action.bound setCity(next: string) {
-    this.draft.city = next
+  @action.bound setCity(next: number) {
+    this.values.regionId = next
     this.setNearestMetro('')
   }
 
   get nearestMetro() {
-    return this.draft.nearestMetro
+    return this.values.nearestMetro
   }
 
   @action.bound setNearestMetro(next: string) {
-    this.draft.nearestMetro = next
+    this.values.nearestMetro = next
   }
 }

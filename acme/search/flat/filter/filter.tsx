@@ -23,10 +23,10 @@ export function AcmeSearchFlatFilter({
         ) : null}
       </label>
       <label>
-        <SnapUiCheckBox id={`${id}-house`} name="house" value={filter.house} onChange={filter.setHouse} />
+        <SnapUiCheckBox id={`${id}-house`} name="house" value={filter.realty} onChange={filter.setRealty} />
         Only house
       </label>
-      <button id={`${id}-reset`} disabled={!filter.urlChanged} onClick={filter.resetUrl}>
+      <button id={`${id}-reset`} disabled={!filter.changed} onClick={filter.reset}>
         Reset filters
       </button>
       <button id={`${id}-refreshList`} onClick={refreshList}>

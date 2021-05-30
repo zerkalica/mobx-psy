@@ -29,7 +29,7 @@ export function acmeSearchBootCommonBrowser({
       deps={ctx =>
         ctx
           .set(PsySsrHydrator.instance, new PsySsrHydratorBrowser(cache))
-          .set(SnapRouterLocation.instance, new SnapRouterLocation(ctx, window as typeof window & { [Symbol.toStringTag]: string }))
+          .set(SnapRouterLocation.instance, new SnapRouterLocation(window))
           .set(
             PsyFetcher,
             class AcmeSearchBootCommonBrowserFetcher extends FetcherBrowser {

@@ -1,12 +1,12 @@
-import { action, computed, makeObservable, observable, reaction } from 'mobx'
+import { action, computed, makeObservable, observable } from 'mobx'
 
 import { PsyContext } from '@psy/core/context/Context'
 import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
 import { psySyncEffect } from '@psy/core/sync/effect'
 import { PsySyncLoader } from '@psy/core/sync/Loader'
-import { SnapRouterLocation } from '@snap/router/location'
 
 import { AcmeSearchFlatFilterModel } from './filter/model'
+import { AcmeSearchFlatListRoute } from './ListRoute'
 
 export interface AcmeSearchFlatDTO {
   id: string
@@ -19,9 +19,13 @@ export class AcmeSearchFlatModel {
 }
 
 export class AcmeSearchFlatModelStore {
-  constructor(protected $: PsyContext, protected options: { id: string }, protected location = $.get(SnapRouterLocation.instance)) {
+  constructor(
+    protected $: PsyContext,
+    protected options: { id: string },
+    protected listRoute = $.get(AcmeSearchFlatListRoute.instance)
+  ) {
     makeObservable(this)
-    psySyncEffect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
+    psySyncEffect(this, 'filtered', () => this.filter.values, this.pageReset)
   }
 
   @computed get filter() {
@@ -29,9 +33,7 @@ export class AcmeSearchFlatModelStore {
   }
 
   @computed protected get params() {
-    return this.location.route({
-      page: 1,
-    }).values
+    return this.listRoute.paramsReq()
   }
 
   get page() {
@@ -39,7 +41,8 @@ export class AcmeSearchFlatModelStore {
   }
 
   @action.bound setPage(next: number) {
-    this.params.page = Math.max(1, Math.min(next, this.lastTotalPages))
+    const page = Math.max(1, Math.min(next, this.lastTotalPages))
+    this.listRoute.push({ ...this.params, page })
   }
 
   @action.bound protected pageReset() {
