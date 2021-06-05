@@ -2,11 +2,6 @@ import { NullablePartial, SnapRouterCodec } from '@snap/router/codec'
 import { SnapRouterQueryMap } from '@snap/router/queryMap'
 import { SnapRouterSegMap } from '@snap/router/segMap'
 
-const parkingSegMap = new SnapRouterSegMap({
-  's-parkovkoi': ['OPEN', 'UNDERGROUND'],
-  's-podzemnoi-parkovkoi': ['UNDERGROUND'],
-} as const)
-
 const priceMaxSegMap = new SnapRouterSegMap({
   '1': [1e6],
   '2': [2e6],
@@ -20,6 +15,11 @@ const priceMaxSegMap = new SnapRouterSegMap({
   '15': [15e6],
   '20': [20e6],
 })
+
+const parkingSegMap = new SnapRouterSegMap({
+  's-parkovkoi': ['OPEN', 'UNDERGROUND'],
+  's-podzemnoi-parkovkoi': ['UNDERGROUND'],
+} as const)
 
 const parkingMap = new SnapRouterQueryMap({
   OPEN: 'OPEN',
@@ -63,22 +63,18 @@ export class AcmeSearchFlatListRoute {
       (
         t,
         p: Record<
-          'project' | 'region' | 'deal' | 'realty' | 'priceMaxNumber' | 'parking' | 'priceMaxDeshevie' | 'metro' | 'remont',
+          'project' | 'region' | 'deal' | 'realty' | 'parking' | 'priceMaxDeshevie' | 'priceMaxNumber' | 'metro' | 'remont',
           typeof t
         >,
-        or = t`|`,
-        begin = t`(?:`,
-        endReq = t`)`,
-        end = t`)?`,
-        seg = begin + `/`
+        opt = (...strs: string[]) => t`(?:` + strs.join(t`|`) + t`)?`
       ) => [
-        seg + p.project`nedvishimost` + endReq,
-        seg + p.region`\w+` + end,
-        seg + p.deal`pokupka|arenda` + `-` + p.realty`kvartiri|komnati|doma|uchastka` + end,
-        seg + p.priceMaxDeshevie`deshevie` + or + begin + p.priceMaxNumber`do-${val => val`d{1,2}`}-mln-rub` + end + end,
-        seg + p.metro`metro-${val => val`.+`}` + end,
-        seg + p.remont`s-remontom` + end,
-        seg + p.parking`s-parkovkoi|s-podzemnoi-parkovkoi` + end,
+        '/' + p.project`nedvishimost`,
+        opt('/' + p.region`\w+`),
+        opt('/' + p.deal(dealSegMap) + `-` + p.realty(realtySegMap)),
+        opt('/' + p.priceMaxDeshevie`deshevie`, p.priceMaxNumber`do-${val => val`d{1,2}`}-mln-rub`),
+        opt('/' + p.metro`metro-${val => val`.+`}`),
+        opt('/' + p.remont`s-remontom`),
+        opt('/' + p.parking(parkingSegMap)),
       ]
     )
   }
@@ -118,7 +114,9 @@ export class AcmeSearchFlatListRoute {
     const { seg, query } = this.codecCached.match(url)
 
     if (!seg) return
+
     const project = seg.project
+
     if (!project) return
     if (!seg.region) return
 
@@ -127,34 +125,40 @@ export class AcmeSearchFlatListRoute {
     if (!regionInfo) return
 
     let priceMax = query.price?.map(Number)?.[0]
-
     if (seg.priceMaxDeshevie) priceMax = regionInfo.deshevie
     if (seg.priceMaxNumber) priceMax = priceMaxSegMap.param(seg.priceMaxNumber)?.[0]
 
-    let parking = parkingSegMap.param(seg.parking) ?? parkingMap.param(query.parking)
+    const parkingSeg = parkingSegMap.param(seg.parking)
+    const parking = parkingSeg ?? parkingMap.param(query.parking)
+
     let metroIds = query.metroIds?.map(Number).filter(n => !Number.isNaN(n))
     if (seg.metro) metroIds = regionInfo.metro.filter(metro => metro.slug === seg.metro).map(metro => metro.id)
 
-    const deal = dealSegMap.param(seg.deal)?.[0] ?? dealMap.param(query.deal)?.[0]
-    if (!deal) return undefined
+    const dealSeg = dealSegMap.param(seg.deal)?.[0]
+    const deal = dealSeg ?? dealMap.param(query.deal)?.[0] ?? 'SELL'
 
-    const realty = realtySegMap.param(seg.realty)?.[0] ?? realtyMap.param(query.realty)?.[0]
+    const realtySeg = realtySegMap.param(seg.realty)?.[0]
+    const realty = realtySeg ?? realtyMap.param(query.realty)?.[0] ?? 'FLAT'
 
-    let page = query.page ? Number(query.page) : undefined
+    const remont = seg.remont || query.remont?.[0] === '1' ? true : undefined
+
+    let roomCount = query.roomCount?.length ? Number(query.roomCount[0]) : undefined
+    if (Number.isNaN(roomCount)) roomCount = undefined
+
+    let page = query.page?.length ? Number(query.page[0]) : undefined
     if (Number.isNaN(page)) page = undefined
-
-    const remont = Boolean(seg.remont ?? query.remont?.[0]) ? true : undefined
 
     const out = {
       seg: {
         remont,
         regionId: regionInfo.id,
-        deal: seg.deal ? deal : undefined,
-        realty: seg.realty ? realty : undefined,
+        deal: dealSeg,
+        realty: realtySeg,
         priceMax: seg.priceMaxNumber || seg.priceMaxDeshevie ? priceMax : undefined,
-        parking: seg.parking ? parking : undefined,
+        parking: parkingSeg,
         metroIds: seg.metro ? metroIds : undefined,
       },
+      roomCount,
       remont,
       deal,
       realty,
@@ -181,11 +185,17 @@ export class AcmeSearchFlatListRoute {
   url(params: Omit<ReturnType<this['paramsReq']>, 'seg'>) {
     const { seg, query } = this.codecCached.initial()
 
-    seg.project = 'nedvishimost'
+    seg.project = true
     if (!params.regionId) throw new Error('Need an regionId')
 
     const regionInfo = this.regionInfo({ id: params.regionId })
     seg.region = regionInfo?.slug
+
+    seg.deal = dealSegMap.query(params.deal)
+    query.deal = dealMap.query(params.deal)
+
+    seg.realty = realtySegMap.query(params.realty)
+    query.realty = realtyMap.query(params.realty)
 
     if (regionInfo?.deshevie && params.priceMax === regionInfo.deshevie) seg.priceMaxDeshevie = 'deshevie'
     seg.priceMaxNumber = priceMaxSegMap.query(params.priceMax)
@@ -200,8 +210,10 @@ export class AcmeSearchFlatListRoute {
 
     query.page = params.page
 
-    seg.remont = params.remont ? 's-remontom' : undefined
+    seg.remont = params.remont
     query.remont = params.remont ? '1' : undefined
+
+    query.roomCount = params.roomCount
 
     const keysWithData = this.nullableKeys.filter(v => seg[v] !== undefined)
     if (keysWithData.length > 2) {

@@ -1,4 +1,4 @@
-export class SnapRouterSegMap<Out> {
+export class SnapRouterSegMap<Out = unknown> {
   constructor(protected segMap: Record<string, readonly Out[]>) {}
 
   regExp = Object.keys(this.segMap).join('|')

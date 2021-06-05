@@ -37,7 +37,7 @@ export class AcmeSearchFlatModelStore {
   }
 
   get page() {
-    return Math.max(1, Math.min(this.params.page, this.lastTotalPages))
+    return Math.max(1, Math.min(this.params.page ?? 1, this.lastTotalPages))
   }
 
   @action.bound setPage(next: number) {

@@ -5,13 +5,6 @@ import { psySyncEffect } from '@psy/core/sync/effect'
 
 import { AcmeSearchFlatListRoute } from '../ListRoute'
 
-export const acmeSearchFlatFilterModelDefaults = {
-  rooms: 0,
-  house: false,
-  region: '',
-  nearestMetro: '',
-}
-
 export class AcmeSearchFlatFilterModel {
   [Symbol.toStringTag] = 'AcmeSearchFlatFilterModel'
   constructor(protected $: PsyContext, protected route = $.get(AcmeSearchFlatListRoute.instance)) {
@@ -32,20 +25,20 @@ export class AcmeSearchFlatFilterModel {
     return JSON.stringify(this.values) !== JSON.stringify(this.valuesDefault)
   }
 
-  @action.bound protected reset() {
+  @action.bound reset() {
     this.route.push(this.valuesDefault)
   }
 
-  @action.bound protected submit() {
+  @action.bound submit() {
     this.route.push(this.values)
   }
 
   get rooms() {
-    return this.values.rooms
+    return this.values.roomCount
   }
 
   @action.bound setRooms(next: number) {
-    this.values.rooms = next
+    this.values.roomCount = next
   }
 
   get realty() {
@@ -56,7 +49,7 @@ export class AcmeSearchFlatFilterModel {
     return true
   }
 
-  @action.bound setRealty(next: boolean) {
+  @action.bound setRealty(next = this.values.realty) {
     this.values.realty = next
   }
 
@@ -64,16 +57,7 @@ export class AcmeSearchFlatFilterModel {
     return this.values.regionId
   }
 
-  @action.bound setCity(next: number) {
+  @action.bound setRegion(next: number) {
     this.values.regionId = next
-    this.setNearestMetro('')
-  }
-
-  get nearestMetro() {
-    return this.values.nearestMetro
-  }
-
-  @action.bound setNearestMetro(next: string) {
-    this.values.nearestMetro = next
   }
 }

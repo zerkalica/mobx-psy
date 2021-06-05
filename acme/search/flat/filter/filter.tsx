@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { SnapUiCheckBox } from '@snap/ui/checkbox'
 import { SnapUiNumberInput } from '@snap/ui/numberInput'
 
 import { AcmeSearchFlatFilterModel } from './model'
@@ -19,13 +18,20 @@ export function AcmeSearchFlatFilter({
       <label id={`${id}-label`}>
         Rooms:
         {filter.roomsVisible ? (
-          <SnapUiNumberInput id={`${id}-rooms`} name="rooms" min={0} max={3} value={filter.rooms} onChange={filter.setRooms} />
+          <SnapUiNumberInput
+            id={`${id}-rooms`}
+            name="rooms"
+            min={0}
+            max={3}
+            value={filter.rooms ?? 0}
+            onChange={filter.setRooms}
+          />
         ) : null}
       </label>
-      <label>
+      {/* <label>
         <SnapUiCheckBox id={`${id}-house`} name="house" value={filter.realty} onChange={filter.setRealty} />
         Only house
-      </label>
+      </label> */}
       <button id={`${id}-reset`} disabled={!filter.changed} onClick={filter.reset}>
         Reset filters
       </button>

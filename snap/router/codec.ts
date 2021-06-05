@@ -1,3 +1,5 @@
+import { SnapRouterSegMap } from './segMap'
+
 type QueryOuter = Record<string, string | string[] | number | number[] | undefined>
 type QueryInner = Record<string, string[] | undefined>
 
@@ -24,22 +26,29 @@ function snapRouteParamsToUrl(next: QueryOuter) {
 }
 
 type RegTag = (raw: TemplateStringsArray) => string
-type Tag = (raw: TemplateStringsArray, cb?: (v: RegTag) => string) => string
+type Tag = (raw: TemplateStringsArray | SnapRouterSegMap, cb?: (v: RegTag) => string) => string
 type BuildFn<Key extends string> = (t: Tag, src: Record<Key, Tag>) => readonly string[]
 
-function buildRegexpTpl(k: string, str: TemplateStringsArray, cb?: (v: RegTag) => string) {
-  const [prefix, suffix = ''] = str
+function buildRegexpTpl(k: string, str: TemplateStringsArray | SnapRouterSegMap, cb?: (v: RegTag) => string) {
+  const [prefix, suffix = ''] = str instanceof SnapRouterSegMap ? [str.regExp, ''] : str
   const mid = cb?.(r => `(?<${k}>${r[0]})`) ?? ''
 
   return `(?${mid ? ':' : `<${k}>`}${prefix}${mid}${suffix})`
 }
 
-function buildUrlTpl(this: Partial<Record<string, string>>, k: string, str: TemplateStringsArray, cb?: (v: RegTag) => string) {
-  const [prefix, suffix = ''] = str
+function buildUrlTpl(
+  this: Partial<Record<string, string | boolean>>,
+  k: string,
+  str: TemplateStringsArray | SnapRouterSegMap,
+  cb?: (v: RegTag) => string
+) {
+  const [prefix, suffix = ''] = str instanceof SnapRouterSegMap ? [str.regExp, ''] : str
   const val = this[k]
-  if (val === undefined) return ''
+  if (!val) return ''
+  if (cb === undefined) return val === true ? prefix : val
+  if (val === true) throw new Error(`Need a string: key ${k}, data: ${JSON.stringify(this)}`)
 
-  const mid = cb?.(() => val ?? '') ?? ''
+  const mid = cb(() => val)
 
   return `${prefix}${mid}${suffix}`
 }
@@ -60,7 +69,7 @@ export class SnapRouterCodec<Key extends string> {
       },
     })
 
-    this.regExp = new RegExp(this.build(r => r[0], o).join(''))
+    this.regExp = new RegExp(this.build(r => (r instanceof SnapRouterSegMap ? r.regExp : r[0]), o).join(''))
     this.empty = empty
     this.keys = Object.keys(empty) as Key[]
   }
@@ -68,7 +77,7 @@ export class SnapRouterCodec<Key extends string> {
   public keys: readonly Key[]
 
   protected emptySegments = this.buildSegments()
-  protected empty: Record<Key, string | undefined>
+  protected empty: Record<Key, string | boolean | undefined>
   protected regExp: RegExp
 
   initial() {
@@ -78,7 +87,7 @@ export class SnapRouterCodec<Key extends string> {
     }
   }
 
-  protected buildSegments(input: Partial<Record<Key, string>> = {}) {
+  protected buildSegments(input: Partial<Record<Key, string | boolean>> = {}) {
     const o = new Proxy({} as Record<Key, Tag>, {
       get(t, k) {
         return buildUrlTpl.bind(input, k as string)
@@ -88,7 +97,7 @@ export class SnapRouterCodec<Key extends string> {
     return this.build(() => '', o)
   }
 
-  url({ seg, query }: { seg: Partial<Record<Key, string>>; query?: QueryOuter }) {
+  url({ seg, query }: { seg: Partial<Record<Key, string | boolean>>; query?: QueryOuter }) {
     const normalized = { ...query }
     for (const k in seg) normalized[k] = undefined
 

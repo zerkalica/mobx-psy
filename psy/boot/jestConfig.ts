@@ -4,10 +4,10 @@ import { psyBootInfoTsConfig } from './info'
 
 import type { Config } from '@jest/types'
 
-export function jestConfig(pkgDir: string, { tsConfigJson = 'tsconfig.json' } = {}) {
+export function jestConfig(pkgDir: string, { tsConfigJson = 'tsconfig.json', outDir = '-' } = {}) {
   const t = psyBootInfoTsConfig(path.join(pkgDir, tsConfigJson))
-  const roots = t.projectReferences?.map(ref => ref.path) ?? []
-  roots.push(path.join(pkgDir, '-'))
+  const roots = t.projectReferences?.map(ref => path.join(ref.path, outDir)) ?? []
+  roots.push(path.join(pkgDir, outDir))
   const config: Config.InitialOptions = {
     roots,
   }
