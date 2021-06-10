@@ -28,7 +28,7 @@ export function snapServer({
   srv = srv
     .use(snapServerMdlContext({ outDir, browserConfig, serverConfig, fetcher }))
     .get('/version', snapServerMdlVersion)
-    .get('/favicon.ico', (req, res) => res.status(200))
+    .get('/favicon.ico', (req, res) => res.status(200).end())
 
   srv = bottom(srv)
 

@@ -49,10 +49,6 @@ export class PsyFetcher {
     return this.json(args, init)
   }
 
-  static hash(p: PsyFetcherProps) {
-    return p.kind + '.' + JSON.stringify(p.params)
-  }
-
   static serializeBody(body: unknown) {
     if (
       body &&

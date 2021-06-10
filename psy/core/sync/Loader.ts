@@ -1,7 +1,6 @@
 import { action, computed, makeObservable, observable, onBecomeUnobserved } from 'mobx'
 
 import { PsyContext } from '../context/Context'
-import { psyDataIsPromise } from '../data/isPromise'
 import { psyErrorThrowHidden } from '../error/hidden'
 import { psyErrorNormalize } from '../error/normalize'
 import { PsyFetcher, PsyFetcherProps } from '../fetcher/Fetcher'
@@ -26,37 +25,43 @@ export class PsySyncLoader<Result> implements PsySyncRefreshable {
     protected hydrator = $.get(PsySsrHydrator.instance)
   ) {
     makeObservable(this)
-    onBecomeUnobserved(this, 'value', this.destructor)
+    onBecomeUnobserved(this, 'counter', this.destructor.bind(this))
   }
 
   @computed protected get key() {
-    return this.fetcher.hash(this.args())
+    const args = this.args()
+
+    // Need refetch if args changed while loading
+    this.cached = undefined
+
+    return args.kind + '.' + JSON.stringify(args.params)
   }
 
   @observable protected counter = 0
+
   protected cached: Result | Promise<unknown> | Error | undefined = undefined
-  protected initial = true
 
   get isFirstRun() {
-    return this.initial
+    return this.cached === undefined
   }
 
-  @computed get value(): Result {
+  get value() {
     // Subscribe to observable counter to recalucate all value deps, if Loader.next called
     this.counter
+    // Subsribe to args to refetch, recalculate if args changed
+    const key = this.key
 
     let cached = this.cached
-    if (cached === undefined) {
-      cached = this.hydrator.get<Result>(this.key)
-    }
+
+    if (cached === undefined) cached = this.hydrator.get<Result>(key)
     if (cached === undefined) {
       cached = this.fetch()
       psySyncRefreshable(cached, this)
-      this.hydrator.prepare(this.key, cached)
+      this.hydrator.prepare(key, cached)
       this.cached = cached
     }
-    if (cached instanceof Error) return psyErrorThrowHidden(cached)
-    if (psyDataIsPromise(cached)) return psyErrorThrowHidden(cached)
+
+    if (cached instanceof Error || cached instanceof Promise) return psyErrorThrowHidden(cached)
 
     return cached
   }
@@ -70,10 +75,10 @@ export class PsySyncLoader<Result> implements PsySyncRefreshable {
       const p = this.fetcher.get(this.args(), this.ac.signal) as Promise<Result>
 
       const next = await p
+      if (next === undefined) throw new Error(`Change undefined to null in response of ${this}`)
 
       this.hydrator.set(this.key, next)
       this.cached = next
-      this.initial = false
       this.next()
     } catch (e) {
       const err = psyErrorNormalize(e) as Error
@@ -89,13 +94,12 @@ export class PsySyncLoader<Result> implements PsySyncRefreshable {
   }
 
   @action.bound refresh() {
-    this.hydrator.remove(this.key)
+    this.cached = undefined
     this.next()
   }
 
-  @action.bound protected destructor() {
-    this.hydrator.remove(this.key)
+  protected destructor() {
     this.ac.abort()
-    this.initial = true
+    this.cached = undefined
   }
 }

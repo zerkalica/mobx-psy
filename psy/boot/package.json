@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "del": "^5.1.0",
+    "enhanced-resolve": "^5.8.2",
     "exits": "^2.0.1",
     "find-up": "^5.0.0",
     "globby": "^11.0.1",

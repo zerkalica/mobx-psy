@@ -1,9 +1,11 @@
+import { PsyErrorNotFound } from '@psy/core/error/NotFound'
+
 import { SnapRouterSegMap } from './segMap'
 
 type QueryOuter = Record<string, string | string[] | number | number[] | undefined>
 type QueryInner = Record<string, string[] | undefined>
 
-export class SnapRouterCodecError extends Error {
+export class SnapRouterCodecError extends PsyErrorNotFound {
   name = 'SnapRouterCodecError'
 }
 
@@ -30,8 +32,10 @@ function snapRouteParamsToUrl(next: QueryOuter) {
 }
 
 type RegTag = (raw: TemplateStringsArray) => string
-type Tag = (raw: TemplateStringsArray | string, cb?: (v: RegTag) => string) => string
-type BuildFn<Key extends string> = (t: Tag, src: Record<Key, Tag>) => readonly string[]
+
+export type SnapRouterCodecTag = (raw: TemplateStringsArray | string, cb?: (v: RegTag) => string) => string
+
+type BuildFn<Key extends string> = (t: SnapRouterCodecTag, src: Record<Key, SnapRouterCodecTag>) => readonly string[]
 
 function buildRegexpTpl(k: string, str: TemplateStringsArray | string, cb?: (v: RegTag) => string) {
   const [prefix, suffix = ''] = Array.isArray(str) ? str : [str, '']
@@ -67,7 +71,7 @@ export class SnapRouterCodec<Key extends string> {
   constructor(protected build: BuildFn<Key>) {
     const empty = {} as Record<Key, string | undefined>
 
-    const o = new Proxy({} as Record<Key, Tag>, {
+    const o = new Proxy({} as Record<Key, SnapRouterCodecTag>, {
       get(t, k) {
         empty[k as Key] = undefined
         return buildRegexpTpl.bind(null, k as string)
@@ -96,7 +100,7 @@ export class SnapRouterCodec<Key extends string> {
   }
 
   protected buildSegments(input: Partial<Record<Key, string | boolean>> = {}) {
-    const o = new Proxy({} as Record<Key, Tag>, {
+    const o = new Proxy({} as Record<Key, SnapRouterCodecTag>, {
       get(t, k) {
         return buildUrlTpl.bind(input, k as string)
       },

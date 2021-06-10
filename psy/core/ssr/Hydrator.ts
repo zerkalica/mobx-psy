@@ -1,5 +1,4 @@
 export class PsySsrHydrator {
-  r = Math.random()
   constructor(protected state: Record<string, any> = {}) {}
 
   get<V>(key: string): V | Promise<unknown> | Error | undefined {
@@ -14,10 +13,6 @@ export class PsySsrHydrator {
 
   renderError(error: Error) {}
   renderSuccess(component: unknown) {}
-
-  remove(key: string) {
-    this.state[key] = undefined
-  }
 
   collect(): Promise<{ state: Record<string, any>; errors: readonly Error[]; pending: number; rendered: number }> {
     throw new Error('implement')

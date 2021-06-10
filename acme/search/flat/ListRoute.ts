@@ -1,8 +1,8 @@
-import { action, computed, makeObservable, observable } from 'mobx'
+import { action, computed, makeObservable } from 'mobx'
 
 import { psyObjectMerge } from '@psy/core/object/merge'
 import { psyObjectSetter } from '@psy/core/object/setter'
-import { NullablePartial, SnapRouterCodec, SnapRouterCodecError } from '@snap/router/codec'
+import { NullablePartial, SnapRouterCodec, SnapRouterCodecError, SnapRouterCodecTag } from '@snap/router/codec'
 import { SnapRouterQueryMap } from '@snap/router/queryMap'
 import { SnapRouterSegMap } from '@snap/router/segMap'
 
@@ -62,19 +62,19 @@ export class AcmeSearchFlatListRoute {
     makeObservable(this)
   }
 
-  @observable.struct writable = { ...this.get }
+  protected static codec = new SnapRouterCodec(AcmeSearchFlatListRoute.regExSrc.bind(AcmeSearchFlatListRoute))
 
-  protected codec = new SnapRouterCodec(
-    (
-      t,
-      p: Record<
-        'project' | 'region' | 'deal' | 'realty' | 'parking' | 'priceMaxDeshevie' | 'priceMaxNumber' | 'metro' | 'remont',
-        typeof t
-      >,
-      opt = (...strs: string[]) => t`(?:` + strs.join(t`|`) + t`)?`
-    ) => [
+  protected static regExSrc(
+    t: SnapRouterCodecTag,
+    p: Record<
+      'project' | 'region' | 'deal' | 'realty' | 'parking' | 'priceMaxDeshevie' | 'priceMaxNumber' | 'metro' | 'remont',
+      SnapRouterCodecTag
+    >,
+    opt = (...strs: string[]) => t`(?:` + strs.join(t`|`) + t`)?`
+  ) {
+    return [
       '/' + p.project(this.root()),
-      opt('/' + p.region`\\w+`),
+      opt('/' + p.region`[\\w]+`),
       opt('/' + p.deal(dealSegMap.regExp) + `-` + p.realty(realtySegMap.regExp)),
       opt('/' + p.priceMaxDeshevie`deshevie`, p.priceMaxNumber`do-${val => val`\\d{1,2}`}-mln-rub`),
       opt('/' + p.metro`metro-${val => val`.+`}`),
@@ -83,17 +83,23 @@ export class AcmeSearchFlatListRoute {
       opt('/'),
       t`$`,
     ]
-  )
+  }
 
-  protected root() {
+  protected static root() {
     return 'nedvishimost'
   }
+
+  protected codec = AcmeSearchFlatListRoute.codec
 
   toString() {
     return this.codec.toString()
   }
 
-  static instance = new AcmeSearchFlatListRoute()
+  static instanceCached: AcmeSearchFlatListRoute | undefined = undefined
+
+  static get instance() {
+    return this.instanceCached ?? (this.instanceCached = new AcmeSearchFlatListRoute())
+  }
 
   protected regionInfo(p: { id: number; slug?: undefined } | { id?: undefined; slug: string }) {
     // Place here suspense logic id by slug
@@ -165,7 +171,7 @@ export class AcmeSearchFlatListRoute {
 
   @computed.struct get get() {
     const seg = this.seg
-    if (!seg) throw new SnapRouterCodecError(`${this.loc.url ?? '/'} not matched ${this}`)
+    if (!seg) throw new SnapRouterCodecError(`URL '${this.loc.url ?? '/'}' not matched ${this}`)
     const { query } = this.raw
     const priceMax = query.price?.map(Number)?.[0]
     const parking = parkingMap.param(query.parking)
@@ -199,7 +205,7 @@ export class AcmeSearchFlatListRoute {
   }
 
   @computed get defaults() {
-    return new AcmeSearchFlatListRoute({ url: '/nedvishimost' }).get
+    return new AcmeSearchFlatListRoute({ url: '/nedvishimost/moskva' }).get
   }
 
   @action.bound reset() {
@@ -236,7 +242,7 @@ export class AcmeSearchFlatListRoute {
     if (metroId) seg.metro = regionInfo?.metro.find(metro => (metro.id = metroId))?.slug
     query.metroIds = params.metroIds
 
-    query.page = params.page
+    query.page = params.page === 1 ? undefined : params.page
 
     seg.remont = params.remont
     query.remont = params.remont ? '1' : undefined
