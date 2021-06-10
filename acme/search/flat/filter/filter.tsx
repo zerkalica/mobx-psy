@@ -1,41 +1,36 @@
 import React from 'react'
 
+import { usePsyContext } from '@psy/react/context/context'
 import { SnapUiNumberInput } from '@snap/ui/numberInput'
 
-import { AcmeSearchFlatFilterModel } from './model'
+import { AcmeSearchFlatListRoute } from '../ListRoute'
 
-export function AcmeSearchFlatFilter({
-  id,
-  filter,
-  refreshList,
-}: {
-  refreshList: () => void
-  filter: AcmeSearchFlatFilterModel
-  id: string
-}) {
+export function AcmeSearchFlatFilter(p: { refreshList?: () => void; id: string }) {
+  const route = usePsyContext().get(AcmeSearchFlatListRoute.instance)
+
   return (
-    <div id={id}>
-      <label id={`${id}-label`}>
+    <div id={p.id}>
+      <label id={`${p.id}-label`}>
         Rooms:
-        {filter.roomsVisible ? (
+        {route.get.roomCount ? (
           <SnapUiNumberInput
-            id={`${id}-rooms`}
+            id={`${p.id}-rooms`}
             name="rooms"
             min={0}
             max={3}
-            value={filter.rooms ?? 0}
-            onChange={filter.setRooms}
+            value={route.get.roomCount}
+            onChange={route.set.roomCount}
           />
         ) : null}
       </label>
       {/* <label>
-        <SnapUiCheckBox id={`${id}-house`} name="house" value={filter.realty} onChange={filter.setRealty} />
+        <SnapUiCheckBox id={`${id}-house`} name="house" value={route.get.realty} onChange={route.get.setRealty} />
         Only house
       </label> */}
-      <button id={`${id}-reset`} disabled={!filter.changed} onClick={filter.reset}>
+      <button id={`${p.id}-reset`} disabled={!route.changed} onClick={route.reset}>
         Reset filters
       </button>
-      <button id={`${id}-refreshList`} onClick={refreshList}>
+      <button id={`${p.id}-refreshList`} onClick={p.refreshList}>
         Refresh list
       </button>
     </div>

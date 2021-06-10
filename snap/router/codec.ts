@@ -3,6 +3,10 @@ import { SnapRouterSegMap } from './segMap'
 type QueryOuter = Record<string, string | string[] | number | number[] | undefined>
 type QueryInner = Record<string, string[] | undefined>
 
+export class SnapRouterCodecError extends Error {
+  name = 'SnapRouterCodecError'
+}
+
 function snapRouteParamsToUrl(next: QueryOuter) {
   const params = new URLSearchParams()
   let hash = ''
@@ -26,11 +30,11 @@ function snapRouteParamsToUrl(next: QueryOuter) {
 }
 
 type RegTag = (raw: TemplateStringsArray) => string
-type Tag = (raw: TemplateStringsArray | SnapRouterSegMap, cb?: (v: RegTag) => string) => string
+type Tag = (raw: TemplateStringsArray | string, cb?: (v: RegTag) => string) => string
 type BuildFn<Key extends string> = (t: Tag, src: Record<Key, Tag>) => readonly string[]
 
-function buildRegexpTpl(k: string, str: TemplateStringsArray | SnapRouterSegMap, cb?: (v: RegTag) => string) {
-  const [prefix, suffix = ''] = str instanceof SnapRouterSegMap ? [str.regExp, ''] : str
+function buildRegexpTpl(k: string, str: TemplateStringsArray | string, cb?: (v: RegTag) => string) {
+  const [prefix, suffix = ''] = Array.isArray(str) ? str : [str, '']
   const mid = cb?.(r => `(?<${k}>${r[0]})`) ?? ''
 
   return `(?${mid ? ':' : `<${k}>`}${prefix}${mid}${suffix})`
@@ -39,10 +43,10 @@ function buildRegexpTpl(k: string, str: TemplateStringsArray | SnapRouterSegMap,
 function buildUrlTpl(
   this: Partial<Record<string, string | boolean>>,
   k: string,
-  str: TemplateStringsArray | SnapRouterSegMap,
+  str: TemplateStringsArray | string,
   cb?: (v: RegTag) => string
 ) {
-  const [prefix, suffix = ''] = str instanceof SnapRouterSegMap ? [str.regExp, ''] : str
+  const [prefix, suffix = ''] = Array.isArray(str) ? str : [str, '']
   const val = this[k]
   if (!val) return ''
   if (cb === undefined) return val === true ? prefix : val
@@ -56,6 +60,7 @@ function buildUrlTpl(
 export type NullablePropertyOf<T> = {
   [K in keyof T]: undefined extends T[K] ? K : never
 }[keyof T]
+
 export type NullablePartial<T> = Omit<T, NullablePropertyOf<T>> & Partial<Pick<T, NullablePropertyOf<T>>>
 
 export class SnapRouterCodec<Key extends string> {
@@ -69,16 +74,19 @@ export class SnapRouterCodec<Key extends string> {
       },
     })
 
-    this.regExp = new RegExp(this.build(r => (r instanceof SnapRouterSegMap ? r.regExp : r[0]), o).join(''))
+    this.regExp = new RegExp(build(r => (r instanceof SnapRouterSegMap ? r.regExp : r[0]), o).join(''))
     this.empty = empty
+    this[Symbol.toStringTag] = '' + this.regExp.source
     this.keys = Object.keys(empty) as Key[]
   }
+
+  [Symbol.toStringTag]: string
 
   public keys: readonly Key[]
 
   protected emptySegments = this.buildSegments()
   protected empty: Record<Key, string | boolean | undefined>
-  protected regExp: RegExp
+  readonly regExp: RegExp
 
   initial() {
     return {

@@ -22,6 +22,8 @@ export function acmeSearchBootCommonBrowser({
   const cache = cacheStr ? (JSON.parse(cacheStr) as Record<string, any> & { __config: typeof fallbackConfig }) : undefined
   const config = cache?.__config ?? fallbackConfig
 
+  console.log(`${acmeSearchPkgName}...`)
+
   ReactDOM.render(
     <PsyContextProvide
       children={<AcmeSearch id={acmeSearchPkgName} />}

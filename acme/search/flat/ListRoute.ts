@@ -1,4 +1,8 @@
-import { NullablePartial, SnapRouterCodec } from '@snap/router/codec'
+import { action, computed, makeObservable, observable } from 'mobx'
+
+import { psyObjectMerge } from '@psy/core/object/merge'
+import { psyObjectSetter } from '@psy/core/object/setter'
+import { NullablePartial, SnapRouterCodec, SnapRouterCodecError } from '@snap/router/codec'
 import { SnapRouterQueryMap } from '@snap/router/queryMap'
 import { SnapRouterSegMap } from '@snap/router/segMap'
 
@@ -54,39 +58,49 @@ export class AcmeSearchFlatListRoute {
   constructor(
     protected loc: { url?: string; push?(url: string): void; replace?(url: string): void } = {},
     protected ctx?: { isServer: boolean }
-  ) {}
+  ) {
+    makeObservable(this)
+  }
+
+  @observable.struct writable = { ...this.get }
+
+  protected codec = new SnapRouterCodec(
+    (
+      t,
+      p: Record<
+        'project' | 'region' | 'deal' | 'realty' | 'parking' | 'priceMaxDeshevie' | 'priceMaxNumber' | 'metro' | 'remont',
+        typeof t
+      >,
+      opt = (...strs: string[]) => t`(?:` + strs.join(t`|`) + t`)?`
+    ) => [
+      '/' + p.project(this.root()),
+      opt('/' + p.region`\\w+`),
+      opt('/' + p.deal(dealSegMap.regExp) + `-` + p.realty(realtySegMap.regExp)),
+      opt('/' + p.priceMaxDeshevie`deshevie`, p.priceMaxNumber`do-${val => val`\\d{1,2}`}-mln-rub`),
+      opt('/' + p.metro`metro-${val => val`.+`}`),
+      opt('/' + p.remont`s-remontom`),
+      opt('/' + p.parking(parkingSegMap.regExp)),
+      opt('/'),
+      t`$`,
+    ]
+  )
+
+  protected root() {
+    return 'nedvishimost'
+  }
+
+  toString() {
+    return this.codec.toString()
+  }
 
   static instance = new AcmeSearchFlatListRoute()
 
-  protected codec() {
-    return new SnapRouterCodec(
-      (
-        t,
-        p: Record<
-          'project' | 'region' | 'deal' | 'realty' | 'parking' | 'priceMaxDeshevie' | 'priceMaxNumber' | 'metro' | 'remont',
-          typeof t
-        >,
-        opt = (...strs: string[]) => t`(?:` + strs.join(t`|`) + t`)?`
-      ) => [
-        '/' + p.project`nedvishimost`,
-        opt('/' + p.region`\w+`),
-        opt('/' + p.deal(dealSegMap) + `-` + p.realty(realtySegMap)),
-        opt('/' + p.priceMaxDeshevie`deshevie`, p.priceMaxNumber`do-${val => val`d{1,2}`}-mln-rub`),
-        opt('/' + p.metro`metro-${val => val`.+`}`),
-        opt('/' + p.remont`s-remontom`),
-        opt('/' + p.parking(parkingSegMap)),
-      ]
-    )
-  }
-
-  protected codecCached = this.codec()
-
   protected regionInfo(p: { id: number; slug?: undefined } | { id?: undefined; slug: string }) {
     // Place here suspense logic id by slug
-    if (p.id === 444 || p.slug === 'spb')
+    if (p.id === 444 || p.slug === 'sankt-peterburg')
       return {
         id: 444,
-        slug: 'spb',
+        slug: 'sankt-peterburg',
         deshevie: 6.5e6,
         metro: [
           {
@@ -96,10 +110,10 @@ export class AcmeSearchFlatListRoute {
         ],
       }
 
-    if (p.id === 3 || p.slug === 'msk')
+    if (p.id === 3 || p.slug === 'moskva')
       return {
         id: 3,
-        slug: 'msk',
+        slug: 'moskva',
         deshevie: 8.5e6,
         metro: [
           {
@@ -108,11 +122,16 @@ export class AcmeSearchFlatListRoute {
           },
         ],
       }
+
+    throw new Error('Region not found: ' + p.slug)
   }
 
-  params(url = this.loc.url ?? '/') {
-    const { seg, query } = this.codecCached.match(url)
+  @computed protected get raw() {
+    return this.codec.match(this.loc.url ?? '/')
+  }
 
+  @computed.struct get seg() {
+    const { seg } = this.raw
     if (!seg) return
 
     const project = seg.project
@@ -122,25 +141,38 @@ export class AcmeSearchFlatListRoute {
 
     const regionInfo = this.regionInfo({ slug: seg.region })
 
-    if (!regionInfo) return
-
-    let priceMax = query.price?.map(Number)?.[0]
-    if (seg.priceMaxDeshevie) priceMax = regionInfo.deshevie
+    let priceMax = seg.priceMaxDeshevie ? regionInfo.deshevie : undefined
     if (seg.priceMaxNumber) priceMax = priceMaxSegMap.param(seg.priceMaxNumber)?.[0]
 
-    const parkingSeg = parkingSegMap.param(seg.parking)
-    const parking = parkingSeg ?? parkingMap.param(query.parking)
+    const parking = parkingSegMap.param(seg.parking)
+    const metroIds = seg.metro ? regionInfo.metro.filter(metro => metro.slug === seg.metro).map(metro => metro.id) : undefined
+    const deal = dealSegMap.param(seg.deal)?.[0] ?? 'SELL'
+    const realty = realtySegMap.param(seg.realty)?.[0] ?? 'FLAT'
+    const remont = seg.remont ? true : undefined
 
-    let metroIds = query.metroIds?.map(Number).filter(n => !Number.isNaN(n))
-    if (seg.metro) metroIds = regionInfo.metro.filter(metro => metro.slug === seg.metro).map(metro => metro.id)
+    const out = {
+      remont,
+      regionId: regionInfo.id,
+      deal,
+      realty,
+      priceMax: seg.priceMaxNumber || seg.priceMaxDeshevie ? priceMax : undefined,
+      parking,
+      metroIds: seg.metro ? metroIds : undefined,
+    }
 
-    const dealSeg = dealSegMap.param(seg.deal)?.[0]
-    const deal = dealSeg ?? dealMap.param(query.deal)?.[0] ?? 'SELL'
+    return out as NullablePartial<typeof out>
+  }
 
-    const realtySeg = realtySegMap.param(seg.realty)?.[0]
-    const realty = realtySeg ?? realtyMap.param(query.realty)?.[0] ?? 'FLAT'
-
-    const remont = seg.remont || query.remont?.[0] === '1' ? true : undefined
+  @computed.struct get get() {
+    const seg = this.seg
+    if (!seg) throw new SnapRouterCodecError(`${this.loc.url ?? '/'} not matched ${this}`)
+    const { query } = this.raw
+    const priceMax = query.price?.map(Number)?.[0]
+    const parking = parkingMap.param(query.parking)
+    const metroIds = query.metroIds?.map(Number).filter(n => !Number.isNaN(n))
+    const deal = dealMap.param(query.deal)?.[0] ?? 'SELL'
+    const realty = realtyMap.param(query.realty)?.[0] ?? 'FLAT'
+    const remont = query.remont?.[0] === '1' ? true : undefined
 
     let roomCount = query.roomCount?.length ? Number(query.roomCount[0]) : undefined
     if (Number.isNaN(roomCount)) roomCount = undefined
@@ -148,42 +180,38 @@ export class AcmeSearchFlatListRoute {
     let page = query.page?.length ? Number(query.page[0]) : undefined
     if (Number.isNaN(page)) page = undefined
 
-    const out = {
-      seg: {
-        remont,
-        regionId: regionInfo.id,
-        deal: dealSeg,
-        realty: realtySeg,
-        priceMax: seg.priceMaxNumber || seg.priceMaxDeshevie ? priceMax : undefined,
-        parking: parkingSeg,
-        metroIds: seg.metro ? metroIds : undefined,
-      },
+    const out = psyObjectMerge(seg, {
       roomCount,
       remont,
       deal,
       realty,
       page,
       metroIds,
-      regionId: regionInfo.id,
       priceMax,
       parking,
-    }
+    })
 
-    return out as Readonly<NullablePartial<typeof out>>
+    return out as NullablePartial<typeof out>
   }
 
-  paramsReq(url = this.loc.url) {
-    const params = this.params(url)
-
-    if (!params) throw new Error(`Required params`)
-
-    return params
+  @computed get changed() {
+    return JSON.stringify(this.get) !== JSON.stringify(this.defaults)
   }
 
-  protected nullableKeys = this.codecCached.keys.filter(k => k !== 'project' && k !== 'region' && k !== 'deal' && k !== 'realty')
+  @computed get defaults() {
+    return new AcmeSearchFlatListRoute({ url: '/nedvishimost' }).get
+  }
 
-  url(params: Omit<ReturnType<this['paramsReq']>, 'seg'>) {
-    const { seg, query } = this.codecCached.initial()
+  @action.bound reset() {
+    this.push(this.defaults)
+  }
+
+  readonly set = psyObjectSetter<this['get']>(action((k, v) => this.push({ ...this.get, [k]: v })))
+
+  protected nullableKeys = this.codec.keys.filter(k => k !== 'project' && k !== 'region' && k !== 'deal' && k !== 'realty')
+
+  url(params = this.defaults) {
+    const { seg, query } = this.codec.initial()
 
     seg.project = true
     if (!params.regionId) throw new Error('Need an regionId')
@@ -220,19 +248,19 @@ export class AcmeSearchFlatListRoute {
       for (const key of this.nullableKeys) seg[key] = undefined
     }
 
-    return this.codecCached.url({
+    return this.codec.url({
       seg,
       query,
     })
   }
 
-  push(params: Omit<ReturnType<this['paramsReq']>, 'seg'>) {
+  @action.bound push(params = this.defaults) {
     const url = this.url(params)
     if (this.loc.push === undefined) throw new Error('loc.push not setted')
     this.loc.push(url)
   }
 
-  replace(params: Omit<ReturnType<this['paramsReq']>, 'seg'>) {
+  @action.bound replace(params = this.defaults) {
     const url = this.url(params)
     if (this.loc.replace === undefined) throw new Error('loc.replace not setted')
     this.loc.replace(url)

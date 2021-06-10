@@ -8,7 +8,10 @@ export class SnapRouterLocation {
     client.addEventListener('popstate', this.onPopState)
   }
 
-  static instance = new SnapRouterLocation(psyClient)
+  static cache: SnapRouterLocation | undefined = undefined
+  static get instance() {
+    return this.cache ?? (this.cache = new SnapRouterLocation(psyClient))
+  }
 
   protected destructor() {
     this.client.removeEventListener('popstate', this.onPopState)

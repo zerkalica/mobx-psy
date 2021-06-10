@@ -11,4 +11,5 @@ new SnapBuildBundler({
   distRoot: __dirname,
   pkgName: acmeSearchPkgName,
   template: new PsySsrTemplate(),
+  isDev: true,
 }).bundle()
