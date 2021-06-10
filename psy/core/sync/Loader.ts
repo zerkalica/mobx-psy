@@ -21,15 +21,17 @@ import { PsySyncRefreshable, psySyncRefreshable } from './refreshable'
 export class PsySyncLoader<Result> implements PsySyncRefreshable {
   constructor(
     protected $: PsyContext,
-    protected args: PsyFetcherProps,
+    protected args: () => PsyFetcherProps,
     protected fetcher = $.get(PsyFetcher),
     protected hydrator = $.get(PsySsrHydrator.instance)
   ) {
     makeObservable(this)
-    onBecomeUnobserved(this, 'value', this.destructor.bind(this))
+    onBecomeUnobserved(this, 'value', this.destructor)
   }
 
-  protected key = this.fetcher.hash(this.args)
+  @computed protected get key() {
+    return this.fetcher.hash(this.args())
+  }
 
   @observable protected counter = 0
   protected cached: Result | Promise<unknown> | Error | undefined = undefined
@@ -63,8 +65,9 @@ export class PsySyncLoader<Result> implements PsySyncRefreshable {
 
   protected async fetch() {
     try {
+      this.ac.abort()
       this.ac = new AbortController()
-      const p = this.fetcher.get(this.args, this.ac.signal) as Promise<Result>
+      const p = this.fetcher.get(this.args(), this.ac.signal) as Promise<Result>
 
       const next = await p
 
@@ -81,16 +84,16 @@ export class PsySyncLoader<Result> implements PsySyncRefreshable {
     }
   }
 
-  @action next() {
+  @action protected next() {
     this.counter++
   }
 
-  refresh() {
+  @action.bound refresh() {
     this.hydrator.remove(this.key)
     this.next()
   }
 
-  protected destructor() {
+  @action.bound protected destructor() {
     this.hydrator.remove(this.key)
     this.ac.abort()
     this.initial = true

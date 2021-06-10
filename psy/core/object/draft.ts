@@ -1,4 +1,6 @@
-import { makeObservable, observable } from 'mobx'
+import { action, makeObservable, observable, reaction } from 'mobx'
+
+import { psySyncEffect } from '../sync/effect'
 
 /**
  * Create an observable mutable proxy of immutable object.
@@ -10,7 +12,7 @@ import { makeObservable, observable } from 'mobx'
  * }
  *
  * const original = new A
- * const copy = draft(original)
+ * const copy = new Draft(original).values
  *
  * autorun(() => {
  *   console.log(copy, 'changed')
@@ -24,42 +26,15 @@ import { makeObservable, observable } from 'mobx'
  * }
  * ```
  */
-export function psyObjectDraft<O extends {}>(orig: O): O {
-  return new PsyObjectDraft(orig).values
-}
-
-class PsyObjectDraft<O extends {}, K extends keyof O = keyof O> {
-  readonly values: O
-
-  constructor(protected original: O) {
+export class PsyObjectDraft<O extends {}> {
+  constructor(protected original: O, protected push: (values: O) => void, reactionOptions?: Parameters<typeof reaction>[2]) {
     makeObservable(this)
-    const values = (this.values = {} as O)
-    const keys = Object.keys(original)
-    for (let key of keys) {
-      // subscribe to original changes
-      original[key as K]
-      Object.defineProperty(values, key, {
-        enumerable: true,
-        get: this.getValue.bind(this, key as K),
-        set: this.setValue.bind(this, key as K),
-      })
-    }
+    psySyncEffect(this, 'values', () => this.values, this.submit, reactionOptions)
   }
 
-  @observable protected draft = new Map<keyof O, O[K]>()
+  @observable.struct values = { ...this.original }
 
-  protected getValue(name: K): O[K] {
-    if (this.draft.has(name)) return this.draft.get(name) as O[K]
-    return this.original[name]
-  }
-
-  protected setValue(name: K, value: O[K]) {
-    if (this.original[name] === value) this.draft.delete(name)
-    else this.draft.set(name, value)
-    return true
-  }
-
-  get changed() {
-    return this.draft.size > 0
+  @action.bound submit() {
+    this.push(this.values)
   }
 }

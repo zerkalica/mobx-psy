@@ -1,6 +1,10 @@
 export type PsySsrTemplateScriptProps = { src: string }
 
 export class PsySsrTemplate {
+  fileName() {
+    return 'index.html'
+  }
+
   titleText() {
     return `Debug title`
   }

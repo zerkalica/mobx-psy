@@ -58,7 +58,7 @@ export function snapServerMdlContext({
             static requestId = () => requestId
           }
         )
-        .set(SnapRouterLocation.instance, new SnapRouterLocation($, cli))
+        .set(SnapRouterLocation.instance, new SnapRouterLocation(cli))
     })
   })
 }

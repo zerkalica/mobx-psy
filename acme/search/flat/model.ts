@@ -1,12 +1,10 @@
-import { action, computed, makeObservable, observable, reaction } from 'mobx'
+import { action, computed, makeObservable, observable } from 'mobx'
 
 import { PsyContext } from '@psy/core/context/Context'
 import { PsyFetcher } from '@psy/core/fetcher/Fetcher'
-import { psySyncEffect } from '@psy/core/sync/effect'
 import { PsySyncLoader } from '@psy/core/sync/Loader'
-import { SnapRouterLocation } from '@snap/router/location'
 
-import { AcmeSearchFlatFilterModel } from './filter/model'
+import { AcmeSearchFlatListRoute } from './ListRoute'
 
 export interface AcmeSearchFlatDTO {
   id: string
@@ -19,27 +17,25 @@ export class AcmeSearchFlatModel {
 }
 
 export class AcmeSearchFlatModelStore {
-  constructor(protected $: PsyContext, protected options: { id: string }, protected location = $.get(SnapRouterLocation.instance)) {
+  constructor(
+    protected $: PsyContext,
+    protected options: { id: string },
+    protected listRoute = $.get(AcmeSearchFlatListRoute.instance)
+  ) {
     makeObservable(this)
-    psySyncEffect(this, 'filtered', () => reaction(() => JSON.stringify(this.filter.values), this.pageReset))
   }
 
-  @computed get filter() {
-    return new AcmeSearchFlatFilterModel(this.$)
-  }
-
-  @computed protected get params() {
-    return this.location.route({
-      page: 1,
-    }).values
+  protected get filter() {
+    return this.listRoute.get
   }
 
   get page() {
-    return Math.max(1, Math.min(this.params.page, this.lastTotalPages))
+    return Math.max(1, Math.min(this.filter.page ?? 1, this.lastTotalPages))
   }
 
   @action.bound setPage(next: number) {
-    this.params.page = Math.max(1, Math.min(next, this.lastTotalPages))
+    const page = Math.max(1, Math.min(next, this.lastTotalPages))
+    this.listRoute.push({ ...this.filter, page })
   }
 
   @action.bound protected pageReset() {
@@ -86,18 +82,17 @@ export class AcmeSearchFlatModelStore {
     return this.lastTotalPages
   }
 
-  @computed protected get loader() {
-    return new PsySyncLoader<{
-      items: readonly AcmeSearchFlatDTO[]
-      total_pages: number
-    }>(this.$, {
+  protected payload() {
+    return {
       kind: 'flats',
-      params: {
-        ...this.params,
-        ...this.filter.values,
-      },
-    })
+      params: this.filter,
+    } as const
   }
+
+  protected loader = new PsySyncLoader<{
+    items: readonly AcmeSearchFlatDTO[]
+    total_pages: number
+  }>(this.$, this.payload.bind(this))
 
   @computed get response() {
     const response = this.loader.value

@@ -22,6 +22,8 @@ export function acmeSearchBootCommonBrowser({
   const cache = cacheStr ? (JSON.parse(cacheStr) as Record<string, any> & { __config: typeof fallbackConfig }) : undefined
   const config = cache?.__config ?? fallbackConfig
 
+  console.log(`${acmeSearchPkgName}...`)
+
   ReactDOM.render(
     <PsyContextProvide
       children={<AcmeSearch id={acmeSearchPkgName} />}
@@ -29,7 +31,7 @@ export function acmeSearchBootCommonBrowser({
       deps={ctx =>
         ctx
           .set(PsySsrHydrator.instance, new PsySsrHydratorBrowser(cache))
-          .set(SnapRouterLocation.instance, new SnapRouterLocation(ctx, window as typeof window & { [Symbol.toStringTag]: string }))
+          .set(SnapRouterLocation.instance, new SnapRouterLocation(window))
           .set(
             PsyFetcher,
             class AcmeSearchBootCommonBrowserFetcher extends FetcherBrowser {

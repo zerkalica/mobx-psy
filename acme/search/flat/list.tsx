@@ -13,7 +13,7 @@ export const AcmeSearchFlatList = psySyncObserver(function AcmeSearchFlatList({ 
 
   return (
     <div id={id}>
-      <AcmeSearchFlatFilter id={`${id}-filter`} filter={flats.filter} refreshList={flats.refresh} />
+      <AcmeSearchFlatFilter id={`${id}-filter`} refreshList={flats.refresh} />
       {psySyncMock({
         unsafe: () => (
           <ul id={`${id}-flats`}>

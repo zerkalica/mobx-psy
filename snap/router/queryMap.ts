@@ -9,10 +9,11 @@ export class SnapRouterQueryMap<Out> {
     return result.length === 0 ? undefined : result
   }
 
-  query(v?: readonly Out[]) {
+  query(v?: readonly Out[] | Out) {
     const segMap = this.segMap
     if (v === undefined) return
     const result = [] as string[]
+    if (!(v instanceof Array)) v = [v]
 
     for (let k in segMap) {
       for (let i = 0; i < v.length; i++) {

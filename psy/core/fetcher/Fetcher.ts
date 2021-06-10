@@ -27,7 +27,9 @@ export class PsyFetcher {
     }
     res.toString = () => res[Symbol.toStringTag] ?? 'Promise'
 
-    res[Symbol.toStringTag] = args.kind
+    Object.defineProperty(res, Symbol.toStringTag, {
+      value: args.kind,
+    })
 
     return res
   }
@@ -54,10 +56,10 @@ export class PsyFetcher {
   static serializeBody(body: unknown) {
     if (
       body &&
-      // !(body instanceof Blob) &&
-      // !(body instanceof FormData) &&
       !(body instanceof URLSearchParams) &&
-      !(body instanceof ReadableStream)
+      !(typeof Blob !== 'undefined' && body instanceof Blob) &&
+      !(typeof FormData !== 'undefined' && body instanceof FormData) &&
+      !(typeof ReadableStream !== 'undefined' && body instanceof ReadableStream)
     )
       body = JSON.stringify(body)
 
