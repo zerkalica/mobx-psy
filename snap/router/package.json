@@ -18,12 +18,6 @@
     "mobx": "^6.0.0"
   },
   "devDependencies": {
-    "@psy/boot": "^1.0.0",
-    "typescript": "^4.0.0",
-    "jest": "^26.4.2"
-  },
-  "peerDependencies": {
-    "typescript": "*",
-    "jest": "*"
+    "@psy/boot": "^1.0.0"
   }
 }

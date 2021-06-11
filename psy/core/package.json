@@ -19,10 +19,5 @@
   },
   "devDependencies": {
     "@psy/boot": "^1.0.1"
-  },
-  "peerDependencies": {
-    "mobx": "*",
-    "jest": "*",
-    "typescript": "*"
   }
 }
