@@ -27,8 +27,6 @@
   "peerDependencies": {
     "mobx": "*",
     "mobx-react-lite": "*",
-    "react": "*",
-    "jest": "*",
-    "typescript": "*"
+    "react": "*"
   }
 }

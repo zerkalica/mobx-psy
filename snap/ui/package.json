@@ -25,9 +25,5 @@
     "@psy/boot": "^1.0.0",
     "@types/styled-system": "^5.1.10",
     "@types/react": "^17.0.2"
-  },
-  "peerDependencies": {
-    "jest": "*",
-    "typescript": "*"
   }
 }
