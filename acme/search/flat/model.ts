@@ -25,6 +25,12 @@ export class AcmeSearchFlatModelStore {
     makeObservable(this)
   }
 
+  static cache?: AcmeSearchFlatModelStore = undefined
+
+  static get instance() {
+    return this.cache ?? (this.cache = new AcmeSearchFlatModelStore(PsyContext.instance, { id: 'root' }))
+  }
+
   protected get filter() {
     return this.listRoute.get
   }
@@ -89,7 +95,7 @@ export class AcmeSearchFlatModelStore {
     } as const
   }
 
-  protected loader = new PsySyncLoader<{
+  readonly loader = new PsySyncLoader<{
     items: readonly AcmeSearchFlatDTO[]
     total_pages: number
   }>(this.$, this.payload.bind(this))
@@ -103,10 +109,6 @@ export class AcmeSearchFlatModelStore {
       ...response,
       items: response.items.map(item => new AcmeSearchFlatModel(this.$, item)),
     }
-  }
-
-  @action.bound refresh() {
-    this.loader.refresh()
   }
 
   @computed get filtered() {

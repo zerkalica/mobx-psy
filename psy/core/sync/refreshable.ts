@@ -6,13 +6,7 @@ export interface PsySyncRefreshable {
   /**
    * Reset fiber state and retry calculations.
    */
-  refresh(): void
-
-  /**
-   * Is fiber calculations running first time?
-   * Used in @link ../mock.ts to return mock on first run instead of real component
-   */
-  readonly isFirstRun: boolean
+  refresh(): unknown
 }
 
 const refreshableKey = Symbol('psySyncRefreshable')
