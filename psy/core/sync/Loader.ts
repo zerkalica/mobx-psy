@@ -8,16 +8,6 @@ import { PsyLog } from '../log/log'
 import { PsySsrHydrator } from '../ssr/Hydrator'
 import { PsySyncRefreshable, psySyncRefreshable } from './refreshable'
 
-/**
- * ```ts
- * class F {
- *   @computed get loader() { return new Loader(this.$, this.filters) }
- *   user() {
- *     return this.loader.value
- *   }
- * }
- * ```
- */
 export class PsySyncLoader<Result, Args extends PsyFetcherProps = PsyFetcherProps> implements PsySyncRefreshable {
   constructor(
     protected $: PsyContext,
@@ -40,22 +30,35 @@ export class PsySyncLoader<Result, Args extends PsyFetcherProps = PsyFetcherProp
 
   @observable protected counter = 0
 
-  get loading() {
-    this.counter
+  protected actual: Result | undefined = undefined
 
-    return this.cached instanceof Promise
+  get loading() {
+    return this.pulled instanceof Promise
+  }
+
+  get initial() {
+    return this.actual === undefined && this.pulled instanceof Promise
   }
 
   get error() {
-    this.counter
-
-    return this.cached instanceof Error ? this.cached : undefined
+    const value = this.pulled
+    return value instanceof Error ? value : undefined
   }
 
-  protected actual: Result | undefined = undefined
+  get value() {
+    const value = this.pulled
+
+    if (this.actual !== undefined) return this.actual
+    if (value instanceof Error || value instanceof Promise) return psyErrorThrowHidden(value)
+
+    this.actual = value
+
+    return value
+  }
+
   protected cached: Result | Promise<unknown> | Error | undefined = undefined
 
-  get value() {
+  @computed protected get pulled() {
     this.counter
     // Subsribe to args to refetch, recalculate if args changed
     const key = this.key
@@ -64,37 +67,31 @@ export class PsySyncLoader<Result, Args extends PsyFetcherProps = PsyFetcherProp
     if (cached === undefined) cached = this.hydrator.get<Result>(key)
     if (cached === undefined) cached = this.refresh()
 
-    if (this.actual !== undefined) return this.actual
-
-    if (cached instanceof Error) return psyErrorThrowHidden(cached)
-    if (cached instanceof Promise) return psyErrorThrowHidden(cached)
-
-    this.actual = cached
-
     return cached
   }
 
   protected ac = new AbortController()
 
   @action.bound refresh() {
-    const next = this.counter + 1
-    const cached = this.refreshAsync(next)
+    const cached = this.refreshAsync()
     psySyncRefreshable(cached, this)
     this.hydrator.prepare(this.key, cached)
     this.cached = cached
-    this.counter = next
+    this.counter++
 
     return cached
   }
 
-  protected async refreshAsync(counter: number) {
+  protected async refreshAsync() {
+    this.ac.abort()
+    this.ac = new AbortController()
+    const signal = this.ac.signal
+
     try {
-      this.ac.abort()
-      this.ac = new AbortController()
-      const next = await this.fetch(this.args(), this.ac.signal)
-      this.success(next, counter)
+      const next = await this.fetch(this.args(), signal)
+      this.success(next, signal)
     } catch (e) {
-      this.fail(e, counter)
+      this.fail(e, signal)
     }
   }
 
@@ -102,20 +99,20 @@ export class PsySyncLoader<Result, Args extends PsyFetcherProps = PsyFetcherProp
     return this.fetcher.get(args, signal) as Promise<Result>
   }
 
-  @action protected fail(e: unknown, counter: number) {
+  @action protected fail(e: unknown, signal: AbortSignal) {
     const err = psyErrorNormalize(e)
     psySyncRefreshable(err, this)
     this.hydrator.error(this.key, err)
-    if (counter !== this.counter) return this.warnAbortSignal()
+    if (signal.aborted) return this.warnAbortSignal()
 
     this.cached = err
     this.counter++
   }
 
-  @action protected success(next: Result, counter: number) {
+  @action protected success(next: Result, signal: AbortSignal) {
     if (next === undefined) throw new Error(`Change undefined to null in response of ${this}`)
     this.hydrator.set(this.key, next)
-    if (counter !== this.counter) return this.warnAbortSignal()
+    if (signal.aborted) return this.warnAbortSignal()
 
     this.cached = next
     this.actual = next
