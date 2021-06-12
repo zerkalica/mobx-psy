@@ -1,9 +1,11 @@
-import { action, computed, makeObservable, observable, onBecomeUnobserved } from 'mobx'
+import { action, computed, makeObservable, observable, onBecomeUnobserved, runInAction } from 'mobx'
 
 import { PsyContext } from '../context/Context'
+import { psyDataIsPromise } from '../data/isPromise'
 import { psyErrorThrowHidden } from '../error/hidden'
 import { psyErrorNormalize } from '../error/normalize'
 import { PsyFetcher, PsyFetcherProps } from '../fetcher/Fetcher'
+import { psyFunctionName } from '../function/name'
 import { PsyLog } from '../log/log'
 import { PsySsrHydrator } from '../ssr/Hydrator'
 import { PsySyncRefreshable, psySyncRefreshable } from './refreshable'
@@ -47,7 +49,6 @@ export class PsySyncLoader<Result, Args extends PsyFetcherProps = PsyFetcherProp
 
   get value() {
     const value = this.pulled
-
     if (this.actual !== undefined) return this.actual
     if (value instanceof Error || value instanceof Promise) return psyErrorThrowHidden(value)
 
@@ -128,5 +129,55 @@ export class PsySyncLoader<Result, Args extends PsyFetcherProps = PsyFetcherProp
     this.ac.abort()
     this.cached = undefined
     this.actual = undefined
+  }
+
+  protected static cache: Map<string, unknown> | undefined = undefined
+
+  static async promise<V>(cb: () => V) {
+    const prev = this.cache
+
+    try {
+      this.cache = new Map()
+      return cb()
+    } catch (e) {
+      if (psyDataIsPromise(e)) return e as Promise<V>
+      psyErrorThrowHidden(e)
+    } finally {
+      this.cache = prev
+    }
+  }
+
+  static memo<V>(cb: () => V, key: string) {
+    if (this.cache?.has(key)) return this.cache.get(key) as V
+    const result = runInAction(cb)
+    this.cache?.set(key, result)
+
+    return result
+  }
+
+  static action<Args extends unknown[], Res>(action: (...args: Args) => Res) {
+    const wrapped = psyFunctionName(async (...args: Args) => {
+      const cache = new Map()
+
+      const cb = () => {
+        const prev = this.cache
+        this.cache = cache
+        try {
+          return action(...args)
+        } catch (e) {
+          if (psyDataIsPromise(e)) {
+            ;(e as Promise<unknown>).then(cb, cb)
+          } else {
+            psyErrorThrowHidden(e)
+          }
+        } finally {
+          this.cache = prev
+        }
+      }
+
+      return cb()
+    }, `${action}#PsySyncLoader.action`)
+
+    return wrapped
   }
 }
