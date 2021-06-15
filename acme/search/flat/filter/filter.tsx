@@ -33,7 +33,7 @@ export function AcmeSearchFlatFilter(p: { id: string }) {
       <button id={`${p.id}-reset`} disabled={!route.changed} onClick={route.reset}>
         Reset filters
       </button>
-      <button id={`${p.id}-refreshList`} onClick={flats.loader.refresh} disabled={flats.loader.loading}>
+      <button id={`${p.id}-refreshList`} onClick={flats.refresh} disabled={flats.loading}>
         Refresh list
       </button>
     </div>
