@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { PsyContext } from '@psy/core/context/Context'
-import { psyDataCompareDeep } from '@psy/core/data/compare'
+import { PsyContext } from '@psy/psy/context/Context'
+import { psyDataCompareDeep } from '@psy/psy/data/compare'
 
 import { usePsyContext } from './context'
 
@@ -29,7 +29,10 @@ import { usePsyContext } from './context'
  * ```
  */
 
-export function usePsyContextMemo<Result, Args extends unknown[]>(cl: new (ctx: PsyContext, ...args: Args) => Result, ...args: Args) {
+export function usePsyContextMemo<Result, Args extends unknown[]>(
+  cl: new (ctx: PsyContext, ...args: Args) => Result,
+  ...args: Args
+) {
   const ctx = usePsyContext()
   const memo = React.useRef<[Args, Result] | undefined>()
   if (memo.current === undefined || !psyDataCompareDeep(args, memo.current[0])) {

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PsyContext, PsyContextUpdater } from '@psy/core/context/Context'
+import { PsyContext, PsyContextUpdater } from '@psy/psy/context/Context'
 
 import { PsyContextReact } from './context'
 

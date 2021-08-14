@@ -1,7 +1,7 @@
 {
-  "name": "@psy/react",
+  "name": "@psy/psy",
   "version": "1.0.0",
-  "description": "Mobx pseudo syncronous loader",
+  "description": "Mobx pseudo syncronous loader core",
   "exports": {
     "./*": "./-/*"
   },
@@ -15,18 +15,9 @@
     "prepublishOnly": "psy-boot prepublish"
   },
   "dependencies": {
-    "mobx": "^6.3.0",
-    "mobx-react-lite": "^3.2.0",
-    "react": "^17.0.2",
-    "@psy/psy": "^1.0.0"
+    "mobx": "^6.3.2"
   },
   "devDependencies": {
-    "@types/react": "^17.0.17",
     "@psy/boot": "^1.0.1"
-  },
-  "peerDependencies": {
-    "mobx": "*",
-    "mobx-react-lite": "*",
-    "react": "*"
   }
 }

@@ -4,7 +4,7 @@
 
 ## Packages
 
-- [@psy/core](./packages/@psy/core/core) - Core library
+- [@psy/psy](./packages/@psy/psy) - Core library
 - [@psy/react](./packages/@psy/react) - React bindings
 - [my/app/search](./packages/my/app/search) - Example application: filter form, list, pagination, loading indicator, parametrized url. Parcel, server side rendering, dev and prod server, state hydrate.
 
@@ -19,10 +19,10 @@ yarn watch
 ## Basic ideas
 
 - Each async calculation in observer component throws promise (like React.Suspense).
-- Each component wrapped into @psy/core observer, which uses [core-react-lite](https://github.com/mobxjs/core-react-lite) internally, but try/catches promises and returns loading/error Fallback component.
-- Each async calculation wrapped into @psy/core cache, after promise resolve, @psy/core rerenders component and returns data from cache.
+- Each component wrapped into @psy/psy observer, which uses [core-react-lite](https://github.com/mobxjs/core-react-lite) internally, but try/catches promises and returns loading/error Fallback component.
+- Each async calculation wrapped into @psy/psy cache, after promise resolve, @psy/psy rerenders component and returns data from cache.
 
-@psy/core emulates [fibers](https://gist.github.com/nin-jin/5408ef8f16f43f1b4fe9cbcea577aac6).
+@psy/psy emulates [fibers](https://gist.github.com/nin-jin/5408ef8f16f43f1b4fe9cbcea577aac6).
 
 ## Compare to core-task
 
@@ -81,7 +81,7 @@ After:
 
 ```tsx
 import { observable, action, makeObservable } from 'core'
-import { sync, observer, suspendify, effect } from '@psy/core'
+import { sync, observer, suspendify, effect } from '@psy/psy'
 import React from 'react'
 
 const baseUrl = '/'
@@ -181,7 +181,7 @@ export function FallbackLoading({children) {
 ## Custom default loading message
 
 ```tsx
-import { configurePsy } from '@psy/core'
+import { configurePsy } from '@psy/psy'
 
 configurePsy({
   loading: FallbackLoading,
@@ -192,7 +192,7 @@ configurePsy({
 ## Data mocking while loading
 
 ```tsx
-import { mock } from '@psy/core'
+import { mock } from '@psy/psy'
 
 // ...
 const App = observer(function App() {
@@ -212,7 +212,7 @@ const App = observer(function App() {
 ## Parallel loading
 
 ```tsx
-import { parallel } from '@psy/core'
+import { parallel } from '@psy/psy'
 
 // ...
 const store1 = new TodoStore()

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PsySyncRefreshable } from '@psy/core/sync/refreshable'
+import { PsySyncRefreshable } from '@psy/psy/sync/refreshable'
 
 export interface PsySyncFallbackLoadingProps {
   /**

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { PsyContext } from '@psy/core/context/Context'
+import { PsyContext } from '@psy/psy/context/Context'
 
 export const PsyContextReact = React.createContext(PsyContext.instance)
 PsyContextReact.displayName = 'PsyContextReact'

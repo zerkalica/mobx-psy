@@ -1,9 +1,9 @@
 import yargs, { Argv } from 'yargs'
 
-import { commandPrePublishYargs } from './prePublish'
-import { commandCleanYargs } from './clean'
 import { PsyBootInfo, psyBootInfo } from '../info/info'
+import { commandCleanYargs } from './clean'
 import { CommandContext } from './context'
+import { commandPrePublishYargs } from './prePublish'
 
 export async function command() {
   const yargs = await commandYargs()
@@ -13,7 +13,7 @@ export async function command() {
     .command(commandCleanYargs)
     .help()
 
-  const argv = commands.parse()
+  const argv = await commands.parse()
   console.log(argv._[0], argv.lib ? 'library' : 'application', argv.projectDir)
   if (argv._.length === 0) commands.showHelp()
 }

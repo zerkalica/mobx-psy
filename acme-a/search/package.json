@@ -1,0 +1,42 @@
+{
+  "name": "@acme-a/search",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Example flat search application",
+  "exports": {
+    "./*": "./-/*"
+  },
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf - *.log .cache",
+    "start": "bin/acme-search",
+    "build": "tsc --build && NODE_ENV=production node ./-/boot/prod/build",
+    "build:dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/build",
+    "analyze": "tsc --build && NODE_ENV=production WP_ANALYZER=1 node ./-/boot/prod/build",
+    "dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/server",
+    "dev:node": "WP_NO_WATCH=1 NODE_ENV=development tsc-watch --build --noClear --onSuccess 'node ./-/boot/dev/server'"
+  },
+  "bin": {
+    "acme-search": "./bin/acme-search"
+  },
+  "dependencies": {
+    "@emotion/styled": "^11.3.0",
+    "@emotion/react": "^11.4.1",
+    "@psy/psy": "^1.0.0",
+    "@psy/react": "^1.0.0",
+    "@acme/router": "^1.0.0",
+    "@acme/server": "^1.0.0",
+    "@acme/ui": "^1.0.0",
+    "express": "^4.17.1",
+    "mobx": "^6.3.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@psy/boot": "^1.0.0",
+    "@acme/build": "^1.0.0",
+    "@types/express": "^4.17.13",
+    "@types/react": "^17.0.17",
+    "@types/react-dom": "^17.0.9"
+  }
+}

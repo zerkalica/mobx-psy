@@ -2,12 +2,12 @@ import { ServerResponse } from 'http'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 
-import { usePsyContextNode } from '@psy/core/context/provide.node'
-import { PsyErrorNotFound } from '@psy/core/error/NotFound'
-import { PsyLog } from '@psy/core/log/log'
-import { psySsrMdlAsync } from '@psy/core/ssr/mdlAsync'
-import { PsySsrRender } from '@psy/core/ssr/Render.node'
-import { PsySsrTemplate } from '@psy/core/ssr/Template'
+import { usePsyContextNode } from '@psy/psy/context/provide.node'
+import { PsyErrorNotFound } from '@psy/psy/error/NotFound'
+import { PsyLog } from '@psy/psy/log/log'
+import { psySsrMdlAsync } from '@psy/psy/ssr/mdlAsync'
+import { PsySsrRender } from '@psy/psy/ssr/Render.node'
+import { PsySsrTemplate } from '@psy/psy/ssr/Template'
 
 import { PsyContextProvide } from '../context/provide'
 
