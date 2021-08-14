@@ -7,7 +7,7 @@
   "author": "Stefan Zerkalica <zerkalica@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "clean": "yarn workspaces run clean && git clean -xdf",
+    "clean": "yarn workspaces run clean",
     "build": "yarn workspaces run build",
     "up": "npm-check-updates -u && yarn workspaces run npm-check-updates -u && yarn workspaces run clean && git clean -xdf && yarn install",
     "postinstall": "yarn workspace @psy/boot run build",
@@ -16,7 +16,7 @@
   "workspaces": [
     "psy/*",
     "acme/*",
-    "acme/a/*"
+    "acme-a/*"
   ],
   "devDependencies": {
     "@types/jest": "^27.0.1",

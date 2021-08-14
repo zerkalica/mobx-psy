@@ -1,7 +1,7 @@
-import '@acme/ui/polyfill'
+import '@acme/browser/polyfill'
 
-import { acmeSearchBootCommonBrowser } from '../common/browser'
-import { acmeSearchBootDevBrowserConfig } from './browserConfig'
+import { AcmeSearchBootBrowser } from '../browser'
+import { acmeSearchBootDevConfigBrowser } from './configBrowser'
 import { acmeSearchBootDevMocks } from './mocks'
 
 const fetcher = acmeSearchBootDevMocks({
@@ -9,4 +9,8 @@ const fetcher = acmeSearchBootDevMocks({
   timeout: 500,
 })
 
-acmeSearchBootCommonBrowser({ fetchFn: fetcher, fallbackConfig: acmeSearchBootDevBrowserConfig })
+const browser = new AcmeSearchBootBrowser()
+browser.fetcher = () => fetcher
+browser.fallbackConfig = () => acmeSearchBootDevConfigBrowser
+
+browser.start()

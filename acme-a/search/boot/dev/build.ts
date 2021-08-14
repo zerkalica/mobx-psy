@@ -1,15 +1,11 @@
 import '@acme/server/polyfill'
 
-import { AcmeBuildBundler } from '@acme/build/bundler'
-import { PsySsrTemplate } from '@psy/psy/ssr/Template'
+import { AcmeSearchBootBuild } from '../build'
+import { acmeSearchBootDevConfig } from './config'
 
-import { acmeSearchPkgName } from '../../pkgName'
-import { acmeSearchBootDevBrowserConfig } from './browserConfig'
+const bundler = new AcmeSearchBootBuild()
+bundler.publicUrl = () => acmeSearchBootDevConfig.browser.publicUrl
+bundler.distRoot = () => __dirname
+bundler.isDev = () => true
 
-new AcmeBuildBundler({
-  publicUrl: acmeSearchBootDevBrowserConfig.publicUrl,
-  distRoot: __dirname,
-  pkgName: acmeSearchPkgName,
-  template: new PsySsrTemplate(),
-  isDev: true,
-}).bundle()
+bundler.bundle()

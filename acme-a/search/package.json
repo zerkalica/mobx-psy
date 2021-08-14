@@ -4,7 +4,7 @@
   "private": true,
   "description": "Example flat search application",
   "exports": {
-    "./*": "./-/*"
+    "./*": "./-/*.js"
   },
   "license": "MIT",
   "scripts": {

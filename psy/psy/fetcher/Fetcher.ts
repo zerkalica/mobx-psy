@@ -21,7 +21,7 @@ export class PsyFetcher {
     return new Date().getTime() + '_' + String(Math.floor(Math.random() * 10e9))
   }
 
-  protected static json(args: PsyFetcherProps, init: RequestInit) {
+  static json(args: PsyFetcherProps, init: RequestInit) {
     const res = this.fetch(this.url(args), init).then(resp => resp.json()) as PromiseLike<unknown> & {
       [Symbol.toStringTag]?: string
     }

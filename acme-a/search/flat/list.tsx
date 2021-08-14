@@ -1,19 +1,17 @@
-import React from 'react'
-
 import { psySyncMock } from '@psy/psy/sync/mock'
-import { usePsyContextMemo } from '@psy/react/context/memo'
-import { PsyContextProvide } from '@psy/react/context/provide'
-import { psySyncObserver } from '@psy/react/sync/observer'
+import { usePsyReactMemo } from '@psy/react/memo'
+import { psyReactObserver } from '@psy/react/observer'
+import { PsyReactProvide } from '@psy/react/provide'
 
 import { AcmeSearchFlatDetails } from './details'
 import { AcmeSearchFlatFilter } from './filter/filter'
 import { AcmeSearchFlatModelStore } from './model'
 
-export const AcmeSearchFlatList = psySyncObserver(function AcmeSearchFlatList({ id }: { id: string }) {
-  const flats = usePsyContextMemo(AcmeSearchFlatModelStore, { id })
+export const AcmeSearchFlatList = psyReactObserver(function AcmeSearchFlatList({ id }: { id: string }) {
+  const flats = usePsyReactMemo(AcmeSearchFlatModelStore, { id })
 
   return (
-    <PsyContextProvide deps={ctx => ctx.set(AcmeSearchFlatModelStore.instance, flats)}>
+    <PsyReactProvide deps={ctx => ctx.set(AcmeSearchFlatModelStore.instance, flats)}>
       <div id={id}>
         <AcmeSearchFlatFilter id={`${id}-filter`} />
         {psySyncMock({
@@ -38,6 +36,6 @@ export const AcmeSearchFlatList = psySyncObserver(function AcmeSearchFlatList({ 
           Next
         </button>
       </div>
-    </PsyContextProvide>
+    </PsyReactProvide>
   )
 })

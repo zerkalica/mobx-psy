@@ -5,7 +5,7 @@
   "private": true,
   "license": "MIT",
   "exports": {
-    "./*": "./-/*"
+    "./*": "./-/*.js"
   },
   "scripts": {
     "clean": "rm -rf - *.log",

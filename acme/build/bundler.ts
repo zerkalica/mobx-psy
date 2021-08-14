@@ -13,33 +13,43 @@ import webpack from 'webpack'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 
-import { AcmeServerManifest } from '@acme/server/Manifest'
-import { psyContextProvideNodeMdl } from '@psy/psy/context/provide.node'
+import { PsyContext } from '@psy/psy/context/Context'
 import { psySsrMdlCombine } from '@psy/psy/ssr/mdlCombine'
 import { PsySsrTemplate } from '@psy/psy/ssr/Template'
 
-import { AcmeBuildAssetPlugin, acmeBuildAssetPluginAssets } from './AssetPlugin'
+import { acmeBuildAssetMdl } from './assetMdl'
+import { AcmeBuildAssetPlugin } from './AssetPlugin'
 
 export class AcmeBuildBundler {
-  constructor(
-    opts: {
-      version?: string
-      pkgName: string
-      noWatch?: boolean
-      distRoot: string
-      publicUrl: string
-      template?: PsySsrTemplate
-      analyzer?: boolean
-      isDev?: boolean
-    },
-    protected isDev = opts.isDev ?? process.env.NODE_ENV === 'development',
-    protected noWatch = opts.noWatch ?? process.env.WP_NO_WATCH === '1',
-    protected analyzer = opts.analyzer ?? process.env.WP_ANALYZER === '1',
-    protected pkgName = opts.pkgName,
-    protected distRoot = opts.distRoot,
-    protected publicUrl = opts.publicUrl,
-    protected template = opts.template
-  ) {}
+  constructor(protected $ = PsyContext.instance) {}
+
+  protected isDevOverrided = false
+
+  isDev() {
+    if (this.isDevOverrided) return this.isDevOverrided
+
+    return process.env.NODE_ENV === 'development'
+  }
+
+  noWatch() {
+    return process.env.WP_NO_WATCH === '1'
+  }
+
+  analyzer() {
+    return process.env.WP_ANALYZER === '1'
+  }
+
+  pkgName() {
+    return ''
+  }
+
+  distRoot() {
+    return ''
+  }
+
+  publicUrl() {
+    return ''
+  }
 
   protected versionCached: string | undefined = undefined
 
@@ -47,28 +57,31 @@ export class AcmeBuildBundler {
     return child_process.execSync('git rev-parse --short HEAD').toString().trim()
   }
 
-  get version() {
+  version() {
     return this.versionCached ?? (this.versionCached = this.getVersion())
   }
 
-  get outDir() {
-    return path.join(this.distRoot, 'public')
+  outDir() {
+    return path.join(this.distRoot(), 'public')
   }
 
-  protected get browserEntry() {
-    return path.join(this.distRoot, 'browser')
+  protected browserEntry() {
+    return path.join(this.distRoot(), 'browser')
   }
 
-  get manifestName() {
+  manifestName() {
     return 'manifest.json'
   }
 
-  protected get manifest() {
-    return path.join(this.outDir, this.manifestName)
+  protected manifestPath() {
+    return path.join(this.outDir(), this.manifestName())
   }
 
   protected wpc(): webpack.Configuration {
-    const { isDev, outDir, browserEntry, pkgName } = this
+    const isDev = this.isDev()
+    const outDir = this.outDir()
+    const browserEntry = this.browserEntry()
+    const pkgName = this.pkgName()
 
     return {
       name: path.basename(browserEntry),
@@ -144,13 +157,13 @@ export class AcmeBuildBundler {
   }
 
   protected plugAcmeAsset() {
-    return new AcmeBuildAssetPlugin({ meta: { version: this.version }, filename: this.manifestName }) as
+    return new AcmeBuildAssetPlugin({ meta: { version: this.version() }, filename: this.manifestName() }) as
       | AcmeBuildAssetPlugin
       | undefined
   }
 
   protected plugAnalyzer() {
-    return this.analyzer ? new BundleAnalyzerPlugin() : undefined
+    return this.analyzer() ? new BundleAnalyzerPlugin() : undefined
   }
 
   protected plugProgress() {
@@ -162,7 +175,7 @@ export class AcmeBuildBundler {
       patterns: [
         {
           from: '**/*.{png,jpg,svg,gif,woff2}',
-          to: this.isDev ? '[name][ext]' : '[name]-[contenthash][ext]',
+          to: this.isDev() ? '[name][ext]' : '[name]-[contenthash][ext]',
           globOptions: {
             ignore: ['**/-'],
           },
@@ -173,10 +186,17 @@ export class AcmeBuildBundler {
 
   protected log(obj: Object | string) {
     console.log(obj)
+    // this.$.get(PsyLog).debug({
+    //   place: 'AcmeBuildBundler',
+    //   message: obj
+    // })
   }
 
   protected compiler() {
-    const { outDir, browserEntry, pkgName, version } = this
+    const outDir = this.outDir()
+    const browserEntry = this.browserEntry()
+    const pkgName = this.pkgName()
+    const version = this.version()
 
     const compiler = webpack(this.wpc())
     const run = promisify(compiler.run.bind(compiler))
@@ -185,9 +205,7 @@ export class AcmeBuildBundler {
     return { compiler, run }
   }
 
-  async bundle() {
-    this.tests()
-
+  async manifest() {
     const { run } = this.compiler()
 
     const stats = await run()
@@ -195,18 +213,28 @@ export class AcmeBuildBundler {
     if (!stats) throw new Error('No stats')
     this.log(stats.toString({ colors: true }))
 
-    const manifest = acmeBuildAssetPluginAssets(stats.compilation)
+    return AcmeBuildAssetPlugin.info(stats.compilation)
+  }
 
-    const template = this.template
+  protected template() {
+    return new PsySsrTemplate()
+  }
 
-    if (!template) return manifest
+  async bundle() {
+    this.tests()
+    const manifest = await this.manifest()
 
-    const t = Object.assign(new PsySsrTemplate(), template)
-    t.pkgName = () => this.pkgName
-    t.version = () => this.version
-    t.bodyJs = () => [...t.bodyJs(), ...Object.values(manifest.entries).map(src => ({ src: this.publicUrl + src }))]
+    const t = this.template()
 
-    await fs.writeFile(path.join(this.outDir, t.fileName()), template.render({ __files: manifest.files }))
+    if (!t) return manifest
+
+    t.pkgName = () => this.pkgName()
+    t.version = () => this.version()
+
+    const prevBodyJs = t.bodyJs.bind(t)
+    t.bodyJs = () => [...prevBodyJs(), ...Object.values(manifest.entries).map(src => ({ src: this.publicUrl() + src }))]
+
+    await fs.writeFile(path.join(this.outDir(), t.fileName()), t.render({ __files: manifest.files }))
 
     return manifest
   }
@@ -219,8 +247,7 @@ export class AcmeBuildBundler {
   }
 
   middleware() {
-    this.isDev = true
-    const { version, noWatch } = this
+    this.isDevOverrided = true
     const { compiler } = this.compiler()
 
     const mdl = webpackDevMiddleware(compiler, {
@@ -229,10 +256,10 @@ export class AcmeBuildBundler {
 
     mdl.close()
 
-    if (noWatch) this.tests()
+    if (this.noWatch()) this.tests()
     else this.watch(mdl.invalidate.bind(mdl))
 
-    return psySsrMdlCombine(mdl, acmeBuildBundlerMdl({ version }))
+    return psySsrMdlCombine(mdl, acmeBuildAssetMdl({ version: this.version() }))
   }
 
   protected watch(invalidate: () => void) {
@@ -248,29 +275,4 @@ export class AcmeBuildBundler {
     tswc.on('compile_errors', invalidate)
     tswc.start('--noClear', '--build', '.')
   }
-}
-
-function acmeBuildBundlerMdl({ version }: { version: string }) {
-  return psyContextProvideNodeMdl(async function acmeBuildBundlerMdl$(
-    $,
-    req,
-    res: Object & {
-      locals?: {
-        webpack?: { devMiddleware?: { stats: webpack.Stats; outputFileSystem: webpack.Compiler['outputFileSystem'] } }
-      }
-    }
-  ) {
-    const compilation = res.locals?.webpack?.devMiddleware?.stats.compilation
-
-    if (!compilation) {
-      throw new Error('acmeBuildBundlerMdl: compilation not found in res.locals.webpack.devMiddleware.stats.compilation')
-    }
-
-    return $.set(AcmeServerManifest, {
-      ...AcmeServerManifest,
-      isDev: true,
-      version,
-      ...acmeBuildAssetPluginAssets(compilation),
-    })
-  })
 }

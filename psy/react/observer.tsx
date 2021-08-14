@@ -11,8 +11,8 @@ import { PsySsrHydrator } from '@psy/psy/ssr/Hydrator'
 import { psySyncMockState } from '@psy/psy/sync/mock'
 import { psySyncRefreshable } from '@psy/psy/sync/refreshable'
 
-import { usePsyContext } from '../context/context'
-import { psySyncConfig } from './config'
+import { psyReactConfig } from './config'
+import { usePsyReactContext } from './context'
 
 /**
  * Handles suspendable calculations in component.
@@ -20,7 +20,7 @@ import { psySyncConfig } from './config'
  *
  * @example
  * ```tsx
- * const App = observer(function App() {
+ * const App = psyReactObserver(function App() {
  *  return <ul>
  *    {
  *      store.todos.map(todo => <div>{todo.text}</div>) // throws Error or Promise
@@ -29,8 +29,8 @@ import { psySyncConfig } from './config'
  * })
  * ```
  */
-export function psySyncObserver<Props extends {}>(baseComponent: React.FunctionComponent<Props>, options = psySyncConfig) {
-  if (options !== psySyncConfig) options = { ...psySyncConfig, ...options }
+export function psyReactObserver<Props extends {}>(baseComponent: React.FunctionComponent<Props>, options = psyReactConfig) {
+  if (options !== psyReactConfig) options = { ...psyReactConfig, ...options }
 
   const value = (baseComponent.displayName ?? baseComponent.name ?? String(baseComponent)) + '#psy'
 
@@ -38,7 +38,7 @@ export function psySyncObserver<Props extends {}>(baseComponent: React.FunctionC
 
   const SafeComponent = psyFunctionName((props: Props): React.ReactElement | null => {
     const node = React.useRef<React.ReactElement | null>(null)
-    const $ = usePsyContext()
+    const $ = usePsyReactContext()
     const hydrator = $.get(PsySsrHydrator.instance)
     const old = PsyContext.instance
     PsyContext.instance = $

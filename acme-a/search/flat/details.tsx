@@ -1,10 +1,8 @@
-import React from 'react'
-
-import { psySyncObserver } from '@psy/react/sync/observer'
+import { psyReactObserver } from '@psy/react/observer'
 
 import { AcmeSearchFlatModel } from './model'
 
-export const AcmeSearchFlatDetails = psySyncObserver(function AcmeSearchFlatDetails({
+export const AcmeSearchFlatDetails = psyReactObserver(function AcmeSearchFlatDetails({
   id,
   flat,
 }: {

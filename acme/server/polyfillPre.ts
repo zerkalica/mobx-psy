@@ -6,4 +6,4 @@ import { enableStaticRendering } from 'mobx-react-lite'
 
 enableStaticRendering(true)
 
-Error.stackTraceLimit = 50
+Error.stackTraceLimit = 100

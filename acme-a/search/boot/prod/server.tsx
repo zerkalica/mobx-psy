@@ -1,11 +1,10 @@
 import '@acme/server/polyfill'
 
-import { acmeSearchBootCommonServer } from '../common/server'
-import { acmeSearchBootProdBrowserConfig } from './browserConfig'
-import { acmeSearchBootProdServerConfig } from './serverConfig'
+import { AcmeSearchBootServer } from '../server'
+import { acmeSearchBootProdConfig } from './config'
 
-acmeSearchBootCommonServer({
-  serverConfig: acmeSearchBootProdServerConfig,
-  browserConfig: acmeSearchBootProdBrowserConfig,
-  distRoot: __dirname,
-})
+const srv = new AcmeSearchBootServer()
+srv.fallbackConfig = () => acmeSearchBootProdConfig
+srv.distRoot = () => __dirname
+
+srv.start()

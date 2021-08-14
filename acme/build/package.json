@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Example app common bundler staff",
   "exports": {
-    "./*": "./-/*"
+    "./*": "./-/*.js"
   },
   "private": true,
   "license": "MIT",

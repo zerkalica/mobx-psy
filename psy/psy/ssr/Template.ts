@@ -1,6 +1,10 @@
 export type PsySsrTemplateScriptProps = { src: string }
 
 export class PsySsrTemplate {
+  node() {
+    return undefined as undefined | unknown
+  }
+
   fileName() {
     return 'index.html'
   }

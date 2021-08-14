@@ -1,6 +1,9 @@
-import '@acme/ui/polyfill'
+import '@acme/browser/polyfill'
 
-import { acmeSearchBootCommonBrowser } from '../common/browser'
-import { acmeSearchBootProdBrowserConfig } from './browserConfig'
+import { AcmeSearchBootBrowser } from '../browser'
+import { acmeSearchBootProdConfigBrowser } from './configBrowser'
 
-acmeSearchBootCommonBrowser({ fallbackConfig: acmeSearchBootProdBrowserConfig })
+const browser = new AcmeSearchBootBrowser()
+browser.fallbackConfig = () => acmeSearchBootProdConfigBrowser
+
+browser.start()

@@ -8,9 +8,9 @@
     {"path": "../../psy/psy"},
     {"path": "../../psy/react"},
     {"path": "../../psy/boot"},
-    {"path": "../../server"},
-    {"path": "../../ui"},
-    {"path": "../../router"},
-    {"path": "../../build"}
+    {"path": "../../acme/server"},
+    {"path": "../../acme/ui"},
+    {"path": "../../acme/router"},
+    {"path": "../../acme/build"}
   ]
 }

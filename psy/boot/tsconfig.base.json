@@ -17,6 +17,6 @@
             "dom",
             "esnext"
         ],
-        "jsx": "react"
+        "jsx": "react-jsx"
     }
 }

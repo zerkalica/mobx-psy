@@ -1,13 +1,12 @@
-import React from 'react'
-
 import { AcmeUiNumberInput } from '@acme/ui/numberInput'
-import { usePsyContext } from '@psy/react/context/context'
+import { usePsyReactContext } from '@psy/react/context'
+import { psyReactObserver } from '@psy/react/observer'
 
 import { AcmeSearchFlatListRoute } from '../ListRoute'
 import { AcmeSearchFlatModelStore } from '../model'
 
-export function AcmeSearchFlatFilter(p: { id: string }) {
-  const $ = usePsyContext()
+export const AcmeSearchFlatFilter = psyReactObserver(function AcmeSearchFlatFilter(p: { id: string }) {
+  const $ = usePsyReactContext()
   const route = $.get(AcmeSearchFlatListRoute.instance)
   const flats = $.get(AcmeSearchFlatModelStore.instance)
 
@@ -38,4 +37,4 @@ export function AcmeSearchFlatFilter(p: { id: string }) {
       </button>
     </div>
   )
-}
+})

@@ -3,24 +3,6 @@ import path from 'path'
 import { callbackify, promisify } from 'util'
 import webpack from 'webpack'
 
-export function acmeBuildAssetPluginAssets(compilation: webpack.Compilation) {
-  const files = {} as Record<string, string>
-  const entries = {} as Record<string, string>
-
-  for (const [k, v] of compilation.assetsInfo) {
-    if (v.sourceFilename) files[v.sourceFilename] = k
-  }
-
-  compilation.entrypoints.forEach((p, k) => {
-    entries[k] = Array.from(p.getEntrypointChunk().files)?.[0]
-  })
-
-  return {
-    files,
-    entries,
-  }
-}
-
 export class AcmeBuildAssetPlugin {
   constructor(
     protected opts: {
@@ -30,12 +12,30 @@ export class AcmeBuildAssetPlugin {
     } = {}
   ) {}
 
+  static info(compilation: webpack.Compilation) {
+    const files = {} as Record<string, string>
+    const entries = {} as Record<string, string>
+
+    for (const [k, v] of compilation.assetsInfo) {
+      if (v.sourceFilename) files[v.sourceFilename] = k
+    }
+
+    compilation.entrypoints.forEach((p, k) => {
+      entries[k] = Array.from(p.getEntrypointChunk().files)?.[0]
+    })
+
+    return {
+      files,
+      entries,
+    }
+  }
+
   apply(compiler: webpack.Compiler) {
     compiler.hooks.emit.tapAsync({ name: 'AcmeAcmeBuildAssetPlugin' }, callbackify(this.emit.bind(this)))
   }
 
   async emit(compilation: webpack.Compilation) {
-    const out = acmeBuildAssetPluginAssets(compilation)
+    const out = AcmeBuildAssetPlugin.info(compilation)
 
     const fs = compilation.compiler.outputFileSystem as typeof compilation.compiler.outputFileSystem & {
       mkdirp?(p: string, cb: (err?: unknown) => void): void

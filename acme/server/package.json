@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Example app common server staff",
   "exports": {
-    "./*": "./-/*"
+    "./*": "./-/*.js"
   },
   "private": true,
   "license": "MIT",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@psy/psy": "^1.0.0",
     "@psy/react": "^1.0.0",
+    "@acme/browser": "^1.0.0",
     "@acme/router": "^1.0.0",
     "@acme/ui": "^1.0.0",
     "abortcontroller-polyfill": "^1.7.3",

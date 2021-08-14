@@ -1,12 +1,10 @@
 import '@acme/server/polyfill'
 
-import { AcmeBuildBundler } from '@acme/build/bundler'
+import { AcmeSearchBootBuild } from '../build'
+import { acmeSearchBootProdConfig } from './config'
 
-import { acmeSearchPkgName } from '../../pkgName'
-import { acmeSearchBootProdBrowserConfig } from './browserConfig'
+const bundler = new AcmeSearchBootBuild()
+bundler.publicUrl = () => acmeSearchBootProdConfig.browser.publicUrl
+bundler.distRoot = () => __dirname
 
-new AcmeBuildBundler({
-  publicUrl: acmeSearchBootProdBrowserConfig.publicUrl,
-  distRoot: __dirname,
-  pkgName: acmeSearchPkgName,
-}).bundle()
+bundler.bundle()

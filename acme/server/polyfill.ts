@@ -1,2 +1,2 @@
 import './polyfillPre'
-import '@acme/ui/polyfill'
+import '@acme/browser/polyfill'

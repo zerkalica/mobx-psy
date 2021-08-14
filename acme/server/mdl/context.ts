@@ -1,11 +1,9 @@
 import express from 'express'
 import nodeFetch from 'node-fetch'
-import path from 'path'
 
 import { AcmeRouterLocation } from '@acme/router/location'
 import { psyContextProvideNode, usePsyContextNode } from '@psy/psy/context/provide.node'
 import { PsyFetcher } from '@psy/psy/fetcher/Fetcher'
-import { PsyFetcherNode } from '@psy/psy/fetcher/Fetcher.node'
 import { PsyLog } from '@psy/psy/log/log'
 import { psySsrClient } from '@psy/psy/ssr/client.node'
 import { PsySsrHydrator } from '@psy/psy/ssr/Hydrator'
@@ -15,18 +13,13 @@ import { psySsrMdlAsync } from '@psy/psy/ssr/mdlAsync'
 import { AcmeServerManifest, AcmeServerManifestLoader } from '../Manifest'
 
 export function acmeServerMdlContext({
-  distRoot = __dirname,
-  outDir = path.join(distRoot, 'public'),
-  browserConfig = {} as Record<string, unknown>,
-  serverConfig = { apiUrl: '/' },
+  outDir = 'public',
+  fallbackConfig = { apiUrl: '/', browser: {} as Record<string, unknown> },
   fetcher: fetchRaw = nodeFetch as unknown as typeof fetch,
 }) {
-  const manifestLoader = new AcmeServerManifestLoader()
-
   return psySsrMdlAsync(async function acmeServerMdlContext$(req: express.Request, res: express.Response, next) {
     const ctx = usePsyContextNode()
-    let manifest = ctx.get(AcmeServerManifest)
-    if (manifest === AcmeServerManifest) manifest = await manifestLoader.load({ outDir })
+    const manifest = await new AcmeServerManifestLoader(ctx).load({ outDir })
 
     psyContextProvideNode(next, $ => {
       const requestId = (req.headers['x-request-id'] as string | undefined) ?? PsyFetcher.requestId()
@@ -35,7 +28,7 @@ export function acmeServerMdlContext({
       const cli = psySsrClient(req, req.secure)
 
       return $.set(AcmeServerManifest, manifest)
-        .set(PsySsrHydrator.instance, new PsySsrHydratorNode({ __config: browserConfig, __files: manifest.files }))
+        .set(PsySsrHydrator.instance, new PsySsrHydratorNode({ __config: fallbackConfig.browser, __files: manifest.files }))
         .set(
           PsyLog,
           class PsyLogNodeConfgured extends $.get(PsyLog) {
@@ -51,9 +44,9 @@ export function acmeServerMdlContext({
         )
         .set(
           PsyFetcher,
-          class PsyFetcherNodeConfigured extends $.get(PsyFetcherNode) {
+          class PsyFetcherNodeConfigured extends $.get(PsyFetcher) {
             static $ = $
-            static baseUrl = serverConfig.apiUrl
+            static baseUrl = fallbackConfig.apiUrl
             static fetch = fetchRaw
             static requestId = () => requestId
           }

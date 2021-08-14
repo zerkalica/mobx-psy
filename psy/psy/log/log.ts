@@ -29,6 +29,11 @@ export class PsyLog {
     return p.message instanceof Error ? p.message.stack : p.message
   }
 
+  static debug<V extends PsyLogObject>(p: V) {
+    if (this.isLogged(p)) return
+    console.log(`${p.place} ${this.contextStr()}: ${this.format(p)}`)
+  }
+
   static warn<V extends PsyLogObject>(p: V) {
     if (this.isLogged(p)) return
     console.warn(`${p.place} ${this.contextStr()}: ${this.format(p)}`)

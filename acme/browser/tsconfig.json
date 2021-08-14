@@ -5,11 +5,8 @@
     "rootDir": "."
   },
   "references": [
-    {"path": "../../psy/psy"},
+    {"path": "../ui"},
     {"path": "../../psy/react"},
-    {"path": "../../psy/boot"},
-    {"path": "../browser"},
-    {"path": "../router"},
-    {"path": "../build"}
+    {"path": "../../psy/boot"}
   ]
 }

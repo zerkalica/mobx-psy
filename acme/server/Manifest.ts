@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 
+import { PsyContext } from '@psy/psy/context/Context'
 import { psyErrorThrowHidden } from '@psy/psy/error/hidden'
 import { psyErrorNormalize } from '@psy/psy/error/normalize'
 
@@ -12,36 +13,43 @@ export const AcmeServerManifest = {
 }
 
 export class AcmeServerManifestLoader {
-  protected cache = new Map<string, typeof AcmeServerManifest>()
+  protected static cache = new Map<string, typeof AcmeServerManifest>()
+
+  constructor(protected $ = PsyContext.instance, protected options = { cache: AcmeServerManifestLoader.cache }) {}
+  protected cache = this.options.cache
 
   async load({ outDir, manifestFileName = 'manifest.json' }: { outDir: string; manifestFileName?: string }) {
+    let manifest = this.$.get(AcmeServerManifest)
+
+    if (manifest !== AcmeServerManifest) return manifest
+
     const manifestFile = path.join(outDir, manifestFileName)
-    let manifest = this.cache.get(manifestFile)
+    let cached = this.cache.get(manifestFile)
 
-    if (!manifest) {
-      let isExists = false
+    if (cached !== undefined) return cached
 
-      try {
-        isExists = (await fs.stat(manifestFile)).isFile()
-      } catch (e) {}
+    let isExists = false
 
-      try {
-        const manifestBuf = !isExists ? undefined : await fs.readFile(manifestFile)
+    try {
+      isExists = (await fs.stat(manifestFile)).isFile()
+    } catch (e) {}
 
-        manifest = !manifestBuf ? undefined : (JSON.parse(manifestBuf.toString()) as typeof AcmeServerManifest)
-        if (!manifest) throw new Error(`No manifest found`)
-      } catch (e) {
-        const err = psyErrorNormalize(e)
-        err.message += ` ${manifestFile}`
+    try {
+      const manifestBuf = !isExists ? undefined : await fs.readFile(manifestFile)
 
-        return psyErrorThrowHidden(err)
-      }
+      cached = !manifestBuf ? undefined : (JSON.parse(manifestBuf.toString()) as typeof AcmeServerManifest)
+      if (!cached) throw new Error(`No manifest found`)
+    } catch (e) {
+      const err = psyErrorNormalize(e)
+      err.message += ` ${manifestFile}`
 
-      if (this.cache.size > 1000) this.cache.clear()
-
-      this.cache.set(manifestFile, manifest)
+      return psyErrorThrowHidden(err)
     }
 
-    return manifest
+    if (this.cache.size > 1000) this.cache.clear()
+
+    this.cache.set(manifestFile, cached)
+
+    return cached
   }
 }
