@@ -1,2 +1,2 @@
-import './polyfillPre'
-import '@acme/browser/polyfill'
+import './envProd'
+import './polyfillCommon'

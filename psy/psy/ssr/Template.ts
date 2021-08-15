@@ -2,7 +2,7 @@ export type PsySsrTemplateScriptProps = { src: string }
 
 export class PsySsrTemplate {
   node() {
-    return undefined as undefined | unknown
+    return undefined as undefined | any
   }
 
   fileName() {
@@ -10,7 +10,7 @@ export class PsySsrTemplate {
   }
 
   titleText() {
-    return `Debug title`
+    return `Что-то пошло не так`
   }
 
   version() {
@@ -66,8 +66,21 @@ export class PsySsrTemplate {
 `
   }
 
-  body() {
+  rid() {
     return ''
+  }
+
+  error = undefined as undefined | Error
+
+  bodyFail() {
+    return `<h2>Что-то пошло не так</h2>
+  <pre>Сообщите ID в тех-поддержку: <b>${this.rid()}</b></pre>
+  ${this.error ? `<pre>${this.error.stack ?? 'unk'}</pre>` : ''}
+`
+  }
+
+  body() {
+    return this.bodyFail()
   }
 
   renderEnd(state?: Record<string, unknown>) {

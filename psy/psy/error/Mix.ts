@@ -22,11 +22,15 @@ export class PsyErrorMix extends Error {
     }
   }
 
-  filterDeep<V>(cls: new (...args: any[]) => V, result = [] as V[]) {
+  find<V>(cls: new (...args: any[]) => V) {
+    return this.filter(cls)?.[0]
+  }
+
+  filter<V>(cls: new (...args: any[]) => V, result = [] as V[]) {
     if (!this.errors) return undefined
 
     for (const e of this.errors) {
-      if (e instanceof PsyErrorMix) e.filterDeep(cls, result)
+      if (e instanceof PsyErrorMix) e.filter(cls, result)
       if (e instanceof cls) result.push(e)
     }
 

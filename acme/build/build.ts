@@ -20,7 +20,7 @@ import { PsySsrTemplate } from '@psy/psy/ssr/Template'
 import { acmeBuildAssetMdl } from './assetMdl'
 import { AcmeBuildAssetPlugin } from './AssetPlugin'
 
-export class AcmeBuildBundler {
+export class AcmeBuild {
   constructor(protected $ = PsyContext.instance) {}
 
   protected isDevOverrided = false
@@ -187,7 +187,7 @@ export class AcmeBuildBundler {
   protected log(obj: Object | string) {
     console.log(obj)
     // this.$.get(PsyLog).debug({
-    //   place: 'AcmeBuildBundler',
+    //   place: 'AcmeBuild',
     //   message: obj
     // })
   }

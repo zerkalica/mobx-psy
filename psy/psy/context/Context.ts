@@ -23,6 +23,10 @@ export class PsyContext {
     return next.changed ? next : this
   }
 
+  get isChanged() {
+    return this.changed
+  }
+
   protected changed = false
 
   set<V extends PsyContextValue>(p: PsyContextKey<V>, v: V) {

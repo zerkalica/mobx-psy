@@ -10,11 +10,11 @@
   "scripts": {
     "clean": "rm -rf - *.log .cache",
     "start": "bin/acme-search",
-    "build": "tsc --build && NODE_ENV=production node ./-/boot/prod/build",
-    "build:dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/build",
-    "analyze": "tsc --build && NODE_ENV=production WP_ANALYZER=1 node ./-/boot/prod/build",
-    "dev": "tsc --build && NODE_ENV=development node ./-/boot/dev/server",
-    "dev:node": "WP_NO_WATCH=1 NODE_ENV=development tsc-watch --build --noClear --onSuccess 'node ./-/boot/dev/server'"
+    "build": "tsc --build && node ./-/boot/prod/build",
+    "build:dev": "tsc --build && node ./-/boot/dev/build",
+    "analyze": "tsc --build && WP_ANALYZER=1 node ./-/boot/prod/build",
+    "dev": "tsc --build && node ./-/boot/dev/server",
+    "dev:node": "WP_NO_WATCH=1 tsc-watch --build --noClear --onSuccess 'node ./-/boot/dev/server'"
   },
   "bin": {
     "acme-search": "./bin/acme-search"

@@ -1,8 +1,8 @@
-import { AcmeBuildBundler } from '@acme/build/bundler'
+import { AcmeBuild } from '@acme/build/build'
 
 import { acmeSearchBootConfig } from './config'
 
-export class AcmeSearchBootBuild extends AcmeBuildBundler {
+export class AcmeSearchBootBuild extends AcmeBuild {
   publicUrl() {
     return acmeSearchBootConfig.browser.publicUrl
   }

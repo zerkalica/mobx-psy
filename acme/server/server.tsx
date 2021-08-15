@@ -1,17 +1,16 @@
-import express from 'express'
+import http, { IncomingMessage, ServerResponse } from 'http'
 import path from 'path'
+import serveStatic from 'serve-static'
 
-import { AcmeBuildBundler } from '@acme/build/bundler'
+import { AcmeBuild } from '@acme/build/build'
 import { PsyContext } from '@psy/psy/context/Context'
 import { usePsyContextNode } from '@psy/psy/context/provide.node'
 import { PsyLog } from '@psy/psy/log/log'
-import { psySsrMdlAsync } from '@psy/psy/ssr/mdlAsync'
 import { PsySsrTemplate } from '@psy/psy/ssr/Template'
-import { psyReactMiddleware } from '@psy/react/middleware.node'
 
+import { AcmeServerControllerFront } from './controller/ControllerFront'
 import { AcmeServerManifest } from './Manifest'
-import { acmeServerMdlContext } from './mdl/context'
-import { acmeServerMdlError } from './mdl/error'
+import { AcmeServerRequestHttp } from './request/RequestHttp'
 
 export class AcmeServer {
   constructor(protected parentCtx = PsyContext.instance) {}
@@ -44,13 +43,11 @@ export class AcmeServer {
     return this.$.get(PsyLog)
   }
 
-  protected srv = express()
-
   bundlerCreate() {
-    return new AcmeBuildBundler()
+    return new AcmeBuild()
   }
 
-  private bundlerCached = undefined as undefined | AcmeBuildBundler
+  private bundlerCached = undefined as undefined | AcmeBuild
 
   private bundler() {
     if (!this.isDev()) return undefined
@@ -63,40 +60,6 @@ export class AcmeServer {
     bundler.isDev = () => this.isDev()
 
     return this.bundlerCached
-  }
-
-  protected staticMdl() {
-    const mdl = this.bundler()?.middleware() ?? express.static(this.outDir(), { index: false })
-
-    this.srv.use(mdl)
-  }
-
-  protected contextMdl() {
-    return this.srv.use(
-      acmeServerMdlContext({
-        outDir: this.outDir(),
-        fallbackConfig: this.fallbackConfig(),
-        fetcher: this.fetcher(),
-      })
-    )
-  }
-
-  protected versionMdl() {
-    this.srv.get('/version', (req, res) => {
-      const $ = usePsyContextNode()
-      const manifest = $.get(AcmeServerManifest)
-      res.send(manifest.version)
-    })
-  }
-
-  protected faviconMdl() {
-    this.srv.use((req, res) => {
-      res.status(200).end()
-    })
-  }
-
-  protected errorMdl() {
-    this.srv.use(acmeServerMdlError)
   }
 
   node() {
@@ -120,35 +83,55 @@ export class AcmeServer {
     return Promise.resolve(template)
   }
 
-  protected renderMdl() {
-    if (!this.node) return undefined
+  protected serverCached: http.Server | undefined = undefined
 
-    this.srv.use(
-      psySsrMdlAsync(async (req, res, next) => {
-        const template = await this.template()
-        psyReactMiddleware({ template })(req, res, next)
-      })
-    )
+  protected middleware() {
+    return this.bundler()?.middleware() ?? serveStatic(this.outDir(), { index: false })
   }
 
-  protected mdl() {
-    this.staticMdl()
-    this.versionMdl()
-    this.faviconMdl()
-    this.contextMdl()
-    this.renderMdl()
+  protected controller() {
+    const controller = new AcmeServerControllerFront(this.$)
+    controller.outDir = () => this.outDir()
+
+    return controller
+  }
+
+  protected async process(reqRaw: IncomingMessage, resRaw: ServerResponse, e?: Error) {
+    const req = new AcmeServerRequestHttp(reqRaw)
+    const controller = this.controller()
+    controller.req = () => req
+
+    const res = await (e ? controller.fail(e) : controller.run())
+
+    resRaw.writeHead(res.statusCode(), { 'Content-Type': res.contentType() })
+    const buffer = res.buffer()
+    if (!buffer || typeof buffer === 'string' || buffer instanceof Buffer) return resRaw.end(buffer)
+
+    buffer.pipe(resRaw)
+  }
+
+  protected server() {
+    if (this.serverCached) return this.serverCached
+    const mdl = this.middleware()
+
+    this.serverCached = http.createServer((reqRaw, resRaw) => {
+      const next = this.process.bind(this, reqRaw, resRaw)
+      if (!mdl) return next()
+
+      mdl(reqRaw, resRaw, next)
+    })
+    this.serverCached.once('error', this.fail.bind(this))
+
+    return this.serverCached
   }
 
   start() {
-    this.mdl()
-    this.errorMdl()
-    this.srv.once('error', this.fail.bind(this))
-    this.srv.listen(this.fallbackConfig().port, this.ready.bind(this))
+    this.server().listen(this.fallbackConfig().port, this.ready.bind(this))
   }
 
   protected fail(e: Error) {
     this.log.error({
-      place: 'AcmeServer.fail',
+      place: 'AcmeServer.startFail',
       message: e,
     })
   }

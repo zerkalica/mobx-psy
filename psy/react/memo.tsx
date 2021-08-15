@@ -23,7 +23,7 @@ import { usePsyReactContext } from './context'
  * }
  *
  * function App(p: {id: string}) {
- *   const user = usePsyMemoClass(User, p.id)
+ *   const user = usePsyReactMemo(User, {id: p.id })
  *   return <div>{user.name}</div>
  * }
  * ```

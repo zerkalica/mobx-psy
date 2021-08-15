@@ -1,1 +1,2 @@
+import './envDev'
 import './polyfillCommon'

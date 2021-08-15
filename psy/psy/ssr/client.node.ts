@@ -2,10 +2,10 @@ import { IncomingMessage } from 'http'
 
 import { psyClient } from '../client/client'
 
-export function psySsrClient(req: IncomingMessage, sequre = true) {
+export function psySsrClient(req: IncomingMessage) {
   const headers = req.headers
 
-  let protocol = headers['x-forwared-proto'] || (sequre ? 'https' : 'http')
+  let protocol = headers['x-forwared-proto'] ?? 'http'
   if (Array.isArray(protocol)) protocol = protocol[0] || ''
 
   let host = headers['x-forwarded-host'] || headers['host'] || ''

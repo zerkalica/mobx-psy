@@ -1,4 +1,4 @@
-import '@acme/server/polyfill'
+import '@acme/server/polyfillDev'
 
 import { AcmeSearchBootServer } from '../server'
 import { acmeSearchBootDevConfig } from './config'

@@ -15,16 +15,30 @@ export const AcmeServerManifest = {
 export class AcmeServerManifestLoader {
   protected static cache = new Map<string, typeof AcmeServerManifest>()
 
-  constructor(protected $ = PsyContext.instance, protected options = { cache: AcmeServerManifestLoader.cache }) {}
-  protected cache = this.options.cache
+  constructor(protected $ = PsyContext.instance) {}
 
-  async load({ outDir, manifestFileName = 'manifest.json' }: { outDir: string; manifestFileName?: string }) {
+  cache() {
+    return AcmeServerManifestLoader.cache
+  }
+
+  outDir() {
+    return ''
+  }
+
+  manifestFile() {
+    return 'manifest.json'
+  }
+
+  async load() {
+    const outDir = this.outDir()
+    const manifestFileName = this.manifestFile()
+    const cache = this.cache()
     let manifest = this.$.get(AcmeServerManifest)
 
     if (manifest !== AcmeServerManifest) return manifest
 
     const manifestFile = path.join(outDir, manifestFileName)
-    let cached = this.cache.get(manifestFile)
+    let cached = cache.get(manifestFile)
 
     if (cached !== undefined) return cached
 
@@ -46,9 +60,9 @@ export class AcmeServerManifestLoader {
       return psyErrorThrowHidden(err)
     }
 
-    if (this.cache.size > 1000) this.cache.clear()
+    if (cache.size > 1000) cache.clear()
 
-    this.cache.set(manifestFile, cached)
+    cache.set(manifestFile, cached)
 
     return cached
   }
