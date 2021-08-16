@@ -1,0 +1,26 @@
+{
+  "name": "@acme/ui",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Example application ui library",
+  "exports": {
+    "./*": "./-/*.js"
+  },
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf - *.log",
+    "build": "tsc --build && jest --passWithNoTests",
+    "dev": "tsc-watch --build --noClear --onSuccess 'jest --passWithNoTests'",
+    "prepublishOnly": "psy-boot prepublish"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0",
+    "react": "^17.0.2"
+  },
+  "devDependencies": {
+    "@psy/boot": "^1.0.0",
+    "@types/styled-system": "^5.1.12",
+    "@types/react": "^17.0.17"
+  }
+}

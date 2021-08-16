@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "-",
+    "rootDir": "."
+  },
+  "references": [
+    {"path": "../../psy/psy"},
+    {"path": "../../psy/react"},
+    {"path": "../../psy/boot"},
+    {"path": "../../acme/server"},
+    {"path": "../../acme/ui"},
+    {"path": "../../acme/router"},
+    {"path": "../../acme/build"}
+  ]
+}

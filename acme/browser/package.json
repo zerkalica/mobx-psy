@@ -1,0 +1,29 @@
+{
+  "name": "@acme/browser",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Example application ui library",
+  "exports": {
+    "./*": "./-/*.js"
+  },
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf - *.log",
+    "build": "tsc --build && jest --passWithNoTests",
+    "dev": "tsc-watch --build --noClear --onSuccess 'jest --passWithNoTests'",
+    "prepublishOnly": "psy-boot prepublish"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "mobx": "^6.3.2",
+    "@acme/ui": "^1.0.0",
+    "@acme/router": "^1.0.0",
+    "@psy/psy": "^1.0.0",
+    "@psy/react": "^1.0.0"
+  },
+  "devDependencies": {
+    "@psy/boot": "^1.0.0",
+    "@types/react": "^17.0.17"
+  }
+}

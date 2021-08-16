@@ -1,0 +1,23 @@
+{
+  "name": "@acme/router",
+  "version": "1.0.0",
+  "description": "Example app stack router",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    "./*": "./-/*.js"
+  },
+  "scripts": {
+    "clean": "rm -rf - *.log",
+    "build": "tsc --build && jest --passWithNoTests",
+    "dev": "tsc-watch --build --noClear --onSuccess 'jest --passWithNoTests'",
+    "prepublishOnly": "psy-boot prepublish"
+  },
+  "dependencies": {
+    "@psy/psy": "^1.0.0",
+    "mobx": "^6.3.2"
+  },
+  "devDependencies": {
+    "@psy/boot": "^1.0.0"
+  }
+}

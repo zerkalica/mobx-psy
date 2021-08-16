@@ -5,7 +5,7 @@
   "typings": "-/index.d.ts",
   "exports": {
     ".": "./-/index.js",
-    "./": "./-/"
+    "./*": "./-/*.js"
   },
   "description": "Typescript based projects build scripts",
   "repository": {
@@ -26,15 +26,14 @@
     "psy-boot": "./bin/psy-boot"
   },
   "dependencies": {
-    "del": "^5.1.0",
+    "del": "^6.0.0",
     "enhanced-resolve": "^5.8.2",
     "exits": "^2.0.1",
     "find-up": "^5.0.0",
-    "globby": "^11.0.1",
-    "ts-jest": "^26.3.0",
-    "yargs": "^16.0.3"
+    "globby": "^11.0.0",
+    "yargs": "^17.1.1"
   },
   "devDependencies": {
-    "@types/yargs": "^15.0.5"
+    "@types/yargs": "^17.0.2"
   }
 }

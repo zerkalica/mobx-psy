@@ -3,7 +3,8 @@
   "compilerOptions": {
     "plugins": [
       //{"name": "ts-plugin-autoimport-fix"}
-    ]
+    ],
+    "jsx": "react-jsx"
   },
   "exclude": [
     "**/node_modules",

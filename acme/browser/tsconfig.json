@@ -5,7 +5,8 @@
     "rootDir": "."
   },
   "references": [
-    {"path": "../psy"},
-    {"path": "../boot"}
+    {"path": "../ui"},
+    {"path": "../../psy/react"},
+    {"path": "../../psy/boot"}
   ]
 }

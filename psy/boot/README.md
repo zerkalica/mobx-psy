@@ -68,7 +68,7 @@ To prevent copypaste, you can extend some configs from `@psy/boot` in your proje
 
 ### tsconfig.json
 
-`@psy/core/tsconfig.json`
+`@psy/psy/tsconfig.json`
 
 ```json
 {
@@ -77,14 +77,14 @@ To prevent copypaste, you can extend some configs from `@psy/boot` in your proje
   "compilerOptions": {
     "baseUrl": "packages",
     "paths": {
-      "@psy/core": ["@psy/core/src"],
-      "@psy/core-*": ["@psy/core-*/src"]
+      "@psy/psy": ["@psy/psy/src"],
+      "@psy/psy-*": ["@psy/psy-*/src"]
     }
   }
 }
 ```
 
-`@psy/core/packages/tsconfig.json`
+`@psy/psy/packages/tsconfig.json`
 
 ```json
 {
@@ -98,7 +98,7 @@ To prevent copypaste, you can extend some configs from `@psy/boot` in your proje
 
 ### jest.config.js
 
-`@psy/core/jest.config.js`
+`@psy/psy/jest.config.js`
 
 ```js
 module.exports = {
@@ -106,7 +106,7 @@ module.exports = {
 }
 ```
 
-`@psy/core/packages/@psy/core/jest.config.js`
+`@psy/psy/packages/@psy/psy/jest.config.js`
 
 ```js
 module.exports = require('@psy/boot').jestConfig(__dirname)
@@ -114,13 +114,13 @@ module.exports = require('@psy/boot').jestConfig(__dirname)
 
 ### prettier.config.js
 
-`@psy/core/prettier.config.js`
+`@psy/psy/prettier.config.js`
 
 ```js
 module.exports = require('@psy/boot').createPrettierConfig(__dirname)
 ```
 
-`@psy/core/packages/@psy/core/prettier.config.js`
+`@psy/psy/packages/@psy/psy/prettier.config.js`
 
 ```js
 module.exports = require('@psy/boot').createPrettierConfig(__dirname)
@@ -129,4 +129,4 @@ module.exports = require('@psy/boot').createPrettierConfig(__dirname)
 ## Advanced
 
 - For additional help, use `@psy/boot --help` or `@psy/boot <command> --help`.
-- Example monorepository with libraries and application: [@psy/core](https://github.com/zerkalica/mobx-psy)
+- Example monorepository with libraries and application: [@psy/psy](https://github.com/zerkalica/mobx-psy)
