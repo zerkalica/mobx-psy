@@ -21,7 +21,7 @@ export class AcmeServerManifestLoader {
     return AcmeServerManifestLoader.cache
   }
 
-  outDir() {
+  publicDir() {
     return ''
   }
 
@@ -30,14 +30,14 @@ export class AcmeServerManifestLoader {
   }
 
   async load() {
-    const outDir = this.outDir()
+    const publicDir = this.publicDir()
     const manifestFileName = this.manifestFile()
     const cache = this.cache()
     let manifest = this.$.get(AcmeServerManifest)
 
     if (manifest !== AcmeServerManifest) return manifest
 
-    const manifestFile = path.join(outDir, manifestFileName)
+    const manifestFile = path.join(publicDir, manifestFileName)
     let cached = cache.get(manifestFile)
 
     if (cached !== undefined) return cached

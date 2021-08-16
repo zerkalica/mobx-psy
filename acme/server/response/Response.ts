@@ -1,15 +1,27 @@
-import { AcmeServerRequestContentType } from '../request/Request'
+import type { AcmeServerRequestContentType } from '../request/Request'
+
+export type AcmeServerResponseProps = Partial<Omit<AcmeServerResponse, 'body'>> & {
+  body?: string | Buffer | NodeJS.ReadableStream | Object | undefined
+}
 
 export class AcmeServerResponse {
-  statusCode() {
-    return 200
-  }
+  readonly code = 200 as number
+  readonly contentType = 'text/html' as AcmeServerRequestContentType
+  readonly body = undefined as string | Buffer | NodeJS.ReadableStream | undefined
 
-  contentType(): AcmeServerRequestContentType {
-    return 'text/html'
-  }
+  constructor(props: AcmeServerResponseProps) {
+    for (let k in this) {
+      if ((props as this)[k] !== undefined) this[k] = (props as this)[k]
+    }
+    const body = props.body
 
-  buffer() {
-    return undefined as string | Buffer | NodeJS.ReadableStream | undefined
+    if (body !== null && typeof body === 'object') {
+      const isStream = typeof (body as { on?: Function }).on === 'function'
+
+      if (!(body instanceof Buffer) && !isStream) {
+        if (!props.contentType) this.contentType = 'application/json'
+        this.body = JSON.stringify(body)
+      }
+    }
   }
 }

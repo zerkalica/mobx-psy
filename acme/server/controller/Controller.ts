@@ -1,16 +1,25 @@
+import { PsyContext } from '@psy/psy/context/Context'
+import { PsyLog } from '@psy/psy/log/log'
+
 import { AcmeServerRequest } from '../request/Request'
-import { AcmeServerResponse } from '../response/Response'
+import { AcmeServerResponse, AcmeServerResponseProps } from '../response/Response'
 
 export class AcmeServerController {
+  constructor(protected $: PsyContext) {}
+
   req() {
     return new AcmeServerRequest()
   }
 
-  res() {
-    return new AcmeServerResponse()
+  res(props: AcmeServerResponseProps) {
+    return new AcmeServerResponse(props)
   }
 
   async process() {
-    return new AcmeServerResponse() as AcmeServerResponse | undefined
+    return undefined as AcmeServerResponse | undefined | void
+  }
+
+  get log() {
+    return this.$.get(PsyLog)
   }
 }

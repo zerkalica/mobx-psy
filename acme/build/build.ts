@@ -61,7 +61,7 @@ export class AcmeBuild {
     return this.versionCached ?? (this.versionCached = this.getVersion())
   }
 
-  outDir() {
+  publicDir() {
     return path.join(this.distRoot(), 'public')
   }
 
@@ -74,12 +74,12 @@ export class AcmeBuild {
   }
 
   protected manifestPath() {
-    return path.join(this.outDir(), this.manifestName())
+    return path.join(this.publicDir(), this.manifestName())
   }
 
   protected wpc(): webpack.Configuration {
     const isDev = this.isDev()
-    const outDir = this.outDir()
+    const outDir = this.publicDir()
     const browserEntry = this.browserEntry()
     const pkgName = this.pkgName()
 
@@ -193,7 +193,7 @@ export class AcmeBuild {
   }
 
   protected compiler() {
-    const outDir = this.outDir()
+    const outDir = this.publicDir()
     const browserEntry = this.browserEntry()
     const pkgName = this.pkgName()
     const version = this.version()
@@ -234,7 +234,7 @@ export class AcmeBuild {
     const prevBodyJs = t.bodyJs.bind(t)
     t.bodyJs = () => [...prevBodyJs(), ...Object.values(manifest.entries).map(src => ({ src: this.publicUrl() + src }))]
 
-    await fs.writeFile(path.join(this.outDir(), t.fileName()), t.render({ __files: manifest.files }))
+    await fs.writeFile(path.join(this.publicDir(), t.fileName()), t.render({ __files: manifest.files }))
 
     return manifest
   }

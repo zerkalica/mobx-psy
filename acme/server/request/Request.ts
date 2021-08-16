@@ -1,7 +1,7 @@
 import { psyClient } from '@psy/psy/client/client'
 import { PsyFetcher } from '@psy/psy/fetcher/Fetcher'
 
-export type AcmeServerRequestContentType = 'text/html' | 'application/json'
+export type AcmeServerRequestContentType = 'text/html' | 'application/json' | 'text/plain'
 
 export class AcmeServerRequest {
   contentType(): AcmeServerRequestContentType {
@@ -29,19 +29,20 @@ export class AcmeServerRequest {
     const protocol = this.proto()
     const userAgent = this.ua()
     // IPv6 literal support
-    const offset: number = host[0] === '[' ? host.indexOf(']') + 1 : 0
-    const index: number = host.indexOf(':', offset)
-    const hostname: string = index !== -1 ? host.substring(0, index) : host
-    const port: string = index !== -1 ? host.substring(index + 1) : ''
+    const offset = host[0] === '[' ? host.indexOf(']') + 1 : 0
+    const index = host.indexOf(':', offset)
+    const hostname = index !== -1 ? host.substring(0, index) : host
+    const port = index !== -1 ? host.substring(index + 1) : ''
 
-    const fullUrl = `${protocol}://${host}${this.url()}`
-    const parts = new URL(fullUrl)
+    const href = `${protocol}://${host}${this.url()}`
+    const origin = `${protocol}://${hostname}`
+    const { pathname, search } = new URL(href)
 
     const location = {
-      search: parts.search || '',
-      origin: `${protocol}://${hostname}`,
-      pathname: parts.pathname || '',
-      href: fullUrl,
+      search,
+      origin,
+      pathname,
+      href,
       port,
       hostname,
     }
