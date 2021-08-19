@@ -6,11 +6,12 @@ import { AcmeBuild } from '@acme/build/build'
 import { PsyContext } from '@psy/psy/context/Context'
 import { PsyLog } from '@psy/psy/log/log'
 
-import { AcmeServerContext } from './Context'
-import { AcmeServerControllerFront } from './controller/ControllerFront'
-import { AcmeServerRequestHttp } from './request/RequestHttp'
+import { AcmeServerContext } from '../Context'
+import { AcmeServerControllerFront } from '../controller/Front'
+import { AcmeServerManifestLoader } from '../Manifest'
+import { AcmeServerRequestHttp } from '../request/RequestHttp'
 
-export class AcmeServer {
+export class AcmeServerHttp {
   constructor(protected $ = PsyContext.instance) {}
 
   fallbackConfig() {
@@ -49,13 +50,30 @@ export class AcmeServer {
     return this.$.get(PsyLog)
   }
 
-  private bundlerCached = undefined as undefined | AcmeBuild
+  context() {
+    const context = new AcmeServerContext(this.$)
+    context.browserConfig = () => this.fallbackConfig().browser
+    context.apiUrl = () => this.apiUrl()
+    return context
+  }
 
-  private bundler() {
+  controller() {
+    const controller = new AcmeServerControllerFront()
+    controller.publicUrl = () => this.publicUrl()
+    controller.pkgName = () => this.pkgName()
+    return controller
+  }
+
+  protected bundlerCreate() {
+    return new AcmeBuild(this.$)
+  }
+
+  private bundlerCached = undefined as undefined | AcmeBuild
+  protected bundler() {
     if (!this.isDev()) return undefined
     if (this.bundlerCached) return this.bundlerCached
 
-    const bundler = (this.bundlerCached = new AcmeBuild(this.$))
+    const bundler = (this.bundlerCached = this.bundlerCreate())
     bundler.publicUrl = () => this.publicUrl()
     bundler.distRoot = () => this.distRoot()
     bundler.publicDir = () => this.publicDir()
@@ -65,36 +83,32 @@ export class AcmeServer {
     return this.bundlerCached
   }
 
-  protected serverCached: http.Server | undefined = undefined
-
   protected middleware() {
     return this.bundler()?.middleware() ?? serveStatic(this.publicDir(), { index: false })
   }
 
-  context() {
-    const context = new AcmeServerContext(this.$)
-    context.publicDir = () => this.publicDir()
-    context.browserConfig = () => this.fallbackConfig().browser
-    context.apiUrl = () => this.apiUrl()
-    return context
-  }
+  protected manifest(reqRaw: IncomingMessage, resRaw: ServerResponse) {
+    const manifest = this.bundler()?.manifestFromResponse(resRaw)
+    if (manifest) return manifest
 
-  controller($: PsyContext) {
-    const controller = new AcmeServerControllerFront($)
-    controller.publicUrl = () => this.publicUrl()
-    controller.pkgName = () => this.pkgName()
-    return controller
+    const manifestLoader = new AcmeServerManifestLoader(this.$)
+    manifestLoader.publicDir = () => this.publicDir()
+    return manifestLoader.load()
   }
 
   protected async process(reqRaw: IncomingMessage, resRaw: ServerResponse, e?: Error) {
+    const manifest = await this.manifest(reqRaw, resRaw)
+
     const req = new AcmeServerRequestHttp(reqRaw)
+    req.manifest = () => manifest
 
     const context = this.context()
     context.req = () => req
 
     const $ = await context.build()
 
-    const controller = this.controller($)
+    const controller = this.controller()
+    controller.$ = $
     controller.req = () => req
 
     const res = await (e ? controller.fail(e) : controller.run())
@@ -104,6 +118,8 @@ export class AcmeServer {
 
     res.body.pipe(resRaw)
   }
+
+  protected serverCached: http.Server | undefined = undefined
 
   protected server() {
     if (this.serverCached) return this.serverCached

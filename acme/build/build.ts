@@ -5,6 +5,7 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 // @ts-ignore
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import { promises as fs } from 'fs'
+import { ServerResponse } from 'http'
 import path from 'path'
 // @ts-ignore
 import TscWatchClient from 'tsc-watch/client'
@@ -14,10 +15,8 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import webpackDevMiddleware from 'webpack-dev-middleware'
 
 import { PsyContext } from '@psy/psy/context/Context'
-import { psySsrMdlCombine } from '@psy/psy/ssr/mdlCombine'
 import { PsySsrTemplate } from '@psy/psy/ssr/Template'
 
-import { acmeBuildAssetMdl } from './assetMdl'
 import { AcmeBuildAssetPlugin } from './AssetPlugin'
 
 export class AcmeBuild {
@@ -259,7 +258,26 @@ export class AcmeBuild {
     if (this.noWatch()) this.tests()
     else this.watch(mdl.invalidate.bind(mdl))
 
-    return psySsrMdlCombine(mdl, acmeBuildAssetMdl({ version: this.version() }))
+    return mdl
+  }
+
+  manifestFromResponse(
+    res: ServerResponse & {
+      locals?: {
+        webpack?: { devMiddleware?: { stats: webpack.Stats; outputFileSystem: webpack.Compiler['outputFileSystem'] } }
+      }
+    }
+  ) {
+    const compilation = res.locals?.webpack?.devMiddleware?.stats.compilation
+    if (!compilation) {
+      throw new Error('manifestFromResponse: compilation not found in res.locals.webpack.devMiddleware.stats.compilation')
+    }
+
+    return {
+      isDev: true,
+      version: this.version(),
+      ...AcmeBuildAssetPlugin.info(compilation),
+    }
   }
 
   protected watch(invalidate: () => void) {

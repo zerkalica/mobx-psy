@@ -7,7 +7,6 @@ import { PsyLog } from '@psy/psy/log/log'
 import { PsySsrHydrator } from '@psy/psy/ssr/Hydrator'
 import { PsySsrHydratorNode } from '@psy/psy/ssr/Hydrator.node'
 
-import { AcmeServerManifest, AcmeServerManifestLoader } from './Manifest'
 import { AcmeServerRequest } from './request/Request'
 
 export class AcmeServerContext {
@@ -57,30 +56,18 @@ export class AcmeServerContext {
     return {}
   }
 
-  async hydrator() {
-    const manifest = await this.manifest()
-    return new PsySsrHydratorNode({ __config: this.browserConfig(), __files: manifest.files })
+  hydrator() {
+    return new PsySsrHydratorNode({ __config: this.browserConfig(), __files: this.req().manifest().files })
   }
 
   location() {
     return new AcmeRouterLocation(this.req().location())
   }
 
-  publicDir() {
-    return ''
-  }
-
-  manifest() {
-    const manifestLoader = new AcmeServerManifestLoader(this.$)
-    manifestLoader.publicDir = () => this.publicDir()
-    return manifestLoader.load()
-  }
-
   async build() {
     return new PsyContext(this.$)
-      .set(AcmeServerManifest, await this.manifest())
       .set(PsyFetcher, this.fetcher())
-      .set(PsySsrHydrator.instance, await this.hydrator())
+      .set(PsySsrHydrator.instance, this.hydrator())
       .set(AcmeRouterLocation.instance, this.location())
       .set(PsyLog, this.logger())
   }

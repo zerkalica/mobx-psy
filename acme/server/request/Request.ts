@@ -1,9 +1,15 @@
 import { psyClient } from '@psy/psy/client/client'
 import { PsyFetcher } from '@psy/psy/fetcher/Fetcher'
 
+import { AcmeServerManifest } from '../Manifest'
+
 export type AcmeServerRequestContentType = 'text/html' | 'application/json' | 'text/plain'
 
 export class AcmeServerRequest {
+  manifest() {
+    return AcmeServerManifest
+  }
+
   contentType(): AcmeServerRequestContentType {
     return 'text/html'
   }

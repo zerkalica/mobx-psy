@@ -5,7 +5,7 @@ import { AcmeServerRequest } from '../request/Request'
 import { AcmeServerResponse, AcmeServerResponseProps } from '../response/Response'
 
 export class AcmeServerController {
-  constructor(protected $: PsyContext) {}
+  constructor(public $ = PsyContext.instance) {}
 
   req() {
     return new AcmeServerRequest()

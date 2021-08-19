@@ -1,12 +1,10 @@
-import React from 'react'
-
-import { AcmeServer } from '@acme/server/server'
+import { AcmeServerHttp } from '@acme/server/server/http'
 
 import { AcmeSearch } from '../search'
 import { AcmeSearchBootBuild } from './build'
 import { acmeSearchBootConfig } from './config'
 
-export class AcmeSearchBootServer extends AcmeServer {
+export class AcmeSearchBootServer extends AcmeServerHttp {
   fallbackConfig() {
     return acmeSearchBootConfig
   }
