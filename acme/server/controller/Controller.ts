@@ -15,8 +15,14 @@ export class AcmeServerController {
     return new AcmeServerResponse(props)
   }
 
-  async process() {
+  async chain() {
     return undefined as AcmeServerResponse | undefined | void
+  }
+
+  async next() {}
+
+  async run() {
+    return (await this.chain()) ?? (await this.next())
   }
 
   get log() {

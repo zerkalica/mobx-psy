@@ -4,7 +4,6 @@ import { PsySsrTemplate } from '@psy/psy/ssr/Template'
 import { PsyReactRenderNode } from '@psy/react/render.node'
 
 import { AcmeServerManifest } from '../Manifest'
-import { AcmeServerResponse } from '../response/Response'
 import { AcmeServerController } from './Controller'
 
 export class AcmeServerControllerFront extends AcmeServerController {
@@ -62,10 +61,6 @@ export class AcmeServerControllerFront extends AcmeServerController {
     return this.res({ code, body })
   }
 
-  async top() {
-    return undefined as undefined | AcmeServerResponse
-  }
-
   async version() {
     if (this.req().url() !== '/version') return
     const manifest = this.$.get(AcmeServerManifest)
@@ -96,20 +91,16 @@ export class AcmeServerControllerFront extends AcmeServerController {
     })
   }
 
-  async bottom() {}
-
   // prettier-ignore
-  async process() {
-    return await this.top() ??
-    await this.version() ??
+  async chain() {
+    return await this.version() ??
     await this.favIcon() ??
-    await this.render() ??
-    await this.bottom()
+    await this.render()
   }
 
   async run() {
     try {
-      const res = await this.process()
+      const res = await super.run()
       if (!res) throw new PsyErrorNotFound('Request not handlered')
 
       return res
